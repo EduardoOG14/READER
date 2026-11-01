@@ -102,9 +102,9 @@ const LibraryView: React.FC = () => {
       <main className="flex-1 w-full overflow-hidden flex flex-col">
         <PullToRefresh onRefresh={refreshLibrary} className="flex-1 w-full max-w-6xl mx-auto p-4 sm:p-6">
           {isLoading ? (
-          <div className="h-72 flex flex-col items-center justify-center text-rose-300 dark:text-emerald-700 gap-3">
-            <Loader2 className="w-9 h-9 animate-spin text-rose-500 dark:text-emerald-400" />
-            <p className="text-xs font-semibold uppercase tracking-wider text-rose-900/60 dark:text-emerald-300/70">
+          <div className="h-72 flex flex-col items-center justify-center text-rose-300 dark:text-zinc-500 gap-3">
+            <Loader2 className="w-9 h-9 animate-spin text-rose-500 dark:text-zinc-400" />
+            <p className="text-xs font-semibold uppercase tracking-wider text-rose-900/60 dark:text-zinc-300/70">
               Cargando biblioteca READER...
             </p>
           </div>
@@ -119,9 +119,9 @@ const LibraryView: React.FC = () => {
             <SpotlightHero />
 
             {/* Collection Section Header / Counter */}
-            <div className="flex items-center justify-between mb-4 pb-2 border-b border-rose-200/50 dark:border-emerald-800/40 text-xs text-[#881337]/75 dark:text-[#a7f3d0]/75">
+            <div className="flex items-center justify-between mb-4 pb-2 border-b border-rose-200/50 dark:border-zinc-800/40 text-xs text-[#881337]/75 dark:text-zinc-400/75">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-[#4c0519] dark:text-[#ecfdf5]">
+                <span className="font-bold text-[#4c0519] dark:text-[#f3f4f6]">
                   {activeCategory ? activeCategory.name : 'Todas las obras'}
                 </span>
                 <span>•</span>

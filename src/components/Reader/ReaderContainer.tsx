@@ -566,8 +566,22 @@ export const ReaderContainer: React.FC = () => {
             )}
           </>
         ) : (
-          <div className="text-center p-6 text-rose-400">
-            Error: No se pudo encontrar el archivo del libro en el almacenamiento.
+          <div className="flex flex-col items-center justify-center gap-5 p-8 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center">
+              <BookOpen className="w-8 h-8 text-rose-400" />
+            </div>
+            <div className="space-y-2">
+              <p className="text-base font-bold text-white">Archivo no encontrado</p>
+              <p className="text-sm text-slate-400 max-w-xs leading-relaxed">
+                No se pudo acceder al archivo de «{activeBook.title}». Es posible que haya sido eliminado o no se importó correctamente.
+              </p>
+            </div>
+            <button
+              onClick={handleClose}
+              className="px-6 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-sm transition-colors shadow-md"
+            >
+              Volver a la biblioteca
+            </button>
           </div>
         )}
       </div>

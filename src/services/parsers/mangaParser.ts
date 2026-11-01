@@ -38,7 +38,13 @@ export async function parseMangaArchive(buffer: ArrayBuffer): Promise<MangaArchi
       try {
         const firstImageEntry = zip.file(imageFiles[0]);
         if (firstImageEntry) {
-          const imgBlob = await firstImageEntry.async('blob');
+          const rawBlob = await firstImageEntry.async('blob');
+          // Fix MIME type for SVG files (Android WebView requires correct MIME)
+          const firstName = imageFiles[0].toLowerCase();
+          const isSvg = firstName.endsWith('.svg');
+          const imgBlob = isSvg && (!rawBlob.type || rawBlob.type === 'application/octet-stream')
+            ? new Blob([rawBlob], { type: 'image/svg+xml' })
+            : rawBlob;
           const optimized = await createOptimizedThumbnail(imgBlob, 320, 460, 0.8);
           if (optimized && optimized.length < 100000) {
             coverUrl = optimized;
@@ -67,7 +73,21 @@ export async function parseMangaArchive(buffer: ArrayBuffer): Promise<MangaArchi
 export async function getMangaPageBlob(zipInstance: JSZip, filename: string): Promise<string> {
   const file = zipInstance.file(filename);
   if (!file) throw new Error(`Page not found: ${filename}`);
-  const blob = await file.async('blob');
+  const rawBlob = await file.async('blob');
+  // Ensure correct MIME type so SVG and other formats render in Android WebView
+  const lower = filename.toLowerCase();
+  const mime = lower.endsWith('.svg')
+    ? 'image/svg+xml'
+    : lower.endsWith('.webp')
+    ? 'image/webp'
+    : lower.endsWith('.png')
+    ? 'image/png'
+    : lower.endsWith('.gif')
+    ? 'image/gif'
+    : 'image/jpeg';
+  const blob = rawBlob.type && rawBlob.type !== 'application/octet-stream'
+    ? rawBlob
+    : new Blob([rawBlob], { type: mime });
   return URL.createObjectURL(blob);
 }
 

@@ -221,7 +221,21 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
       const entry = zip.file(filename);
       if (!entry) return null;
 
-      const blob = await entry.async('blob');
+      const rawBlob = await entry.async('blob');
+      // Ensure correct MIME type for SVG files so Android WebView renders them correctly
+      const lower = filename.toLowerCase();
+      const mime = lower.endsWith('.svg')
+        ? 'image/svg+xml'
+        : lower.endsWith('.webp')
+        ? 'image/webp'
+        : lower.endsWith('.png')
+        ? 'image/png'
+        : lower.endsWith('.gif')
+        ? 'image/gif'
+        : 'image/jpeg';
+      const blob = rawBlob.type && rawBlob.type !== 'application/octet-stream'
+        ? rawBlob
+        : new Blob([rawBlob], { type: mime });
       const url = URL.createObjectURL(blob);
       urlsRef.current.set(pageIndex, url);
       setPageUrls(new Map(urlsRef.current));
