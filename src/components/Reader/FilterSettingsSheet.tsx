@@ -353,47 +353,60 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
 
           {/* 6. Manga Mode Selector */}
           {isManga && (
-            <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">
-                Modo de lectura Manga
+            <div className="pt-2 border-t border-slate-100 dark:border-zinc-800">
+              <label className="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider block mb-2">
+                Dirección de lectura de Manga & Cómic
               </label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-1.5">
                 <button
                   type="button"
                   onClick={() => updateSettings({ mangaDirection: 'webtoon' })}
-                  className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-2xl border text-xs font-semibold transition-all ${
+                  className={`flex flex-col items-center justify-center gap-1 py-2.5 px-1.5 rounded-2xl border text-[11px] font-semibold transition-all cursor-pointer ${
                     settings.mangaDirection === 'webtoon'
-                      ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
-                      : 'border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
+                      ? 'border-rose-500 bg-rose-500/10 text-rose-600 dark:border-zinc-400 dark:bg-zinc-800 dark:text-zinc-100 font-bold'
+                      : 'border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-400 hover:border-slate-300'
                   }`}
                 >
                   <AlignJustify className="w-4 h-4" />
-                  <span>Cascada Webtoon</span>
+                  <span>Webtoon</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => updateSettings({ mangaDirection: 'horizontal' })}
-                  className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-2xl border text-xs font-semibold transition-all ${
-                    settings.mangaDirection === 'horizontal'
-                      ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
-                      : 'border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
+                  onClick={() => updateSettings({ mangaDirection: 'rtl' })}
+                  className={`flex flex-col items-center justify-center gap-1 py-2.5 px-1.5 rounded-2xl border text-[11px] font-semibold transition-all cursor-pointer ${
+                    settings.mangaDirection === 'rtl' || settings.mangaDirection === 'horizontal'
+                      ? 'border-rose-500 bg-rose-500/10 text-rose-600 dark:border-zinc-400 dark:bg-zinc-800 dark:text-zinc-100 font-bold'
+                      : 'border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-400 hover:border-slate-300'
                   }`}
                 >
-                  <span>Paginado Individual</span>
+                  <span>Manga (RTL)</span>
+                  <span className="text-[9.5px] opacity-75">Japonés ➔</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updateSettings({ mangaDirection: 'ltr' })}
+                  className={`flex flex-col items-center justify-center gap-1 py-2.5 px-1.5 rounded-2xl border text-[11px] font-semibold transition-all cursor-pointer ${
+                    settings.mangaDirection === 'ltr'
+                      ? 'border-rose-500 bg-rose-500/10 text-rose-600 dark:border-zinc-400 dark:bg-zinc-800 dark:text-zinc-100 font-bold'
+                      : 'border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-400 hover:border-slate-300'
+                  }`}
+                >
+                  <span>Cómic (LTR)</span>
+                  <span className="text-[9.5px] opacity-75">Occidental ➔</span>
                 </button>
               </div>
             </div>
           )}
 
           {/* 7. Touch zones guide */}
-          <div className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
-            <span className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-              <Smartphone className="w-3.5 h-3.5 text-emerald-500" />
-              Navegación Táctil MoonReader
+          <div className="p-3 bg-slate-50 dark:bg-zinc-900/60 rounded-2xl border border-slate-100 dark:border-zinc-800 text-[11px] text-slate-500 dark:text-zinc-400 space-y-1">
+            <span className="font-bold text-slate-700 dark:text-zinc-300 flex items-center gap-1.5">
+              <Smartphone className="w-3.5 h-3.5 text-rose-500 dark:text-zinc-400" />
+              Navegación Táctil y Gestos
             </span>
-            <p>• Toque lateral izquierdo (25%): Página anterior</p>
-            <p>• Toque central (50%): Mostrar / ocultar controles</p>
-            <p>• Toque lateral derecho (25%): Página siguiente</p>
+            <p>• Pellizco con 2 dedos: Acercar / alejar zoom en cualquier momento</p>
+            <p>• Toque central (50%): Mostrar u ocultar barra de zoom y controles</p>
+            <p>• Toque en extremos (25%): Pasar de página según el sentido elegido</p>
           </div>
         </div>
 
@@ -401,7 +414,7 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
         <div className="pt-2 flex justify-end shrink-0">
           <button
             onClick={onClose}
-            className="w-full py-2.5 rounded-2xl text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm"
+            className="w-full py-2.5 rounded-2xl text-sm font-semibold bg-gradient-to-r from-rose-500 to-pink-500 dark:from-zinc-200 dark:to-zinc-300 dark:text-zinc-950 text-white transition-colors shadow-sm cursor-pointer"
           >
             Aplicar y volver a la lectura
           </button>

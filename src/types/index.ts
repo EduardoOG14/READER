@@ -49,7 +49,7 @@ export interface ReadingSettings {
   lineHeight: number; // for text
   fontFamily?: 'sans' | 'serif' | 'mono' | 'opendyslexic';
   textAlign?: 'left' | 'justify';
-  mangaDirection: 'horizontal' | 'webtoon'; // paged vs vertical scroll
+  mangaDirection: 'horizontal' | 'webtoon' | 'rtl' | 'ltr'; // paged vs vertical scroll vs Japanese RTL vs Comic LTR
   fitMode: 'width' | 'height' | 'contain';
   readingThemePreset?: ReadingThemePreset;
   showMoonStatusBar?: boolean;

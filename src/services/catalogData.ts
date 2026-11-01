@@ -5,7 +5,7 @@ export interface CatalogItem {
   id: string;
   title: string;
   author: string;
-  category: 'libros' | 'manga' | 'comics';
+  category: 'libros' | 'manga' | 'manhwa' | 'comics';
   format: BookFormat;
   genre: string;
   totalPages: number;
@@ -388,7 +388,7 @@ export const SPANISH_CATALOG: CatalogItem[] = [
     id: 'cat-solo-leveling',
     title: 'Solo Leveling: El Despertar',
     author: 'Chugong / DUBU',
-    category: 'manga',
+    category: 'manhwa',
     format: 'cbz',
     genre: 'Manhwa / Acción / Mazmorras',
     totalPages: 10,
@@ -650,6 +650,335 @@ export const SPANISH_CATALOG: CatalogItem[] = [
         { number: 1, chapter: 'Capítulo 1: Más Veloz', scene: 'Corona del Sol', panelText: 'Un cohete de investigación en llamas cae hacia el astro rey. El Hombre de Acero lo intercepta con serenidad.', dialogue: 'No teman. Todo va a estar bien. Los tengo a todos asegurados.' },
         { number: 2, chapter: 'Capítulo 1: La Fortaleza de la Soledad', scene: 'Ártico Profundo', panelText: 'Superman guía a Lois Lane a través de maravillas cósmicas recolectadas de galaxias lejanas.', dialogue: 'Lois... hay algo que debo revelarte antes de que sea demasiado tarde.' },
         { number: 3, chapter: 'Capítulo 1: La Promesa de Metrópolis', scene: 'Azotea del Daily Planet', panelText: 'Incluso sabiendo que su cuerpo se transforma en energía pura, el protector del mundo no vacila.', dialogue: 'Eres mucho más fuerte de lo que crees. Jamás dejes de creer en ti misma.' },
+      ]),
+  },
+
+  // --- MÁS NOVELAS Y CLÁSICOS EN ESPAÑOL ---
+  {
+    id: 'cat-macondo',
+    title: 'Cien Años de Soledad',
+    author: 'Gabriel García Márquez',
+    category: 'libros',
+    format: 'epub',
+    genre: 'Realismo Mágico / Premio Nobel',
+    totalPages: 180,
+    year: 1967,
+    description: 'Muchos años después, frente al pelotón de fusilamiento, el coronel Aureliano Buendía había de recordar aquella tarde remota en que su padre lo llevó a conocer el hielo.',
+    coverGradient: { from: '#b45309', to: '#78350f', accent: '#fde047' },
+    badgeText: 'NOVELA EN ESPAÑOL',
+    createFile: () =>
+      generateBookFile('Cien Años de Soledad', 'Gabriel García Márquez', [
+        {
+          title: 'Capítulo I: La Fundación de Macondo',
+          content: `Muchos años después, frente al pelotón de fusilamiento, el coronel Aureliano Buendía había de recordar aquella tarde remota en que su padre lo llevó a conocer el hielo. Macondo era entonces una aldea de veinte casas de barro y cañabrava construidas a la orilla de un río de aguas diáfanas que se precipitaban por un lecho de piedras pulidas, blancas y enormes como huevos prehistóricos.\n\nEl mundo era tan reciente, que muchas cosas carecían de nombre, y para mencionarlas había que señalarlas con el dedo. Todos los años, por el mes de marzo, una familia de gitanos desarrapados plantaba su carpa cerca de la aldea, y con un grande alboroto de pitos y timbales daban a conocer los nuevos inventos.\n\nPrimero llevaron el imán. Un gitano corpulento, de barba montaraz y manos de gorrión, que se presentó con el nombre de Melquíades, hizo una truculenta demostración pública de lo que él mismo llamaba la octava maravilla de los sabios alquimistas de Macedonia. Fue de casa en casa arrastrando dos lingotes metálicos, y todo el mundo se espantó al ver que los calderos, las pailas, las tenazas y los anafes se caían de su sitio, y las maderas crujían por la desesperación de los clavos y los tornillos tratando de desenclavarse.`,
+        },
+        {
+          title: 'Capítulo II: La Peste del Insomnio',
+          content: `Cuando José Arcadio Buendía se dio cuenta de que la peste había invadido el pueblo, reunió a los jefes de familia para explicarles lo que sabía de la enfermedad del insomnio, y se acordaron medidas para impedir que el flagelo se propagara a otras poblaciones de la ciénaga.\n\nSe concibió un sistema para que los forasteros no comieran ni bebieran nada durante su estancia, pues no cabía duda de que la peste sólo se transmitía por la boca, y todas las cosas de comer y beber estaban contaminadas de insomnio.\n\nEn aquella ocasión se colocaron campanillas en los animales y en las entradas para vigilar que nadie durmiese sin advertirlo. Lo más temible de la enfermedad del insomnio no era la imposibilidad de dormir, sino su inexorable evolución hacia una manifestación más crítica: el olvido. Empezaba por borrar los recuerdos de la infancia, luego el nombre y la noción de las cosas, y por último la identidad de las personas y aun la conciencia del propio ser.`,
+        },
+      ]),
+  },
+  {
+    id: 'cat-divina-comedia',
+    title: 'La Divina Comedia: Infierno',
+    author: 'Dante Alighieri',
+    category: 'libros',
+    format: 'epub',
+    genre: 'Épica Poética / Clásico Universal',
+    totalPages: 150,
+    year: 1320,
+    description: 'A mitad del camino de la vida, me encontré en una selva oscura por haberme apartado del recto camino. El viaje trascendental de Dante guiado por Virgilio a través de los nueve círculos del abismo infernal.',
+    coverGradient: { from: '#7f1d1d', to: '#1c1917', accent: '#f87171' },
+    badgeText: 'LIBRO COMPLETO',
+    createFile: () =>
+      generateBookFile('La Divina Comedia: Infierno', 'Dante Alighieri', [
+        {
+          title: 'Canto I: La Selva Oscura',
+          content: `A mitad del camino de la vida, me encontré en una selva oscura, por haberme apartado del camino recto. ¡Ah, cuán penoso me sería decir lo salvaje, áspera y espesa que era aquella selva, cuyo recuerdo renueva mi pavor! Tan amarga es, que la muerte apenas lo es más; pero para tratar del bien que allí encontré, diré las demás cosas que allí vi.\n\nNo sabré decir fijamente cómo entré en ella, tan soñoliento estaba cuando abandoné el verdadero camino; pero al llegar al pie de una colina, allí donde terminaba el valle que me había llenado el corazón de miedo, miré a lo alto y vi su cima dorada por los rayos del planeta que nos guía rectamente por todos los senderos.\n\nFue entonces cuando se me apareció la sombra del gran poeta Virgilio, quien me dijo: «Conviene que sigas otro camino si quieres salir de este paraje salvaje».`,
+        },
+        {
+          title: 'Canto III: La Puerta del Infierno',
+          content: `POR MÍ SE VA A LA CIUDAD DOLIENTE;\nPOR MÍ SE VA AL ETERNO DOLOR;\nPOR MÍ SE VA ENTRE LA PERDIDA GENTE.\n\nLA JUSTICIA MOVIÓ A MI ALTO CREADOR;\nHÍZOME LA DIVINA POTESTAD,\nLA SUMA SABIDURÍA Y EL PRIMER AMOR.\n\nANTES DE MÍ NO HUBO COSAS CREADAS,\nSINO ETERNAS, Y YO ETERNAMENTE DURO:\n¡OH VOSOTROS LOS QUE ENTRÁIS, ABANDONAD TODA ESPERANZA!\n\nEstas palabras de color oscuro vi escritas en lo alto de una puerta; por lo cual dije: «Maestro, el sentido de estas palabras me es duro». Y él, como hombre experimentado, me respondió: «Aquí conviene desterrar todo temor; aquí debe morir toda cobardía. Hemos llegado al lugar donde te he dicho que verías a las gentes doloridas que han perdido el bien del intelecto».`,
+        },
+      ]),
+  },
+  {
+    id: 'cat-poe',
+    title: 'El Cuervo y Cuentos Macabros',
+    author: 'Edgar Allan Poe',
+    category: 'libros',
+    format: 'epub',
+    genre: 'Terror Psicológico / Misterio',
+    totalPages: 110,
+    year: 1845,
+    description: 'Una vez, en una triste medianoche, mientras meditaba débil y fatigado sobre un curioso volumen de sabiduría olvidada... Las mejores obras maestras del padre del terror gótico moderno.',
+    coverGradient: { from: '#1e1b4b', to: '#020617', accent: '#a855f7' },
+    badgeText: 'LIBRO COMPLETO',
+    createFile: () =>
+      generateBookFile('El Cuervo y Cuentos Macabros', 'Edgar Allan Poe', [
+        {
+          title: 'El Cuervo (The Raven)',
+          content: `Una vez, en una lúgubre medianoche, mientras meditaba débil y fatigado sobre muchos y curiosos volúmenes de sabiduría olvidada, mientras cabeceaba casi dormido, de pronto se oyó un suave golpe, como de alguien que llamara suavemente a la puerta de mi alcoba.\n\n«Es algún visitante —murmuré—, llamando a la puerta de mi alcoba; solo esto y nada más».\n\n¡Ah, recuerdo claramente que era en el sombrío diciembre, y cada brasa agonizante proyectaba su fantasma sobre el suelo! Deseaba ansiosamente la mañana; en vano había procurado extraer de mis libros un respiro del dolor, el dolor por la perdida Leonor, la hermosa doncella a quien los ángeles llaman Leonor, sin nombre aquí para siempre jamás.\n\nY el crujido triste, incierto y sedoso de cada cortina de púrpura me estremecía, me llenaba de terrores fantásticos jamás sentidos; de modo que, para calmar el latido de mi corazón, permanecí repitiendo: «Es algún visitante que solicita entrada en la puerta de mi alcoba; algún visitante tardío que solicita entrada en la puerta de mi alcoba; esto es y nada más».\n\nDe pronto se abrió el postigo y, con un elegante aleteo, entró un majestuoso Cuervo de los santos días de antaño. Se posó sobre un busto de Palas Atenea justo encima de la puerta de mi alcoba; se posó, y nada más.\n\nEntonces le pregunté por su nombre en la noche plutónica, a lo que el ave respondió con voz fúnebre: «Nunca más».`,
+        },
+        {
+          title: 'El Corazón Delator',
+          content: `¡Es verdad! Nervioso, muy espantosamente nervioso he estado y estoy; pero ¿por qué dirán ustedes que estoy loco? La enfermedad había aguzado mis sentidos, no los había destruido, no los había embotado. Sobre todo era agudo mi sentido del oído. Oía todas las cosas en el cielo y en la tierra. Oía muchas cosas en el infierno.\n\n¿Cómo, pues, estoy loco? ¡Escuchen! Y observen con qué calma, con qué cordura puedo contarles toda la historia.\n\nEs imposible decir cómo la idea penetró por primera vez en mi cerebro; pero, una vez concebida, me acosaba día y noche. Motivo no había ninguno. Pasión no había ninguna. Yo amaba al anciano. Jamás me había hecho daño alguno. Jamás me había insultado. Su oro no me despertaba codicia. ¡Creo que fue su ojo! ¡Sí, fue eso! Tenía el ojo de un buitre: un ojo azul pálido, con una película sobre él. Siempre que caía sobre mí se me helaba la sangre; y así, lentamente, gradualmente, me resolví a quitarle la vida al viejo, y librarme así del ojo para siempre.`,
+        },
+      ]),
+  },
+  {
+    id: 'cat-odisea',
+    title: 'La Odisea',
+    author: 'Homero',
+    category: 'libros',
+    format: 'epub',
+    genre: 'Épica Clásica / Mitología Griega',
+    totalPages: 160,
+    year: -800,
+    description: 'Háblame, Musa, de aquel varón de multiforme ingenio que anduvo errante durante largos años tras destruir la sagrada ciudadela de Troya. La epopeya definitiva del viaje y el regreso al hogar.',
+    coverGradient: { from: '#0369a1', to: '#0f172a', accent: '#38bdf8' },
+    badgeText: 'CLÁSICO EN ESPAÑOL',
+    createFile: () =>
+      generateBookFile('La Odisea', 'Homero', [
+        {
+          title: 'Canto I: Concilio de los Dioses e Invocación a la Musa',
+          content: `Háblame, Musa, de aquel varón de multiforme ingenio que, después de destruir la sacra ciudad de Troya, anduvo peregrinando larguísimo tiempo, vio las poblaciones y conoció las costumbres de muchos hombres y padeció en su ánimo grandes penas en el ponto, pugnando por salvar su vida y la vuelta de sus compañeros a la patria.\n\nMas ni aun así pudo librarlos, no obstante sus grandes esfuerzos; pues perecieron por sus propias locuras, ¡insensatos!, que se comieron las vacas del Sol, hijo de Hiperión, y el dios les quitó el día de la llegada.\n\nDiosa, hija de Zeus, cuéntanos algo de estas aventuras a nosotros también.\n\nTodos los demás guerreros que habían escapado de la dolorosa muerte estaban ya en sus hogares, a salvo de la guerra y del mar; sólo Odiseo, que ardía en deseos de volver a su esposa y a su patria, se hallaba retenido en una cóncava gruta por la ninfa Calipso, divina entre las diosas, que anhelaba tomarlo por esposo.`,
+        },
+      ]),
+  },
+  {
+    id: 'cat-crimen-castigo',
+    title: 'Crimen y Castigo',
+    author: 'Fiódor Dostoyevski',
+    category: 'libros',
+    format: 'epub',
+    genre: 'Novela Psicológica / Clásico Ruso',
+    totalPages: 190,
+    year: 1866,
+    description: 'El dilema moral de Rodión Raskólnikov en San Petersburgo. ¿Tiene derecho un ser extraordinario a transgredir la ley moral por el bien de un propósito supremo? La redención a través del sufrimiento.',
+    coverGradient: { from: '#3f3f46', to: '#18181b', accent: '#a1a1aa' },
+    badgeText: 'LIBRO COMPLETO',
+    createFile: () =>
+      generateBookFile('Crimen y Castigo', 'Fiódor Dostoyevski', [
+        {
+          title: 'Primera Parte: La Idea Obsesiva',
+          content: `A principios de julio, en una época extraordinariamente calurosa, un joven salió al atardecer de su cuartucho, en el callejón de S., y marchó despacio, como vacilando, hacia el puente de K.\n\nHabía tenido la suerte de no encontrarse con su patrona en la escalera. Su cuartucho se hallaba situado bajo el tejado de una alta casa de cinco pisos, y parecía más bien un armario que un aposento. La patrona, que le tenía alquilado este cuartucho con pensión y servicio, vivía un piso más abajo, y cada vez que el joven salía a la calle tenía forzosamente que pasar por delante de la puerta de su cocina, casi siempre abierta de par en par que daba a la escalera.\n\nY cada vez que pasaba por allí, el joven experimentaba una sensación dolorosa y cobarde de la que se avergonzaba y que le hacía fruncir el ceño. Debía mucho dinero a la patrona y temía encontrarse con ella.\n\nNo era que fuese cobarde ni apocado, antes al contrario; pero desde hacía algún tiempo se hallaba en un estado de irritación y de tensión constante, muy parecido a la hipocondría. Se había aislado tanto de todos, que temía el encuentro, no sólo con la patrona, sino con cualquiera.`,
+        },
+      ]),
+  },
+
+  // --- MÁS MANGAS EN ESPAÑOL ---
+  {
+    id: 'cat-bleach',
+    title: 'Bleach: La Muerte y la Fresa',
+    author: 'Tite Kubo',
+    category: 'manga',
+    format: 'cbz',
+    genre: 'Shonen / Shinigamis / Sobrenatural',
+    totalPages: 10,
+    year: 2001,
+    description: 'Ichigo Kurosaki, un adolescente capaz de ver espíritus, recibe los poderes de una Shinigami llamada Rukia Kuchiki para salvar a su familia del ataque de un monstruoso Hollow.',
+    coverGradient: { from: '#0284c7', to: '#0f172a', accent: '#38bdf8' },
+    badgeText: 'MANGA EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('Bleach', 'Tite Kubo', [
+        { number: 1, chapter: 'Capítulo 1: Death and Strawberry', scene: 'Habitación de Ichigo', panelText: 'Una joven con túnica negra tradicional y una espada zanpakuto traspasa la pared sin tocarla.', dialogue: '¿Quién eres tú? ¿Y por qué entras por mi ventana vestida de samurái?' },
+        { number: 2, chapter: 'Capítulo 1: La Espada Espiritual', scene: 'El Rugido del Hollow', panelText: 'Para derrotar a la bestia devoradora de almas, Rukia debe traspasar su poder atravesando el pecho de Ichigo.', dialogue: 'Clava mi espada en el centro de tu pecho... conviértete en un Shinigami sustituto.' },
+        { number: 3, chapter: 'Capítulo 1: El Despertar de Zangetsu', scene: 'Calle de Karakura', panelText: 'Una descomunal hoja de espada nace del destello espiritual partiendo la máscara del monstruo.', dialogue: '¡No permitiré que toques a mi familia jamás!' },
+      ]),
+  },
+  {
+    id: 'cat-hunter-x-hunter',
+    title: 'Hunter x Hunter: El Examen',
+    author: 'Yoshihiro Togashi',
+    category: 'manga',
+    format: 'cbz',
+    genre: 'Shonen / Aventura / Estrategia',
+    totalPages: 10,
+    year: 1998,
+    description: 'Gon Freecss abandona Isla Ballena para presentarse al legendario y letal examen de Cazador, persiguiendo los pasos de su padre Ging y conociendo a Killua, Kurapika y Leorio.',
+    coverGradient: { from: '#15803d', to: '#14532d', accent: '#4ade80' },
+    badgeText: 'MANGA EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('Hunter x Hunter', 'Yoshihiro Togashi', [
+        { number: 1, chapter: 'Capítulo 1: Partida de Isla Ballena', scene: 'Puerto de Salida', panelText: 'Gon pesca al Señor del Lago con su caña y gana el derecho de zarpar hacia el examen.', dialogue: '¡Volveré siendo un gran Cazador! ¡Se lo prometo a todos!' },
+        { number: 2, chapter: 'Capítulo 1: El Encuentro en el Túnel', scene: 'Maratón Subterráneo', panelText: 'Entre los cientos de aspirantes despiadados, Gon conoce a un niño de pelo blanco sobre una patineta.', dialogue: 'Oye, tienes mi misma edad, ¿verdad? Me llamo Killua.' },
+        { number: 3, chapter: 'Capítulo 1: El Pantano Numelle', scene: 'La Niebla de las Ilusiones', panelText: 'Hisoka el mago despliega su temible baraja de naipes afilados probando a los novatos.', dialogue: 'El examen de cazador es maravilloso... solo los verdaderamente fuertes sobreviven.' },
+      ]),
+  },
+  {
+    id: 'cat-kimetsu',
+    title: 'Kimetsu no Yaiba: Destino de Sangre',
+    author: 'Koyoharu Gotouge',
+    category: 'manga',
+    format: 'cbz',
+    genre: 'Shonen / Espadas / Demonios',
+    totalPages: 10,
+    year: 2016,
+    description: 'Tanjiro Kamado regresa a su hogar en la montaña nevada para encontrar a su familia masacrada y a su hermana Nezuko transformada en demonio. Comienza el camino de la Respiración del Agua.',
+    coverGradient: { from: '#059669', to: '#042f2e', accent: '#34d399' },
+    badgeText: 'MANGA EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('Kimetsu no Yaiba', 'Koyoharu Gotouge', [
+        { number: 1, chapter: 'Capítulo 1: Crueldad en la Nieve', scene: 'Sendero Helado', panelText: 'Tanjiro carga a su hermana sobre la espalda mientras las lágrimas se congelan en su rostro.', dialogue: '¡No mueras, Nezuko! ¡Te juro que encontraré una cura y te devolveré a ser humana!' },
+        { number: 2, chapter: 'Capítulo 1: Giyu Tomioka', scene: 'Bosque de Bambú', panelText: 'El Pilar del Agua alza su katana para ejecutar a la criatura, pero Nezuko defiende a su hermano.', dialogue: '¡No supliques piedad! Los débiles no tienen derechos ni elecciones. ¡Empuña tu hacha y lucha!' },
+        { number: 3, chapter: 'Capítulo 1: La Respiración del Agua', scene: 'Montaña Sagiri', panelText: 'Bajo el entrenamiento de Urokodaki, Tanjiro aprende a sentir el hilo de apertura en el combate.', dialogue: 'Primera postura: ¡Tajo de la Superficie del Agua!' },
+      ]),
+  },
+  {
+    id: 'cat-jujutsu',
+    title: 'Jujutsu Kaisen: Ryomen Sukuna',
+    author: 'Gege Akutami',
+    category: 'manga',
+    format: 'cbz',
+    genre: 'Shonen / Maldiciones / Hechicería',
+    totalPages: 10,
+    year: 2018,
+    description: 'Yuji Itadori ingiere un dedo podrido perteneciente a Ryomen Sukuna, el Rey de las Maldiciones, para salvar a sus amigos de la escuela, convirtiéndose en el recipiente de una fuerza apocalíptica.',
+    coverGradient: { from: '#991b1b', to: '#3b0764', accent: '#f43f5e' },
+    badgeText: 'MANGA EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('Jujutsu Kaisen', 'Gege Akutami', [
+        { number: 1, chapter: 'Capítulo 1: El Dedo Podrido', scene: 'Azotea del Instituto', panelText: 'Rodeado por un espíritu maldito monstruoso, Yuji toma una decisión irreversible.', dialogue: '¡Si me trago esta reliquia especial... obtendré la energía maldita para salvarlos!' },
+        { number: 2, chapter: 'Capítulo 1: El Despertar del Rey', scene: 'Cielo Ensangrentado', panelText: 'Tatuajes oscuros emergen en la piel de Yuji mientras Sukuna ríe con ferocidad demoníaca.', dialogue: '¡Ah, la luz de la luna! ¡La carne fresca de las mujeres y los niños siempre es la mejor!' },
+        { number: 3, chapter: 'Capítulo 1: Satoru Gojo', scene: 'Pasillo Destruido', panelText: 'El hechicero más poderoso de la era moderna detiene el ataque de Sukuna con una sonrisa despreocupada.', dialogue: 'No te preocupes, Yuji. Después de todo... yo soy el más fuerte.' },
+      ]),
+  },
+  {
+    id: 'cat-chainsaw-man',
+    title: 'Chainsaw Man: Perro y Motosierra',
+    author: 'Tatsuki Fujimoto',
+    category: 'manga',
+    format: 'cbz',
+    genre: 'Shonen / Acción Desenfrenada / Horror',
+    totalPages: 10,
+    year: 2018,
+    description: 'Denji vive en la miseria pagando las deudas de su padre junto a Pochita, el demonio de la motosierra. Tras una traición mortal, renace como el imparable demonio motosierra.',
+    coverGradient: { from: '#ea580c', to: '#7c2d12', accent: '#f97316' },
+    badgeText: 'MANGA EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('Chainsaw Man', 'Tatsuki Fujimoto', [
+        { number: 1, chapter: 'Capítulo 1: El Pacto del Corazón', scene: 'Basurero de la Mafia', panelText: 'Al borde de la muerte, Pochita ofrece su propio corazón a Denji a cambio de una promesa.', dialogue: 'Denji... muéstrame tus sueños. Mi corazón será tu corazón.' },
+        { number: 2, chapter: 'Capítulo 1: ¡Arranca la Cuerda!', scene: 'Noche de Venganza', panelText: 'Denji jala la cuerda en su pecho y tres sierras de acero rugen brotando de su cabeza y brazos.', dialogue: '¡Todos ustedes van a pagar por lo que le hicieron a mi perrito!' },
+        { number: 3, chapter: 'Capítulo 1: El Abrazo de Makima', scene: 'Amanecer en la Fábrica', panelText: 'Una misteriosa cazadora de demonios de Seguridad Pública llega al lugar y le ofrece un hogar.', dialogue: '¿Quieres ser mi mascota? Te daré pan con mermelada todos los días.' },
+      ]),
+  },
+
+  // --- MANHWAS Y WEBTOONS EN ESPAÑOL ---
+  {
+    id: 'cat-tower-of-god',
+    title: 'Tower of God: El Piso de Pruebas',
+    author: 'SIU',
+    category: 'manhwa',
+    format: 'cbz',
+    genre: 'Manhwa / Fantasía Épica / Misterio',
+    totalPages: 10,
+    year: 2010,
+    description: '¿Qué es lo que deseas? ¿Dinero? ¿Gloria? ¿Poder? ¿Venganza? O algo que supere todo eso. Lo que sea que desees, está aquí arriba en la cima de la Torre.',
+    coverGradient: { from: '#0284c7', to: '#1e3a8a', accent: '#60a5fa' },
+    badgeText: 'MANHWA EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('Tower of God', 'SIU', [
+        { number: 1, chapter: 'Capítulo 1: El Niño de la Cueva', scene: 'Puertas de la Torre', panelText: 'Bam persigue a Rachel cuando las puertas colosales de la Torre se abren solo para él.', dialogue: '¡Rachel! Si tú subes la Torre... ¡yo te seguiré sin importar qué tan alto sea!' },
+        { number: 2, chapter: 'Capítulo 1: Headon el Guardián', scene: 'Piso Cero', panelText: 'El enigmático guardián con báculo ofrece la prueba de la Anguila de Acero al muchacho.', dialogue: 'Bienvenido a la Torre, irregular. ¿Tienes el valor de desafiar la jaula de la bestia?' },
+        { number: 3, chapter: 'Capítulo 1: Marzo Negro', scene: 'La Espada de Yuri Zahard', panelText: 'La princesa de la Torre queda fascinada por la mirada pura de Bam y le entrega un arma imperial.', dialogue: 'Toma esta aguja prestada, chico. ¡Demuéstrame de qué estás hecho!' },
+      ]),
+  },
+  {
+    id: 'cat-beginning-after-end',
+    title: 'The Beginning After The End: El Renacer',
+    author: 'TurtleMe / Fuyuki23',
+    category: 'manhwa',
+    format: 'cbz',
+    genre: 'Manhwa / Isekai / Magia y Espada',
+    totalPages: 10,
+    year: 2018,
+    description: 'El Rey Grey poseía fuerza, riqueza y prestigio sin rival en un mundo gobernado por la habilidad marcial. Sin embargo, la soledad era su única compañera. Renacido en el continente mágico de Dicathen como Arthur Leywin.',
+    coverGradient: { from: '#4338ca', to: '#1e1b4b', accent: '#818cf8' },
+    badgeText: 'MANHWA EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('The Beginning After The End', 'TurtleMe', [
+        { number: 1, chapter: 'Capítulo 1: El Bebé Prodigio', scene: 'Cabaña de la Familia Leywin', panelText: 'Con recuerdos intactos de su vida pasada como monarca, Arthur comienza a meditar su núcleo de maná a los tres años.', dialogue: 'En este nuevo mundo el maná es real. Si purifico mi núcleo ahora... superaré todo límite humano.' },
+        { number: 2, chapter: 'Capítulo 1: El Despertar del Núcleo', scene: 'Sala de Estar', panelText: 'Una explosión de energía cristalina destroza la casa cuando su núcleo de maná pasa a color negro.', dialogue: '¡Rey Reynolds, mira a nuestro hijo! ¡Ha despertado su maná antes de aprender a correr!' },
+        { number: 3, chapter: 'Capítulo 1: El Dragón Sylvia', scene: 'Caverna del Abismo', panelText: 'Tras caer por un barranco, un colosal dragón de escamas doradas salva la vida del joven Arthur.', dialogue: 'Pequeño humano... te encomiendo el futuro de este continente y mi propio huevo.' },
+      ]),
+  },
+  {
+    id: 'cat-omniscient-reader',
+    title: 'Lector Omnisciente: El Fin del Mundo',
+    author: 'Sing Shong / Sleepy-C',
+    category: 'manhwa',
+    format: 'cbz',
+    genre: 'Manhwa / Apocalipsis / Sistema',
+    totalPages: 10,
+    year: 2020,
+    description: 'Kim Dokja era un oficinista común cuyo único pasatiempo era leer una novela web de 3149 capítulos llamada "Tres Formas de Sobrevivir en un Mundo Destruido". El día en que finaliza la lectura, el mundo real se transforma en los escenarios sangrientos de la novela.',
+    coverGradient: { from: '#0f172a', to: '#020617', accent: '#38bdf8' },
+    badgeText: 'MANHWA EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('Omniscient Reader', 'Sing Shong', [
+        { number: 1, chapter: 'Capítulo 1: El Prólogo del Apocalipsis', scene: 'Vagón del Tren Subterráneo', panelText: 'El tren se detiene de golpe en la oscuridad. Una criatura con cuernos de duende aparece flotando en el pasillo.', dialogue: '[Canal del Sistema activado: ¡El escenario principal número 1 ha comenzado! Maten a un ser vivo en 30 minutos.]' },
+        { number: 2, chapter: 'Capítulo 1: Solo Yo Conozco el Final', scene: 'Caos en el Vagón', panelText: 'Dokja se da cuenta de que cada detalle a su alrededor coincide con la novela que acaba de terminar.', dialogue: 'Sé exactamente lo que sucederá... porque soy el único lector que leyó esta historia hasta el final.' },
+        { number: 3, chapter: 'Capítulo 1: Los Saltamontes', scene: 'Solución Ingeniosa', panelText: 'Dokja rompe la caja de insectos de un niño y aplasta un saltamontes, cumpliendo la regla sin derramar sangre humana.', dialogue: 'El escenario decía "un ser vivo", no especificó que tuviera que ser una persona.' },
+      ]),
+  },
+
+  // --- MÁS CÓMICOS EN ESPAÑOL ---
+  {
+    id: 'cat-dark-knight',
+    title: 'Batman: El Regreso del Caballero Oscuro',
+    author: 'Frank Miller',
+    category: 'comics',
+    format: 'cbz',
+    genre: 'Cómic / DC / Obra Maestra Noir',
+    totalPages: 10,
+    year: 1986,
+    description: 'Diez años después del retiro de los superhéroes, una Gotham City decadente cae en manos de la brutal banda de los Mutantes. Bruce Wayne, a sus 55 años, se enfunda el manto del murciélago por última vez.',
+    coverGradient: { from: '#18181b', to: '#09090b', accent: '#38bdf8' },
+    badgeText: 'CÓMIC EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('The Dark Knight Returns', 'Frank Miller', [
+        { number: 1, chapter: 'Capítulo 1: La Noche del Murciélago', scene: 'Calles de Gotham', panelText: 'El trueno ilumina la silueta más temida de la historia sobre las gárgolas de la ciudad.', dialogue: 'La lluvia en mi pecho es como un viejo amigo. Esta es mi noche... y este es mi castigo.' },
+        { number: 2, chapter: 'Capítulo 1: El Líder Mutante', scene: 'El Foso de Barro', panelText: 'Un coloso de músculos afilados desafía a Batman en un duelo cuerpo a cuerpo.', dialogue: 'No lo entiendes, muchacho... Esta no es una fosa de lodo. Es una mesa de operaciones, y yo soy el cirujano.' },
+        { number: 3, chapter: 'Capítulo 1: El Duelo contra el Sol', scene: 'Callejón del Crimen', panelText: 'Con una armadura de combate pesada, Bruce enfrenta a Superman bajo el cielo tormentoso.', dialogue: 'Quiero que recuerdes, Clark... en todos los años por venir... que fui el único hombre que te derrotó.' },
+      ]),
+  },
+  {
+    id: 'cat-sandman',
+    title: 'The Sandman: Preludios y Nocturnos',
+    author: 'Neil Gaiman',
+    category: 'comics',
+    format: 'cbz',
+    genre: 'Cómic / Fantasía Oscura / Vertigo',
+    totalPages: 10,
+    year: 1989,
+    description: 'Sueño de los Eternos es capturado por un ritual ocultista y encerrado durante siete décadas. Tras liberarse, debe recuperar sus tres símbolos de poder: el rubí, el yelmo y la bolsa de arena de los sueños.',
+    coverGradient: { from: '#312e81', to: '#0f172a', accent: '#c084fc' },
+    badgeText: 'CÓMIC EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('The Sandman', 'Neil Gaiman', [
+        { number: 1, chapter: 'Capítulo 1: El Sueño de los Justos', scene: 'Sótano de la Mansión Burgess', panelText: 'Un círculo mágico con runas de sangre retiene al Señor del Reino de los Sueños en una esfera de cristal.', dialogue: 'Pueden encerrar mi carne durante cien años... pero los sueños de los hombres jamás morirán.' },
+        { number: 2, chapter: 'Capítulo 1: La Fuga de Morfeo', scene: 'La Guardia Dormida', panelText: 'El cristal se resquebraja cuando el guardia parpadea y cae dormido. La venganza de Sueño despierta.', dialogue: 'Te condeno a una eternidad de pesadillas vivientes de las que jamás podrás despertar.' },
+        { number: 3, chapter: 'Capítulo 1: Hacia el Infierno', scene: 'Las Puertas de Lucifer', panelText: 'Para recuperar su yelmo de poder, Morfeo desciende al palacio de Lucifer Estrella de la Mañana.', dialogue: 'Juguemos el juego más antiguo... Yo soy un cometa veloz. ¿Qué eres tú?' },
+      ]),
+  },
+  {
+    id: 'cat-xmen-days',
+    title: 'X-Men: Días del Futuro Pasado',
+    author: 'Chris Claremont & John Byrne',
+    category: 'comics',
+    format: 'cbz',
+    genre: 'Cómic / Marvel / Distopía Mutante',
+    totalPages: 10,
+    year: 1981,
+    description: 'En un futuro distópico dominado por los Centinelas mecánicos donde los mutantes son recluidos en campos de concentración, Kitty Pryde proyecta su mente al pasado para evitar el magnicidio que desató la catástrofe.',
+    coverGradient: { from: '#991b1b', to: '#1e3a8a', accent: '#f59e0b' },
+    badgeText: 'CÓMIC EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('X-Men: Días del Futuro Pasado', 'Chris Claremont', [
+        { number: 1, chapter: 'Capítulo 1: Este Futuro Debe Morir', scene: 'Ruinas de Nueva York', panelText: 'Un cartel con los rostros de los X-Men caídos: Magneto, Cíclope, Tormenta... casi todos muertos.', dialogue: 'Los Centinelas no se detuvieron con los mutantes. Gobernaron a toda la humanidad con mano de hierro.' },
+        { number: 2, chapter: 'Capítulo 1: La Última Resistencia de Logan', scene: 'Puertas del Campamento', panelText: 'Wolverine, con el cabello encanecido, salta con sus garras de adamantium contra los gigantes de metal.', dialogue: '¡Por última vez, latas parlantes! ¡Sintamos el filo de mis garras!' },
+        { number: 3, chapter: 'Capítulo 1: El Salto Temporal', scene: 'Laboratorio de la Mansión X', panelText: 'La mente adulta de Kitty Pryde despierta en su cuerpo adolescente en la época dorada de los X-Men.', dialogue: '¡Profesor Xavier! ¡Deben escucharme! ¡El senador Kelly va a ser asesinado esta misma tarde!' },
       ]),
   },
 ];

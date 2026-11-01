@@ -20,7 +20,7 @@ interface ExploreModalProps {
   onClose: () => void;
 }
 
-type CategoryFilter = 'todos' | 'libros' | 'manga' | 'comics';
+type CategoryFilter = 'todos' | 'libros' | 'manga' | 'manhwa' | 'comics';
 
 export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) => {
   const { books, openReader, refreshLibrary } = useApp();
@@ -80,7 +80,7 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
 
       // 2. Import into user's personal library (IndexedDB + Android storage)
       await importBookFile(file, [
-        item.category === 'manga' ? 'cat-manga' : 'cat-books',
+        item.category !== 'libros' ? 'cat-manga' : 'cat-books',
       ]);
 
       // 3. Refresh user's library context
@@ -205,6 +205,16 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
               }`}
             >
               Mangas
+            </button>
+            <button
+              onClick={() => setActiveCategory('manhwa')}
+              className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
+                activeCategory === 'manhwa'
+                  ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
+                  : 'bg-rose-50 dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 hover:bg-rose-100 dark:hover:bg-zinc-700'
+              }`}
+            >
+              Manhwas y Webtoons
             </button>
             <button
               onClick={() => setActiveCategory('comics')}
