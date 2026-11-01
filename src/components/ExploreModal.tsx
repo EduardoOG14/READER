@@ -25,8 +25,10 @@ type CategoryFilter = 'todos' | 'libros' | 'manga' | 'manhwa' | 'comics';
 export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) => {
   const { books, openReader, refreshLibrary } = useApp();
 
+  const PAGE_SIZE = 36;
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('todos');
   const [filterQuery, setFilterQuery] = useState('');
+  const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -45,14 +47,33 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
     setTimeout(() => setToastMessage(null), 3000);
   };
 
+  // Pre-normalize owned books for O(1)/O(N) high performance lookup
+  const cleanOwnedBooks = useMemo(() => {
+    return books.map(b => ({
+      book: b,
+      cleanTitle: b.title.toLowerCase().replace(/[^a-z0-9]/g, ''),
+    }));
+  }, [books]);
+
   // Check if a catalog item is already saved in the user's personal library
   const getOwnedBook = (item: CatalogItem): Book | undefined => {
     const cleanCatalogTitle = item.title.toLowerCase().replace(/[^a-z0-9]/g, '');
-    return books.find(b => {
-      const cleanBookTitle = b.title.toLowerCase().replace(/[^a-z0-9]/g, '');
-      return cleanBookTitle.includes(cleanCatalogTitle) || cleanCatalogTitle.includes(cleanBookTitle);
-    });
+    const found = cleanOwnedBooks.find(
+      cb => cb.cleanTitle.includes(cleanCatalogTitle) || cleanCatalogTitle.includes(cb.cleanTitle)
+    );
+    return found?.book;
   };
+
+  // Category counts
+  const categoryCounts = useMemo(() => {
+    return {
+      todos: SPANISH_CATALOG.length,
+      libros: SPANISH_CATALOG.filter(i => i.category === 'libros').length,
+      manga: SPANISH_CATALOG.filter(i => i.category === 'manga').length,
+      manhwa: SPANISH_CATALOG.filter(i => i.category === 'manhwa').length,
+      comics: SPANISH_CATALOG.filter(i => i.category === 'comics').length,
+    };
+  }, []);
 
   // Filter catalog items by category and local search query
   const filteredCatalog = useMemo(() => {
@@ -70,6 +91,21 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
       );
     });
   }, [activeCategory, filterQuery]);
+
+  // Sliced items for progressive 60fps rendering
+  const visibleItems = useMemo(() => {
+    return filteredCatalog.slice(0, displayLimit);
+  }, [filteredCatalog, displayLimit]);
+
+  const handleCategoryChange = (category: CategoryFilter) => {
+    setActiveCategory(category);
+    setDisplayLimit(PAGE_SIZE);
+  };
+
+  const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilterQuery(e.target.value);
+    setDisplayLimit(PAGE_SIZE);
+  };
 
   // Handle "Marcar cómo propio" action
   const handleMarkAsOwned = async (item: CatalogItem) => {
@@ -160,13 +196,16 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
             <input
               type="text"
               value={filterQuery}
-              onChange={e => setFilterQuery(e.target.value)}
+              onChange={handleQueryChange}
               placeholder="Filtrar por título, autor o género..."
               className="w-full pl-10 pr-4 py-2 text-xs bg-rose-50/50 dark:bg-zinc-900/80 border border-rose-200/80 dark:border-zinc-700 rounded-2xl outline-none text-[#4c0519] dark:text-[#f3f4f6] placeholder-rose-400/60 dark:placeholder-zinc-500 focus:ring-2 focus:ring-rose-400/30 dark:focus:ring-zinc-600 transition-all"
             />
             {filterQuery && (
               <button
-                onClick={() => setFilterQuery('')}
+                onClick={() => {
+                  setFilterQuery('');
+                  setDisplayLimit(PAGE_SIZE);
+                }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-rose-400 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-zinc-200"
               >
                 <X className="w-3.5 h-3.5" />
@@ -177,54 +216,54 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
           {/* Category Tabs */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
             <button
-              onClick={() => setActiveCategory('todos')}
+              onClick={() => handleCategoryChange('todos')}
               className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
                 activeCategory === 'todos'
                   ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
                   : 'bg-rose-50 dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 hover:bg-rose-100 dark:hover:bg-zinc-700'
               }`}
             >
-              Todos ({SPANISH_CATALOG.length})
+              Todos ({categoryCounts.todos})
             </button>
             <button
-              onClick={() => setActiveCategory('libros')}
+              onClick={() => handleCategoryChange('libros')}
               className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
                 activeCategory === 'libros'
                   ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
                   : 'bg-rose-50 dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 hover:bg-rose-100 dark:hover:bg-zinc-700'
               }`}
             >
-              Libros y Novelas
+              Libros y Novelas ({categoryCounts.libros})
             </button>
             <button
-              onClick={() => setActiveCategory('manga')}
+              onClick={() => handleCategoryChange('manga')}
               className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
                 activeCategory === 'manga'
                   ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
                   : 'bg-rose-50 dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 hover:bg-rose-100 dark:hover:bg-zinc-700'
               }`}
             >
-              Mangas
+              Mangas ({categoryCounts.manga})
             </button>
             <button
-              onClick={() => setActiveCategory('manhwa')}
+              onClick={() => handleCategoryChange('manhwa')}
               className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
                 activeCategory === 'manhwa'
                   ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
                   : 'bg-rose-50 dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 hover:bg-rose-100 dark:hover:bg-zinc-700'
               }`}
             >
-              Manhwas y Webtoons
+              Manhwas y Webtoons ({categoryCounts.manhwa})
             </button>
             <button
-              onClick={() => setActiveCategory('comics')}
+              onClick={() => handleCategoryChange('comics')}
               className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
                 activeCategory === 'comics'
                   ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
                   : 'bg-rose-50 dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 hover:bg-rose-100 dark:hover:bg-zinc-700'
               }`}
             >
-              Cómics
+              Cómics ({categoryCounts.comics})
             </button>
           </div>
         </div>
@@ -239,116 +278,136 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
-              {filteredCatalog.map(item => {
-                const ownedBook = getOwnedBook(item);
-                const isDownloading = downloadingId === item.id;
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
+                {visibleItems.map(item => {
+                  const ownedBook = getOwnedBook(item);
+                  const isDownloading = downloadingId === item.id;
 
-                return (
-                  <div
-                    key={item.id}
-                    className="p-3 sm:p-3.5 rounded-2xl bg-rose-50/40 dark:bg-zinc-900/60 border border-rose-200/70 dark:border-zinc-800 hover:border-rose-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between gap-3 shadow-xs"
-                  >
-                    {/* Header info */}
-                    <div className="space-y-2">
-                      {/* Gradient preview badge */}
-                      <div
-                        className="h-24 sm:h-28 rounded-xl p-3 flex flex-col justify-between text-white shadow-xs relative overflow-hidden"
-                        style={{
-                          background: `linear-gradient(135deg, ${item.coverGradient.from}, ${item.coverGradient.to})`,
-                        }}
-                      >
-                        <div className="flex items-center justify-between text-[10px] font-bold tracking-wider uppercase">
-                          <span className="px-2 py-0.5 rounded-full bg-black/35 backdrop-blur-xs">
-                            {item.format.toUpperCase()}
-                          </span>
-                          <span
-                            className="px-2 py-0.5 rounded-full"
-                            style={{ backgroundColor: `${item.coverGradient.accent}40` }}
-                          >
-                            {item.badgeText}
-                          </span>
-                        </div>
-
-                        <div className="z-10">
-                          <h4 className="font-extrabold text-sm sm:text-base leading-tight drop-shadow-sm line-clamp-2">
-                            {item.title}
-                          </h4>
-                          <p className="text-[11px] opacity-90 truncate drop-shadow-xs">
-                            {item.author} {item.year ? `(${item.year})` : ''}
-                          </p>
-                        </div>
-
-                        {/* Subtle decorative circle */}
+                  return (
+                    <div
+                      key={item.id}
+                      className="p-3 sm:p-3.5 rounded-2xl bg-rose-50/40 dark:bg-zinc-900/60 border border-rose-200/70 dark:border-zinc-800 hover:border-rose-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between gap-3 shadow-xs"
+                    >
+                      {/* Header info */}
+                      <div className="space-y-2">
+                        {/* Gradient preview badge */}
                         <div
-                          className="absolute -right-4 -bottom-4 w-20 h-20 rounded-full opacity-20 pointer-events-none"
-                          style={{ backgroundColor: item.coverGradient.accent }}
-                        />
-                      </div>
-
-                      {/* Genre & Meta */}
-                      <div className="flex items-center justify-between text-[11px] text-[#881337]/75 dark:text-zinc-400 font-mono">
-                        <span className="font-sans font-semibold text-rose-700 dark:text-zinc-300 truncate max-w-[160px]">
-                          {item.genre}
-                        </span>
-                        <span>{item.totalPages} págs. aprox</span>
-                      </div>
-
-                      {/* Synopsis */}
-                      <p className="text-xs text-[#4c0519]/80 dark:text-zinc-300 line-clamp-3 leading-relaxed">
-                        {item.description}
-                      </p>
-                    </div>
-
-                    {/* Action buttons */}
-                    <div className="pt-2 border-t border-rose-100 dark:border-zinc-800">
-                      {ownedBook ? (
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] border border-emerald-500/30">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                            <span>En tu biblioteca</span>
+                          className="h-24 sm:h-28 rounded-xl p-3 flex flex-col justify-between text-white shadow-xs relative overflow-hidden"
+                          style={{
+                            background: `linear-gradient(135deg, ${item.coverGradient.from}, ${item.coverGradient.to})`,
+                          }}
+                        >
+                          <div className="flex items-center justify-between text-[10px] font-bold tracking-wider uppercase">
+                            <span className="px-2 py-0.5 rounded-full bg-black/35 backdrop-blur-xs">
+                              {item.format.toUpperCase()}
+                            </span>
+                            <span
+                              className="px-2 py-0.5 rounded-full"
+                              style={{ backgroundColor: `${item.coverGradient.accent}40` }}
+                            >
+                              {item.badgeText}
+                            </span>
                           </div>
 
-                          <button
-                            onClick={() => handleReadOwnedBook(ownedBook)}
-                            className="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer shrink-0"
-                            title="Abrir y leer ahora"
-                          >
-                            <Play className="w-3.5 h-3.5 fill-white" />
-                            <span>Leer</span>
-                          </button>
+                          <div className="z-10">
+                            <h4 className="font-extrabold text-sm sm:text-base leading-tight drop-shadow-sm line-clamp-2">
+                              {item.title}
+                            </h4>
+                            <p className="text-[11px] opacity-90 truncate drop-shadow-xs">
+                              {item.author} {item.year ? `(${item.year})` : ''}
+                            </p>
+                          </div>
+
+                          {/* Subtle decorative circle */}
+                          <div
+                            className="absolute -right-4 -bottom-4 w-20 h-20 rounded-full opacity-20 pointer-events-none"
+                            style={{ backgroundColor: item.coverGradient.accent }}
+                          />
                         </div>
-                      ) : (
-                        <button
-                          onClick={() => handleMarkAsOwned(item)}
-                          disabled={isDownloading}
-                          className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 dark:from-zinc-200 dark:to-zinc-300 dark:hover:from-white dark:hover:to-zinc-200 text-white dark:text-zinc-950 font-bold text-xs shadow-xs active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                        >
-                          {isDownloading ? (
-                            <>
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                              <span>Guardando copia local...</span>
-                            </>
-                          ) : (
-                            <>
-                              <BookmarkCheck className="w-4 h-4 stroke-[2.2]" />
-                              <span>Marca cómo propio</span>
-                            </>
-                          )}
-                        </button>
-                      )}
+
+                        {/* Genre & Meta */}
+                        <div className="flex items-center justify-between text-[11px] text-[#881337]/75 dark:text-zinc-400 font-mono">
+                          <span className="font-sans font-semibold text-rose-700 dark:text-zinc-300 truncate max-w-[160px]">
+                            {item.genre}
+                          </span>
+                          <span>{item.totalPages} págs. aprox</span>
+                        </div>
+
+                        {/* Synopsis */}
+                        <p className="text-xs text-[#4c0519]/80 dark:text-zinc-300 line-clamp-3 leading-relaxed">
+                          {item.description}
+                        </p>
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="pt-2 border-t border-rose-100 dark:border-zinc-800">
+                        {ownedBook ? (
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] border border-emerald-500/30">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                              <span>En tu biblioteca</span>
+                            </div>
+
+                            <button
+                              onClick={() => handleReadOwnedBook(ownedBook)}
+                              className="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer shrink-0"
+                              title="Abrir y leer ahora"
+                            >
+                              <Play className="w-3.5 h-3.5 fill-white" />
+                              <span>Leer</span>
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => handleMarkAsOwned(item)}
+                            disabled={isDownloading}
+                            className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 dark:from-zinc-200 dark:to-zinc-300 dark:hover:from-white dark:hover:to-zinc-200 text-white dark:text-zinc-950 font-bold text-xs shadow-xs active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                          >
+                            {isDownloading ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <span>Guardando copia local...</span>
+                              </>
+                            ) : (
+                              <>
+                                <BookmarkCheck className="w-4 h-4 stroke-[2.2]" />
+                                <span>Marca cómo propio</span>
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+
+              {/* Progressive loading controls */}
+              {visibleItems.length < filteredCatalog.length && (
+                <div className="pt-4 pb-2 flex flex-col sm:flex-row items-center justify-center gap-2.5">
+                  <button
+                    onClick={() => setDisplayLimit(prev => Math.min(prev + PAGE_SIZE, filteredCatalog.length))}
+                    className="w-full sm:w-auto px-6 py-2.5 rounded-2xl bg-rose-500 hover:bg-rose-600 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                  >
+                    <span>Cargar más obras (+{Math.min(PAGE_SIZE, filteredCatalog.length - visibleItems.length)})</span>
+                  </button>
+                  <button
+                    onClick={() => setDisplayLimit(filteredCatalog.length)}
+                    className="text-xs font-semibold text-rose-600 dark:text-zinc-400 hover:underline px-3 py-1.5 cursor-pointer"
+                  >
+                    Mostrar todas ({filteredCatalog.length})
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
 
         {/* Footer */}
         <div className="pt-3 border-t border-rose-100 dark:border-zinc-800 flex items-center justify-between text-xs text-[#881337]/70 dark:text-zinc-500 shrink-0">
           <span>
-            {filteredCatalog.length} {filteredCatalog.length === 1 ? 'obra disponible' : 'obras disponibles'} en español
+            Mostrando {Math.min(visibleItems.length, filteredCatalog.length)} de {filteredCatalog.length} {filteredCatalog.length === 1 ? 'obra' : 'obras'} en español
           </span>
           <button
             onClick={onClose}

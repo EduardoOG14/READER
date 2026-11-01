@@ -1,0 +1,911 @@
+[
+  {
+    "id": "cat-quijote",
+    "title": "Don Quijote de la Mancha",
+    "author": "Miguel de Cervantes",
+    "year": 1605,
+    "pages": 863,
+    "genre": "Novela / Clásico Universal / Sátira",
+    "desc": "En un lugar de la Mancha, de cuyo nombre no quiero acordarme, un hidalgo enloquecido por los libros de caballerías sale en busca de aventuras junto a su fiel escudero Sancho Panza."
+  },
+  {
+    "id": "cat-soledad",
+    "title": "Cien Años de Soledad",
+    "author": "Gabriel García Márquez",
+    "year": 1967,
+    "pages": 471,
+    "genre": "Novela / Realismo Mágico / Obra Cumbre",
+    "desc": "Muchos años después, frente al pelotón de fusilamiento, el coronel Aureliano Buendía había de recordar aquella tarde remota en que su padre lo llevó a conocer el hielo en el mítico pueblo de Macondo."
+  },
+  {
+    "id": "cat-metamorfosis",
+    "title": "La Metamorfosis",
+    "author": "Franz Kafka",
+    "year": 1915,
+    "pages": 128,
+    "genre": "Novela / Ficción Existencialista",
+    "desc": "Al despertar Gregorio Samsa una mañana, tras un sueño intranquilo, se encontró sobre su cama convertido en un monstruoso insecto."
+  },
+  {
+    "id": "cat-principito",
+    "title": "El Principito",
+    "author": "Antoine de Saint-Exupéry",
+    "year": 1943,
+    "pages": 96,
+    "genre": "Fábula Filosófica / Clásico Universal",
+    "desc": "Pido perdón a los niños por haber dedicado este libro a una persona grande. Solo con el corazón se puede ver bien; lo esencial es invisible para los ojos."
+  },
+  {
+    "id": "cat-arte-guerra",
+    "title": "El Arte de la Guerra",
+    "author": "Sun Tzu",
+    "year": -500,
+    "pages": 112,
+    "genre": "Tratado Militar / Filosofía Clásica",
+    "desc": "El arte supremo de la guerra es someter al enemigo sin luchar. Conoce a tu enemigo y conócete a ti mismo y saldrás victorioso en mil batallas."
+  },
+  {
+    "id": "cat-frankenstein",
+    "title": "Frankenstein o el Moderno Prometeo",
+    "author": "Mary Shelley",
+    "year": 1818,
+    "pages": 280,
+    "genre": "Novela Gótica / Ciencia Ficción",
+    "desc": "El doctor Víctor Frankenstein desafía las leyes naturales creando una criatura viva a partir de restos humanos, desatando una tragedia de rechazo y venganza."
+  },
+  {
+    "id": "cat-dorian-gray",
+    "title": "El Retrato de Dorian Gray",
+    "author": "Oscar Wilde",
+    "year": 1890,
+    "pages": 254,
+    "genre": "Novela Filosófica / Decadentismo",
+    "desc": "Un joven de extraordinaria belleza desea que su retrato pinte el envejecimiento y la corrupción de su alma mientras él conserva la eterna juventud."
+  },
+  {
+    "id": "cat-dracula",
+    "title": "Drácula",
+    "author": "Bram Stoker",
+    "year": 1897,
+    "pages": 418,
+    "genre": "Novela Gótica / Terror Clásico",
+    "desc": "El abogado Jonathan Harker viaja a los Cárpatos para asesorar al conde Drácula, descubriendo un terror milenario que se dispone a invadir las calles de Londres."
+  },
+  {
+    "id": "cat-holmes-escarlata",
+    "title": "Estudio en Escarlata",
+    "author": "Arthur Conan Doyle",
+    "year": 1887,
+    "pages": 188,
+    "genre": "Novela Policíaca / Detectives",
+    "desc": "El doctor John H. Watson conoce al excéntrico consultor Sherlock Holmes en el 221B de Baker Street, resolviendo su primer crimen con la ciencia de la deducción."
+  },
+  {
+    "id": "cat-divina-comedia",
+    "title": "La Divina Comedia",
+    "author": "Dante Alighieri",
+    "year": 1320,
+    "pages": 580,
+    "genre": "Poema Épico / Clásico Medieval",
+    "desc": "En medio del camino de nuestra vida, me encontré en una selva oscura. Guiado por Virgilio y Beatriz, Dante recorre el Infierno, el Purgatorio y el Paraíso."
+  },
+  {
+    "id": "cat-cuentos-poe",
+    "title": "El Cuervo y Cuentos Macabros",
+    "author": "Edgar Allan Poe",
+    "year": 1845,
+    "pages": 220,
+    "genre": "Relatos de Terror / Suspenso Gótico",
+    "desc": "Colección de obras maestras del misterio: El corazón delator, El gato negro, La caída de la casa Usher y el legendario poema El Cuervo."
+  },
+  {
+    "id": "cat-odisea",
+    "title": "La Odisea",
+    "author": "Homero",
+    "year": -800,
+    "pages": 448,
+    "genre": "Epopeya Griega / Clásico Mitológico",
+    "desc": "El regreso de Odiseo a Ítaca tras la Guerra de Troya, sorteando la cólera de Poseidón, cíclopes, sirenas y hechiceras para reencontrarse con Penélope."
+  },
+  {
+    "id": "cat-crimen-castigo",
+    "title": "Crimen y Castigo",
+    "author": "Fiódor Dostoyevski",
+    "year": 1866,
+    "pages": 671,
+    "genre": "Novela Psicológica / Realismo Ruso",
+    "desc": "El estudiante Raskólnikov asesina a una vieja usurera creyéndose superior a la moral ordinaria, pero la culpa y el remordimiento devoran su mente en San Petersburgo."
+  },
+  {
+    "id": "cat-1984",
+    "title": "1984",
+    "author": "George Orwell",
+    "year": 1949,
+    "pages": 326,
+    "genre": "Novela / Distopía / Obra Clásica Universal",
+    "desc": "En Oceanía, el Partido y el Gran Hermano controlan cada pensamiento a través de la telepantalla. Winston Smith comete el peor crimen: pensar por sí mismo y amar."
+  },
+  {
+    "id": "cat-un-mundo-feliz",
+    "title": "Un Mundo Feliz",
+    "author": "Aldous Huxley",
+    "year": 1932,
+    "pages": 280,
+    "genre": "Novela / Ciencia Ficción / Distopía Filosófica",
+    "desc": "En un mundo donde el dolor ha sido erradicado mediante acondicionamiento genético y soma, la estabilidad social reina a costa del arte y los sentimientos humanos."
+  },
+  {
+    "id": "cat-gran-gatsby",
+    "title": "El Gran Gatsby",
+    "author": "F. Scott Fitzgerald",
+    "year": 1925,
+    "pages": 210,
+    "genre": "Novela / Clásico Americano / Romance & Drama",
+    "desc": "En los dorados años veinte en Long Island, el millonario Jay Gatsby organiza fiestas fastuosas con la única esperanza de reconquistar a su amor de juventud."
+  },
+  {
+    "id": "cat-pedro-paramo",
+    "title": "Pedro Páramo",
+    "author": "Juan Rulfo",
+    "year": 1955,
+    "pages": 132,
+    "genre": "Novela / Realismo Mágico / Clásico Mexicano",
+    "desc": "Vine a Comala porque me dijeron que acá vivía mi padre, un tal Pedro Páramo. Un viaje espectral a un pueblo donde murmuran las ánimas de los difuntos."
+  },
+  {
+    "id": "cat-rayuela",
+    "title": "Rayuela",
+    "author": "Julio Cortázar",
+    "year": 1963,
+    "pages": 640,
+    "genre": "Novela / Boom Latinoamericano / Contranovela",
+    "desc": "¿Encontraría a la Maga? Las andanzas bohemias de Horacio Oliveira entre París y Buenos Aires en una novela que puede leerse de múltiples formas."
+  },
+  {
+    "id": "cat-miserables",
+    "title": "Los Miserables",
+    "author": "Víctor Hugo",
+    "year": 1862,
+    "pages": 1200,
+    "genre": "Novela Histórica / Romanticismo Francés",
+    "desc": "La redención del exconvicto Jean Valjean en la Francia convulsa del siglo XIX, perseguido implacablemente por el inflexible inspector Javert."
+  },
+  {
+    "id": "cat-montecristo",
+    "title": "El Conde de Montecristo",
+    "author": "Alejandro Dumas",
+    "year": 1844,
+    "pages": 1100,
+    "genre": "Novela de Aventuras / Venganza y Justicia",
+    "desc": "Traicionado y encarcelado injustamente en el Castillo de If, Edmond Dantès escapa para reclamar un tesoro legendario y ejecutar una fría y calculada venganza."
+  },
+  {
+    "id": "cat-orgullo-prejuicio",
+    "title": "Orgullo y Prejuicio",
+    "author": "Jane Austen",
+    "year": 1813,
+    "pages": 416,
+    "genre": "Novela Romántica / Costumbrismo",
+    "desc": "Elizabeth Bennet y el altivo señor Darcy deben superar sus prejuicios de clase y su propio orgullo para admitir el profundo amor que los une."
+  },
+  {
+    "id": "cat-ficciones",
+    "title": "Ficciones",
+    "author": "Jorge Luis Borges",
+    "year": 1944,
+    "pages": 214,
+    "genre": "Cuentos / Laberintos / Metaficción",
+    "desc": "La biblioteca de Babel, El jardín de senderos que se bifurcan, Tlön, Uqbar, Orbis Tertius y las creaciones filosóficas más asombrosas de la literatura en español."
+  },
+  {
+    "id": "cat-aleph",
+    "title": "El Aleph",
+    "author": "Jorge Luis Borges",
+    "year": 1949,
+    "pages": 208,
+    "genre": "Cuentos Filosóficos / Literatura Fantástica",
+    "desc": "En el sótano de una vieja casa en la calle Garay se encuentra el Aleph: el punto que contiene todos los puntos del universo vistos simultáneamente."
+  },
+  {
+    "id": "cat-tunel",
+    "title": "El Túnel",
+    "author": "Ernesto Sabato",
+    "year": 1948,
+    "pages": 158,
+    "genre": "Novela Psicológica / Existencialismo",
+    "desc": "El pintor Juan Pablo Castel confiesa desde prisión el asesinato de María Iribarne, la única persona que pareció comprender el oscuro túnel de su soledad."
+  },
+  {
+    "id": "cat-ceguera",
+    "title": "Ensayo sobre la Ceguera",
+    "author": "José Saramago",
+    "year": 1995,
+    "pages": 384,
+    "genre": "Novela / Distopía / Alegoría Humana",
+    "desc": "Una misteriosa epidemia de ceguera blanca azota a la sociedad, desnudando los instintos más ruines y la compasión más pura de la naturaleza humana."
+  },
+  {
+    "id": "cat-cronica-muerte",
+    "title": "Crónica de una Muerte Anunciada",
+    "author": "Gabriel García Márquez",
+    "year": 1981,
+    "pages": 156,
+    "genre": "Novela / Periodismo Mágico",
+    "desc": "El día en que lo iban a matar, Santiago Nasar se levantó a las 5:30 de la mañana. Todo el pueblo sabía del crimen de honor, pero nadie lo impidió."
+  },
+  {
+    "id": "cat-amor-colera",
+    "title": "El Amor en los Tiempos del Cólera",
+    "author": "Gabriel García Márquez",
+    "year": 1985,
+    "pages": 490,
+    "genre": "Novela / Romance Épico",
+    "desc": "Florentino Ariza espera más de cincuenta años y nueve meses por Fermina Daza, demostrando que el amor es tan invencible como una peste."
+  },
+  {
+    "id": "cat-iliada",
+    "title": "La Ilíada",
+    "author": "Homero",
+    "year": -800,
+    "pages": 512,
+    "genre": "Epopeya Griega / Clásico Bélico",
+    "desc": "Canta, oh diosa, la cólera del pélida Aquiles: la batalla entre griegos y troyanos ante las murallas de Ilión con la intervención de los dioses del Olimpo."
+  },
+  {
+    "id": "cat-rebelion-granja",
+    "title": "La Rebelión en la Granja",
+    "author": "George Orwell",
+    "year": 1945,
+    "pages": 144,
+    "genre": "Fábula Política / Sátira Totalitaria",
+    "desc": "Los animales de la Granja Solar se rebelan contra la tiranía humana, pero pronto los cerdos imponen su propia dictadura: todos los animales son iguales, pero algunos más que otros."
+  },
+  {
+    "id": "cat-fahrenheit-451",
+    "title": "Fahrenheit 451",
+    "author": "Ray Bradbury",
+    "year": 1953,
+    "pages": 224,
+    "genre": "Ciencia Ficción / Distopía Literaria",
+    "desc": "Guy Montag es un bombero cuya misión no es apagar fuegos, sino quemar libros prohibidos, hasta que una joven despierta en él la llama de la curiosidad."
+  },
+  {
+    "id": "cat-flores-mal",
+    "title": "Las Flores del Mal",
+    "author": "Charles Baudelaire",
+    "year": 1857,
+    "pages": 240,
+    "genre": "Poesía / Simbolismo Francés",
+    "desc": "La obra maestra poética que desentrañó el spleen y el ideal de la vida moderna en el París bohemio del siglo XIX."
+  },
+  {
+    "id": "cat-madame-bovary",
+    "title": "Madame Bovary",
+    "author": "Gustave Flaubert",
+    "year": 1856,
+    "pages": 440,
+    "genre": "Realismo Francés / Tragedia Social",
+    "desc": "Emma Bovary, consumida por el tedio conyugal y sus lecturas románticas, busca desesperadamente la pasión a través de amantes e ilusiones de lujo."
+  },
+  {
+    "id": "cat-la-peste",
+    "title": "La Peste",
+    "author": "Albert Camus",
+    "year": 1947,
+    "pages": 308,
+    "genre": "Novela Filosófica / Existencialismo",
+    "desc": "En la ciudad argelina de Orán estalla un brote letal de peste bubónica. El doctor Rieux y un puñado de hombres deciden luchar contra el absurdo de la muerte."
+  },
+  {
+    "id": "cat-el-extranjero",
+    "title": "El Extranjero",
+    "author": "Albert Camus",
+    "year": 1942,
+    "pages": 160,
+    "genre": "Novela Filosófica / Absurdismo",
+    "desc": "Hoy mamá ha muerto. O tal vez ayer, no sé. Meursault asiste impertérrito a los eventos que lo llevarán ante la justicia bajo el sol abrasador de Argel."
+  },
+  {
+    "id": "cat-guerra-paz",
+    "title": "Guerra y Paz",
+    "author": "León Tolstói",
+    "year": 1869,
+    "pages": 1300,
+    "genre": "Novela Histórica / Realismo Ruso",
+    "desc": "El colosal retrato de la sociedad aristocrática rusa entrelazado con las sangrientas guerras napoleónicas y la invasión de 1812."
+  },
+  {
+    "id": "cat-anna-karenina",
+    "title": "Anna Karénina",
+    "author": "León Tolstói",
+    "year": 1877,
+    "pages": 864,
+    "genre": "Realismo Ruso / Tragedia Conyugal",
+    "desc": "Todas las familias felices se parecen entre sí; cada familia desdichada lo es a su manera. La apasionada y trágica historia de amor entre Anna y Vronsky."
+  },
+  {
+    "id": "cat-guardian-centeno",
+    "title": "El Guardián entre el Centeno",
+    "author": "J.D. Salinger",
+    "year": 1951,
+    "pages": 240,
+    "genre": "Novela / Juventud y Desencanto",
+    "desc": "Expulsado de su colegio, el adolescente Holden Caulfield deambula durante dos días por Nueva York enfrentando la falsedad del mundo adulto."
+  },
+  {
+    "id": "cat-grandes-esperanzas",
+    "title": "Grandes Esperanzas",
+    "author": "Charles Dickens",
+    "year": 1861,
+    "pages": 540,
+    "genre": "Novela de Aprendizaje / Clásico Victoriano",
+    "desc": "El huérfano Pip recibe una misteriosa fortuna que transforma su vida, cruzando su destino con la amargada señorita Havisham y la fría Estella."
+  },
+  {
+    "id": "cat-cancion-navidad",
+    "title": "Canción de Navidad",
+    "author": "Charles Dickens",
+    "year": 1843,
+    "pages": 128,
+    "genre": "Cuento Moral / Fantasía Navideña",
+    "desc": "El avaro Ebenezer Scrooge es visitado por los tres espíritus de la Navidad para mostrarle el pasado, el presente y el desolador futuro de su egoísmo."
+  },
+  {
+    "id": "cat-jane-eyre",
+    "title": "Jane Eyre",
+    "author": "Charlotte Brontë",
+    "year": 1847,
+    "pages": 560,
+    "genre": "Novela Gótica / Romance Victoriano",
+    "desc": "Una institutriz huérfana y de espíritu inquebrantable se enamora del enigmático señor Rochester en Thornfield Hall, donde un secreto acecha en el ático."
+  },
+  {
+    "id": "cat-cumbres-borrascosas",
+    "title": "Cumbres Borrascosas",
+    "author": "Emily Brontë",
+    "year": 1847,
+    "pages": 410,
+    "genre": "Gótico / Pasión y Venganza",
+    "desc": "En los páramos desolados de Yorkshire, el amor obsesivo y salvaje entre Heathcliff y Catherine Earnshaw desata una tormenta de odios y rencores generacionales."
+  },
+  {
+    "id": "cat-isla-tesoro",
+    "title": "La Isla del Tesoro",
+    "author": "Robert Louis Stevenson",
+    "year": 1883,
+    "pages": 280,
+    "genre": "Novela de Piratas / Aventura Clásica",
+    "desc": "El joven Jim Hawkins encuentra el mapa del tesoro del capitán Flint y zarpa en la Hispaniola junto al carismático pirata Long John Silver."
+  },
+  {
+    "id": "cat-jekyll-hyde",
+    "title": "El Extraño Caso del Dr. Jekyll y Mr. Hyde",
+    "author": "Robert Louis Stevenson",
+    "year": 1886,
+    "pages": 140,
+    "genre": "Terror Psicológico / Doble Personalidad",
+    "desc": "A través de un brebaje químico, un respetable médico londinense libera la encarnación pura de sus impulsos más malvados y violentos."
+  },
+  {
+    "id": "cat-hermanos-karamazov",
+    "title": "Los Hermanos Karamázov",
+    "author": "Fiódor Dostoyevski",
+    "year": 1880,
+    "pages": 980,
+    "genre": "Novela Filosófica / Parricidio y Fe",
+    "desc": "La tormentosa relación entre el libertino Fiódor Pávlovich y sus cuatro hijos, donde se debaten la existencia de Dios, el libre albedrío y la culpa."
+  },
+  {
+    "id": "cat-noches-blancas",
+    "title": "Noches Blancas",
+    "author": "Fiódor Dostoyevski",
+    "year": 1848,
+    "pages": 110,
+    "genre": "Novela Romántica Sentimental",
+    "desc": "Durante cuatro mágicas noches luminosas en San Petersburgo, un joven soñador y solitario traba amistad y se enamora de Nástenka en un puente del canal."
+  },
+  {
+    "id": "cat-moby-dick",
+    "title": "Moby Dick",
+    "author": "Herman Melville",
+    "year": 1851,
+    "pages": 720,
+    "genre": "Aventura Épica / Monomanía y Naturaleza",
+    "desc": "Llamadme Ismael. La trágica expedición del ballenero Pequod comandado por el capitán Ahab en su obsesiva cacería del gigantesco cachalote blanco."
+  },
+  {
+    "id": "cat-robinson-crusoe",
+    "title": "Robinson Crusoe",
+    "author": "Daniel Defoe",
+    "year": 1719,
+    "pages": 340,
+    "genre": "Novela de Supervivencia / Náufrago",
+    "desc": "Tras naufragar en una isla desierta en el Caribe, un marinero inglés sobrevive durante veintiocho años con su ingenio y la ayuda de Viernes."
+  },
+  {
+    "id": "cat-viajes-gulliver",
+    "title": "Los Viajes de Gulliver",
+    "author": "Jonathan Swift",
+    "year": 1726,
+    "pages": 360,
+    "genre": "Sátira Política / Aventuras Fantásticas",
+    "desc": "Las extraordinarias travesías de Lemuel Gulliver a las tierras de Liliput, Brobdingnag, Laputa y el país de los virtuosos caballos Houyhnhnms."
+  },
+  {
+    "id": "cat-tom-sawyer",
+    "title": "Las Aventuras de Tom Sawyer",
+    "author": "Mark Twain",
+    "year": 1876,
+    "pages": 290,
+    "genre": "Aventuras / Clásico Juvenil Americano",
+    "desc": "Las divertidas peripecias de Tom Sawyer y su amigo Huckleberry Finn a orillas del río Mississippi en un pintoresco pueblo de Misuri."
+  },
+  {
+    "id": "cat-huck-finn",
+    "title": "Las Aventuras de Huckleberry Finn",
+    "author": "Mark Twain",
+    "year": 1884,
+    "pages": 366,
+    "genre": "Aventuras / Libertad y Sociedad",
+    "desc": "Huck escapa de su padre y desciende por el río Mississippi en una balsa junto al esclavo prófugo Jim, en un viaje fundamental sobre la libertad humana."
+  },
+  {
+    "id": "cat-el-alquimista",
+    "title": "El Alquimista",
+    "author": "Paulo Coelho",
+    "year": 1988,
+    "pages": 192,
+    "genre": "Fábula Espiritual / Crecimiento Personal",
+    "desc": "Santiago, un joven pastor andaluz, emprende un viaje hacia las pirámides de Egipto en busca de un tesoro y de su propia Leyenda Personal."
+  },
+  {
+    "id": "cat-veinte-mil-leguas",
+    "title": "Veinte Mil Leguas de Viaje Submarino",
+    "author": "Julio Verne",
+    "year": 1870,
+    "pages": 480,
+    "genre": "Ciencia Ficción / Aventuras Marinas",
+    "desc": "El profesor Aronnax explora los fondos oceánicos a bordo del asombroso submarino Nautilus, capitaneado por el misterioso y rebelde Capitán Nemo."
+  },
+  {
+    "id": "cat-viaje-centro-tierra",
+    "title": "Viaje al Centro de la Tierra",
+    "author": "Julio Verne",
+    "year": 1864,
+    "pages": 310,
+    "genre": "Ciencia Ficción / Exploración Fantástica",
+    "desc": "El profesor Lidenbrock, su sobrino Axel y el guía Hans descienden por el cráter de un volcán en Islandia para descubrir un mundo prehistórico subterráneo."
+  },
+  {
+    "id": "cat-vuelta-mundo-80-dias",
+    "title": "La Vuelta al Mundo en Ochenta Días",
+    "author": "Julio Verne",
+    "year": 1872,
+    "pages": 270,
+    "genre": "Aventuras / Precisión y Geografía",
+    "desc": "El metódico caballero inglés Phileas Fogg y su leal criado Picaporte aceptan una osada apuesta del Reform Club para circunnavegar el globo terrestre."
+  },
+  {
+    "id": "cat-siddhartha",
+    "title": "Siddhartha",
+    "author": "Hermann Hesse",
+    "year": 1922,
+    "pages": 180,
+    "genre": "Novela Filosófica / Espiritualidad Oriental",
+    "desc": "Un joven indio de casta noble abandona comodidades familiares para emprender la senda ascética de la iluminación, la verdad y la paz interior."
+  },
+  {
+    "id": "cat-lobo-estepario",
+    "title": "El Lobo Estepario",
+    "author": "Hermann Hesse",
+    "year": 1927,
+    "pages": 270,
+    "genre": "Novela Psicológica / Crisis Existencial",
+    "desc": "Harry Haller siente en su pecho el desgarro de dos naturalezas en pugna: el hombre civilizado y el lobo salvaje y huraño de la estepa."
+  },
+  {
+    "id": "cat-demian",
+    "title": "Demian",
+    "author": "Hermann Hesse",
+    "year": 1919,
+    "pages": 190,
+    "genre": "Novela de Iniciación / Iluminación y Sombra",
+    "desc": "La historia de la juventud de Emil Sinclair y su amistad con Max Demian, un compañero que le enseña a romper el cascarón de las apariencias."
+  },
+  {
+    "id": "cat-nombre-rosa",
+    "title": "El Nombre de la Rosa",
+    "author": "Umberto Eco",
+    "year": 1980,
+    "pages": 620,
+    "genre": "Misterio Histórico / Teología & Semiótica",
+    "desc": "En una abadía benedictina del norte de Italia en 1327, fray Guillermo de Baskerville investiga una serie de misteriosos asesinatos en torno a la biblioteca secreta."
+  },
+  {
+    "id": "cat-casa-espiritus",
+    "title": "La Casa de los Espíritus",
+    "author": "Isabel Allende",
+    "year": 1982,
+    "pages": 490,
+    "genre": "Saga Familiar / Realismo Mágico Chileno",
+    "desc": "La crónica de cuatro generaciones de la familia Trueba a través de las transformaciones políticas, las pasiones y los dones clarividentes de Clara del Valle."
+  },
+  {
+    "id": "cat-dona-barbara",
+    "title": "Doña Bárbara",
+    "author": "Rómulo Gallegos",
+    "year": 1929,
+    "pages": 360,
+    "genre": "Novela Criollista / Civilización y Barbarie",
+    "desc": "En los llanos venezolanos, Santos Luzardo se enfrenta a la temible cacica doña Bárbara en una encarnizada lucha por la ley y la justicia."
+  },
+  {
+    "id": "cat-voragine",
+    "title": "La Vorágine",
+    "author": "José Eustasio Rivera",
+    "year": 1924,
+    "pages": 320,
+    "genre": "Novela Selvática / Caucho y Aventura",
+    "desc": "Jugué mi corazón al azar y me lo ganó la violencia. Arturo Cova se interna en los infiernos verdes de las selvas del Amazonas colombiano."
+  },
+  {
+    "id": "cat-fiesta-chivo",
+    "title": "La Fiesta del Chivo",
+    "author": "Mario Vargas Llosa",
+    "year": 2000,
+    "pages": 520,
+    "genre": "Novela Histórica / Dictadura y Poder",
+    "desc": "Los últimos días del dictador dominicano Rafael Leónidas Trujillo y la conspiración heroica de los conjurados para ajustar cuentas con el tirano."
+  },
+  {
+    "id": "cat-ciudad-perros",
+    "title": "La Ciudad y los Perros",
+    "author": "Mario Vargas Llosa",
+    "year": 1963,
+    "pages": 440,
+    "genre": "Novela de Aprendizaje / Realismo Urbano",
+    "desc": "La disciplina brutal y los códigos de supervivencia entre los cadetes del Colegio Militar Leoncio Prado de Lima en una de las obras cumbre del boom."
+  },
+  {
+    "id": "cat-niebla",
+    "title": "Niebla",
+    "author": "Miguel de Unamuno",
+    "year": 1914,
+    "pages": 240,
+    "genre": "Nivola / Metaficción & Filosofía Existencial",
+    "desc": "Augusto Pérez se rebela contra su propio creador, Miguel de Unamuno, desafiando a su autor al proclamar que los personajes literarios son más inmortales que los hombres."
+  },
+  {
+    "id": "cat-platero-yo",
+    "title": "Platero y Yo",
+    "author": "Juan Ramón Jiménez",
+    "year": 1914,
+    "pages": 160,
+    "genre": "Prosa Poética / Clásico Español",
+    "desc": "Platero es pequeño, peludo, suave; tan blando por fuera, que se diría todo de algodón. Recuerdos tiernos y luminosos del pueblo andaluz de Moguer."
+  },
+  {
+    "id": "cat-romancero-gitano",
+    "title": "Romancero Gitano",
+    "author": "Federico García Lorca",
+    "year": 1928,
+    "pages": 120,
+    "genre": "Poesía Lírica / Simbolismo Andaluz",
+    "desc": "Verde que te quiero verde. Las pasiones, la tragedia, la luna y la Guardia Civil en los versos más memorables de la Generación del 27."
+  },
+  {
+    "id": "cat-bodas-sangre",
+    "title": "Bodas de Sangre",
+    "author": "Federico García Lorca",
+    "year": 1933,
+    "pages": 110,
+    "genre": "Tragedia Teatral / Pasión y Destino",
+    "desc": "En el día de su boda, una novia huye a caballo con su antiguo amante Leonardo, desatando la venganza de sangre entre dos familias campesinas."
+  },
+  {
+    "id": "cat-casa-bernarda-alba",
+    "title": "La Casa de Bernarda Alba",
+    "author": "Federico García Lorca",
+    "year": 1936,
+    "pages": 120,
+    "genre": "Drama Teatral / Luto y Represión",
+    "desc": "Tras enviudar, Bernarda Alba impone un luto asfixiante de ocho años a sus cinco hijas, encerradas entre muros blancos donde hierve el deseo insatisfecho."
+  },
+  {
+    "id": "cat-fantasma-opera",
+    "title": "El Fantasma de la Ópera",
+    "author": "Gastón Leroux",
+    "year": 1910,
+    "pages": 310,
+    "genre": "Misterio Gótico / Romance Trágico",
+    "desc": "En los subterráneos del majestuoso teatro de la Ópera de París se oculta Erik, un genio deforme y atormentado que instruye y ama a la joven soprano Christine Daaé."
+  },
+  {
+    "id": "cat-mil-y-una-noches",
+    "title": "Las Mil y Una Noches",
+    "author": "Anónimo",
+    "year": 850,
+    "pages": 800,
+    "genre": "Cuentos Orientales / Tradición Popular",
+    "desc": "Para salvar su vida, la astuta Sherezade cautiva cada noche al sultán Shahriar con relatos mágicos de alfombras voladoras, genios y tesoros ocultos."
+  },
+  {
+    "id": "cat-lazarillo",
+    "title": "La Vida de Lazarillo de Tormes",
+    "author": "Anónimo",
+    "year": 1554,
+    "pages": 120,
+    "genre": "Novela Picaresca / Sátira Social",
+    "desc": "El ingenioso Lázaro relata su dura infancia sirviendo a un ciego avaro, a un clérigo mezquino y a un escudero pobre en la España renacentista."
+  },
+  {
+    "id": "cat-mio-cid",
+    "title": "El Cantar de Mio Cid",
+    "author": "Anónimo",
+    "year": 1200,
+    "pages": 160,
+    "genre": "Cantar de Gesta / Poema Épico Castellano",
+    "desc": "Rodrigo Díaz de Vivar, desterrado por el rey Alfonso VI, conquista Valencia y recupera el honor de sus hijas en las cortes de Toledo."
+  },
+  {
+    "id": "cat-regenta",
+    "title": "La Regenta",
+    "author": "Leopoldo Alas Clarín",
+    "year": 1884,
+    "pages": 920,
+    "genre": "Realismo Español / Hipocresía Social",
+    "desc": "En la opresiva y provinciana ciudad de Vetusta, Ana Ozores se debate entre el matrimonio con un hombre mayor, la devoción religiosa y la seducción mundana."
+  },
+  {
+    "id": "cat-rimas-leyendas",
+    "title": "Rimas y Leyendas",
+    "author": "Gustavo Adolfo Bécquer",
+    "year": 1871,
+    "pages": 240,
+    "genre": "Romanticismo Español / Poesía y Misterio",
+    "desc": "¿Qué es poesía? Dices mientras clavas en mi pupila tu pupila azul. Versos inmortales y leyendas fantásticas del monte de las ánimas y el rayo de luna."
+  },
+  {
+    "id": "cat-sabueso-baskerville",
+    "title": "El Sabueso de los Baskerville",
+    "author": "Arthur Conan Doyle",
+    "year": 1902,
+    "pages": 250,
+    "genre": "Novela de Detectives / Misterio en los Páramos",
+    "desc": "Una maldición ancestral acecha a los herederos de Baskerville Hall en los pantanos de Dartmoor en forma de una gigantesca bestia infernal."
+  },
+  {
+    "id": "cat-maquina-tiempo",
+    "title": "La Máquina del Tiempo",
+    "author": "H.G. Wells",
+    "year": 1895,
+    "pages": 140,
+    "genre": "Ciencia Ficción / Viajes Temporales",
+    "desc": "Un inventor victoriano construye un artefacto para viajar al año 802.701, descubriendo la división de la humanidad en los pacíficos Eloi y los siniestros Morlocks."
+  },
+  {
+    "id": "cat-guerra-mundos",
+    "title": "La Guerra de los Mundos",
+    "author": "H.G. Wells",
+    "year": 1898,
+    "pages": 230,
+    "genre": "Ciencia Ficción / Invasión Extraterrestre",
+    "desc": "Cilindros metálicos caen sobre Inglaterra: los marcianos con sus colosales trípodes y rayos calóricos inician la despiadada conquista de la Tierra."
+  },
+  {
+    "id": "cat-hombre-invisible",
+    "title": "El Hombre Invisible",
+    "author": "H.G. Wells",
+    "year": 1897,
+    "pages": 190,
+    "genre": "Ciencia Ficción / Ética y Poder",
+    "desc": "Griffin, un brillante científico que logra volver transparente su cuerpo, cae presa de la locura y el delirio de dominio absoluto en un tranquilo pueblo inglés."
+  },
+  {
+    "id": "cat-isla-moreau",
+    "title": "La Isla del Dr. Moreau",
+    "author": "H.G. Wells",
+    "year": 1896,
+    "pages": 200,
+    "genre": "Ciencia Ficción / Terror Biológico",
+    "desc": "Un náufrago arriba a una remota isla tropical donde un cirujano proscrito transforma animales en humanos mediante dolorosas cirugías."
+  },
+  {
+    "id": "cat-cronicas-marcianas",
+    "title": "Crónicas Marcianas",
+    "author": "Ray Bradbury",
+    "year": 1950,
+    "pages": 280,
+    "genre": "Ciencia Ficción Poética / Colonización Espacial",
+    "desc": "La llegada de expediciones humanas a Marte y el melancólico ocaso de la civilización marciana frente a las ambiciones y nostalgias terrestres."
+  },
+  {
+    "id": "cat-alicia-maravillas",
+    "title": "Alicia en el País de las Maravillas",
+    "author": "Lewis Carroll",
+    "year": 1865,
+    "pages": 180,
+    "genre": "Literatura Infantil / Lógica del Absurdo",
+    "desc": "Alicia cae por la madriguera del Conejo Blanco entrando a un mundo de orugas fumadoras, sombrereros locos, gatos risueños y reinas de corazones."
+  },
+  {
+    "id": "cat-traves-espejo",
+    "title": "A Través del Espejo y lo que Alicia Encontró Allí",
+    "author": "Lewis Carroll",
+    "year": 1871,
+    "pages": 190,
+    "genre": "Fantasía / Ajedrez y Lógica",
+    "desc": "Alicia cruza el cristal del salón para participar como peón en una descomunal partida de ajedrez viviente junto a Tweedledum, Tweedledee y Humpty Dumpty."
+  },
+  {
+    "id": "cat-decameron",
+    "title": "El Decamerón",
+    "author": "Giovanni Boccaccio",
+    "year": 1353,
+    "pages": 640,
+    "genre": "Cuentos Renacentistas / Amor e Ingenio",
+    "desc": "Diez jóvenes refugiados en una villa toscana para huir de la peste negra se turnan para narrar cien cuentos picantes, alegres y cargados de ingenio."
+  },
+  {
+    "id": "cat-aura",
+    "title": "Aura",
+    "author": "Carlos Fuentes",
+    "year": 1962,
+    "pages": 90,
+    "genre": "Novela Gótica Mexicana / Fantasía Oscura",
+    "desc": "Felipe Montero acude a una vieja casona en la calle Donceles para ordenar las memorias de un general difunto, quedando hechizado por la misteriosa Aura."
+  },
+  {
+    "id": "cat-muerte-artemio-cruz",
+    "title": "La Muerte de Artemio Cruz",
+    "author": "Carlos Fuentes",
+    "year": 1962,
+    "pages": 320,
+    "genre": "Boom Latinoamericano / Memoria y Poder",
+    "desc": "En su lecho de muerte, un poderoso magnate y antiguo revolucionario mexicano rememora los instantes decisivos donde sacrificó sus ideales por el poder."
+  },
+  {
+    "id": "cat-sobre-heroes-tumbas",
+    "title": "Sobre Héroes y Tumbas",
+    "author": "Ernesto Sabato",
+    "year": 1961,
+    "pages": 490,
+    "genre": "Novela Psicológica / Buenos Aires Oscuro",
+    "desc": "La tormentosa relación entre Martín y la enigmática Alejandra Vidal Olmos, que incluye el célebre y perturbador Informe sobre Ciegos."
+  },
+  {
+    "id": "cat-reino-este-mundo",
+    "title": "El Reino de Este Mundo",
+    "author": "Alejo Carpentier",
+    "year": 1949,
+    "pages": 150,
+    "genre": "Real Maravilloso / Revolución Haitiana",
+    "desc": "La sublevación de esclavos en el Haití colonial y el surgimiento del tiránico rey Henri Christophe bajo la mirada del esclavo Ti Noel."
+  },
+  {
+    "id": "cat-pasos-perdidos",
+    "title": "Los Pasos Perdidos",
+    "author": "Alejo Carpentier",
+    "year": 1953,
+    "pages": 290,
+    "genre": "Novela / Tiempo y Selva Americana",
+    "desc": "Un musicólogo aburrido de la vida moderna remonta las aguas de un río amazónico en busca de instrumentos indígenas antiguos, retrocediendo en el tiempo."
+  },
+  {
+    "id": "cat-huasipungo",
+    "title": "Huasipungo",
+    "author": "Jorge Icaza",
+    "year": 1934,
+    "pages": 210,
+    "genre": "Novela Indigenista / Lucha y Denuncia Social",
+    "desc": "El drama de los indígenas ecuatorianos despojados de sus huasipungos por los terratenientes y las compañías petroleras extranjeras."
+  },
+  {
+    "id": "cat-marianela",
+    "title": "Marianela",
+    "author": "Benito Pérez Galdós",
+    "year": 1878,
+    "pages": 230,
+    "genre": "Novela Romántica / Belleza y Realismo",
+    "desc": "Nela, una muchacha pobre y de aspecto frágil, sirve de lazarillo al joven ciego Pablo, quien idealiza su bondad interior hasta que recupera la vista."
+  },
+  {
+    "id": "cat-fortunata-jacinta",
+    "title": "Fortunata y Jacinta",
+    "author": "Benito Pérez Galdós",
+    "year": 1887,
+    "pages": 850,
+    "genre": "Realismo Español / Retrato de Madrid",
+    "desc": "La historia de dos mujeres casadas y su relación con el frívolo Juanito Santa Cruz en el rico y vibrante Madrid decimonónico."
+  },
+  {
+    "id": "cat-san-manuel-bueno",
+    "title": "San Manuel Bueno, Mártir",
+    "author": "Miguel de Unamuno",
+    "year": 1931,
+    "pages": 100,
+    "genre": "Novela Filosófica / Fe y Duda",
+    "desc": "Don Manuel, el querido párroco de Valverde de Lucerna, realiza milagros y consuela a sus feligreses mientras guarda en secreto su trágica falta de fe."
+  },
+  {
+    "id": "cat-minas-rey-salomon",
+    "title": "Las Minas del Rey Salomón",
+    "author": "H. Rider Haggard",
+    "year": 1885,
+    "pages": 300,
+    "genre": "Aventuras Coloniales / Exploración Africana",
+    "desc": "Allan Quatermain lidera una expedición al corazón inexplorado de África en busca de un caballero perdido y de las legendarias minas de diamantes bíblicas."
+  },
+  {
+    "id": "cat-dona-perfecta",
+    "title": "Doña Perfecta",
+    "author": "Benito Pérez Galdós",
+    "year": 1876,
+    "pages": 260,
+    "genre": "Novela de Tesis / Intolerancia Religiosa",
+    "desc": "El ingeniero liberal Pepe Rey viaja a la ciudad provinciana de Orbajosa para casarse con su prima Rosario, chocando con el fanatismo de su tía Doña Perfecta."
+  },
+  {
+    "id": "cat-astillero",
+    "title": "El Astillero",
+    "author": "Juan Carlos Onetti",
+    "year": 1961,
+    "pages": 220,
+    "genre": "Novela Existencial / La Ilusión y la Ruina",
+    "desc": "Larsen regresa a la decadente Santa María para dirigir un astillero herrumbroso que ya no construye barcos, aferrándose a una farsa heroica."
+  },
+  {
+    "id": "cat-casa-fieras",
+    "title": "La Colmena",
+    "author": "Camilo José Cela",
+    "year": 1951,
+    "pages": 340,
+    "genre": "Realismo Social / Madrid de Posguerra",
+    "desc": "Un enjambre de personajes entrelazan sus vidas precarias en el Madrid gris de 1943, reflejando el hambre, el miedo y la lucha cotidiana."
+  },
+  {
+    "id": "cat-familia-pascual-duarte",
+    "title": "La Familia de Pascual Duarte",
+    "author": "Camilo José Cela",
+    "year": 1942,
+    "pages": 180,
+    "genre": "Tremendismo / Crónica Negra Rural",
+    "desc": "Pascual Duarte, campesino extremeño condenado a muerte, relata desde su celda la espiral de fatalidad y violencia que marcó su existencia."
+  },
+  {
+    "id": "cat-corazon-tinieblas",
+    "title": "El Corazón de las Tinieblas",
+    "author": "Joseph Conrad",
+    "year": 1899,
+    "pages": 150,
+    "genre": "Aventura Psicológica / Colonialismo y Locura",
+    "desc": "El marinero Marlow remonta las turbias aguas del río Congo en busca del enigmático señor Kurtz, sumergiéndose en el abismo moral del alma humana."
+  },
+  {
+    "id": "cat-retrato-artista",
+    "title": "Retrato del Artista Adolescente",
+    "author": "James Joyce",
+    "year": 1916,
+    "pages": 280,
+    "genre": "Modernismo / Conciencia y Religión",
+    "desc": "La evolución intelectual y espiritual del joven Stephen Dedalus en Dublín, decidiendo romper con la iglesia y la patria para abrazar el arte."
+  },
+  {
+    "id": "cat-senor-presidente",
+    "title": "El Señor Presidente",
+    "author": "Miguel Ángel Asturias",
+    "year": 1946,
+    "pages": 320,
+    "genre": "Realismo Mágico / Dictadura y Terror",
+    "desc": "La asfixiante atmósfera de terror y delación bajo la mirada de un dictador sin nombre en un país latinoamericano devastado por la tiranía."
+  },
+  {
+    "id": "cat-pantaleon-visitadoras",
+    "title": "Pantaleón y las Visitadoras",
+    "author": "Mario Vargas Llosa",
+    "year": 1973,
+    "pages": 310,
+    "genre": "Sátira Militar / Humor y Burocracia",
+    "desc": "El capitán Pantaleón Pantoja recibe la secreta misión de organizar un servicio de visitadoras para atender las necesidades del ejército en la selva."
+  }
+]

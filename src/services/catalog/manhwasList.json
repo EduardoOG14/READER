@@ -1,0 +1,911 @@
+[
+  {
+    "id": "cat-solo-leveling",
+    "title": "Solo Leveling",
+    "author": "Chugong & DUBU",
+    "year": 2018,
+    "pages": 10,
+    "genre": "Manhwa / Acción / Mazmorras & Monarca de las Sombras",
+    "desc": "Sung Jin-woo, el cazador más débil de rango E, sobrevive milagrosamente a una doble mazmorra y despierta un sistema único que solo a él le permite subir de nivel sin límites."
+  },
+  {
+    "id": "cat-tower-of-god",
+    "title": "Tower of God (Torre de Dios)",
+    "author": "SIU",
+    "year": 2010,
+    "pages": 10,
+    "genre": "Webtoon / Fantasía Épica / Misterio & Shinsu",
+    "desc": "Bam entra como un irregular a la colosal Torre para seguir a su amiga Rachel, descubriendo que en la cima aguarda todo cuanto un ser humano pueda desear."
+  },
+  {
+    "id": "cat-tbate",
+    "title": "The Beginning After the End",
+    "author": "TurtleMe & Fuyuki23",
+    "year": 2018,
+    "pages": 10,
+    "genre": "Manhwa / Isekai / Magia & Dragones",
+    "desc": "El rey Grey, invicto en combate pero solitario en su trono, reencarna como el niño Arthur Leywin en un mundo de bestias mágicas y hechicería."
+  },
+  {
+    "id": "cat-omniscient-reader",
+    "title": "Omniscient Reader's Viewpoint",
+    "author": "Sing Shong & Sleepy-C",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Manhwa / Acción / Escenarios del Fin del Mundo",
+    "desc": "Dokja Kim era el único lector de una novela web apocalíptica de 3149 capítulos. Cuando la trama se vuelve realidad, él es el único que sabe cómo salvar el mundo."
+  },
+  {
+    "id": "cat-the-boxer",
+    "title": "The Boxer",
+    "author": "JH",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Manhwa / Deportes / Boxeo Psicológico",
+    "desc": "K, el entrenador de campeones mundiales, descubre a Yu, un huérfano con ojos vacíos pero con una percepción y reflejos divinos para el cuadrilátero."
+  },
+  {
+    "id": "cat-lore-olympus",
+    "title": "Lore Olympus (Cuentos del Olimpo)",
+    "author": "Rachel Smythe",
+    "year": 2018,
+    "pages": 10,
+    "genre": "Webtoon / Mitología Griega / Romance Moderno",
+    "desc": "El mito del rapto de Perséfone reimaginado con teléfonos inteligentes, cotilleos del Olimpo y el tierno romance con el señor del Inframundo, Hades."
+  },
+  {
+    "id": "cat-bastard",
+    "title": "Bastard",
+    "author": "Carnby Kim & Youngchan Hwang",
+    "year": 2014,
+    "pages": 10,
+    "genre": "Manhwa / Thriller / Suspenso Psicológico",
+    "desc": "Jin Seon vive bajo el terror de su padre, un respetado hombre de negocios que es un asesino en serie. Cuando elige a la chica que le gusta como víctima, Jin se rebela."
+  },
+  {
+    "id": "cat-noblesse",
+    "title": "Noblesse",
+    "author": "Jeho Son & Kwangsu Lee",
+    "year": 2007,
+    "pages": 10,
+    "genre": "Webtoon / Sobrenatural / Vampiros Nobles",
+    "desc": "Cadis Etrama Di Raizel despierta de un letargo de 820 años en la Corea moderna y asiste a la escuela secundaria junto a su leal sirviente Frankenstein."
+  },
+  {
+    "id": "cat-god-of-highschool",
+    "title": "The God of High School",
+    "author": "Yongje Park",
+    "year": 2011,
+    "pages": 10,
+    "genre": "Webtoon / Artes Marciales / Dioses & Mitología",
+    "desc": "Jin Mori participa en un torneo nacional de artes marciales mixtas donde el ganador verá cumplido cualquier deseo, descubriendo su origen divino como el Rey Mono."
+  },
+  {
+    "id": "cat-lookism",
+    "title": "Lookism",
+    "author": "Taejun Pak",
+    "year": 2014,
+    "pages": 10,
+    "genre": "Webtoon / Drama Social / Doble Cuerpo & Pandillas",
+    "desc": "Daniel Park, un joven víctima de acoso escolar severo, despierta con el don de alternar su conciencia entre su cuerpo original y un cuerpo atlético y perfecto."
+  },
+  {
+    "id": "cat-sweet-home",
+    "title": "Sweet Home",
+    "author": "Carnby Kim & Youngchan Hwang",
+    "year": 2017,
+    "pages": 10,
+    "genre": "Manhwa / Terror / Monstruos de los Deseos",
+    "desc": "Cha Hyun-soo, un estudiante recluido tras perder a su familia, se atrinchera en su edificio de departamentos cuando los humanos comienzan a convertirse en monstruos."
+  },
+  {
+    "id": "cat-eleceed",
+    "title": "Eleceed",
+    "author": "Jeho Son & ZHENA",
+    "year": 2018,
+    "pages": 10,
+    "genre": "Webtoon / Acción / Despertados & Gatos",
+    "desc": "Jiwoo es un chico bondadoso con súper velocidad que rescata a un gato gordo callejero, sin saber que es Kayden, un temido agente internacional atrapado en forma felina."
+  },
+  {
+    "id": "cat-wind-breaker",
+    "title": "Wind Breaker",
+    "author": "Yongseok Jo",
+    "year": 2013,
+    "pages": 10,
+    "genre": "Webtoon / Deportes / Ciclismo Callejero & Amistad",
+    "desc": "Jay Jo, el perfecto presidente estudiantil, es un virtuoso ciclista que se une a la tripulación Hummingbird para competir en el torneo callejero League of Street."
+  },
+  {
+    "id": "cat-nano-machine",
+    "title": "Nano Machine",
+    "author": "Jeolmu Hyeon & Hanjung Wolya",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Manhwa / Murim / Nanotecnología del Futuro",
+    "desc": "Cheon Yeo-woon, marginado en la jerarquía del Culto Demoníaco, recibe la visita de un descendiente del futuro que le inyecta nanomáquinas en su torrente sanguíneo."
+  },
+  {
+    "id": "cat-mount-hua",
+    "title": "Return of the Blossoming Blade (Mount Hua)",
+    "author": "Biga",
+    "year": 2021,
+    "pages": 10,
+    "genre": "Manhwa / Murim / Reencarnación de la Secta Hua",
+    "desc": "Chung Myung, el Santo de la Espada de los Ciruelos, despierta un siglo después de derrotar a Cheon Ma para descubrir que su querida secta Monte Hua está en la ruina."
+  },
+  {
+    "id": "cat-suicide-hunter",
+    "title": "SSS-Class Suicide Hunter",
+    "author": "Shin Noah",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Manhwa / Mazmorras / Regresión por Muerte",
+    "desc": "Kim Gong-ja obtiene la habilidad de copiar las técnicas de quien lo asesine al costo de morir, retrocediendo un día en el tiempo cada vez que pierde la vida."
+  },
+  {
+    "id": "cat-northern-blade",
+    "title": "Legend of the Northern Blade",
+    "author": "Woogack",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Manhwa / Murim / Venganza de las Sombras",
+    "desc": "Jin Mu-won, último heredero de la Secta Celestial del Norte falsamente acusada de traición, aprende en secreto las artes marciales oscuras para vengar a su padre."
+  },
+  {
+    "id": "cat-mercenary-enrollment",
+    "title": "Mercenary Enrollment (Teenage Mercenary)",
+    "author": "YC & Rakhyun",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Manhwa / Acción Militar / Guardaespaldas Escolar",
+    "desc": "Ijin Yu, único sobreviviente de un accidente aéreo que fue entrenado como niño mercenario de élite, regresa a Corea a los 18 años para proteger a su hermana."
+  },
+  {
+    "id": "cat-weak-hero",
+    "title": "Weak Hero",
+    "author": "Seopass & RAZEN",
+    "year": 2018,
+    "pages": 10,
+    "genre": "Webtoon / Acción Escolar / Estrategia & Física",
+    "desc": "Gray Yeon es un estudiante menudo y aparentemente indefenso que desmantela a los matones más brutales de la secundaria Eunjang usando pura física y cálculo táctico."
+  },
+  {
+    "id": "cat-viral-hit",
+    "title": "Viral Hit: How to Fight",
+    "author": "Taejun Pak & Kim Junghyun",
+    "year": 2019,
+    "pages": 10,
+    "genre": "Webtoon / Artes Marciales / Transmisión en Vivo",
+    "desc": "Hobin Yoo, un chico débil y pobre, encuentra un misterioso canal de NewTube de un tipo con máscara de pollo que enseña a derrotar a cualquier tipo de peleador callejero."
+  },
+  {
+    "id": "cat-tomb-raider-king",
+    "title": "Tomb Raider King",
+    "author": "SAN.G & Yuns",
+    "year": 2019,
+    "pages": 10,
+    "genre": "Manhwa / Reliquias Divinas / Regresión",
+    "desc": "Seo Joo-heon regresa 15 años al pasado antes de ser traicionado, utilizando su conocimiento de las Tumbas de Dioses para saquear todas las reliquias del mundo."
+  },
+  {
+    "id": "cat-overgeared",
+    "title": "Overgeared",
+    "author": "Park Saenal",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Manhwa / Realidad Virtual / Herrero Legendario",
+    "desc": "Shin Youngwoo (Grid) descubre en el juego Satisfy el libro de Pagma, convirtiéndose en el primer artesano legendario capaz de forjar objetos de clase mítica."
+  },
+  {
+    "id": "cat-survival-sword-king",
+    "title": "Survival Story of a Sword King",
+    "author": "Soon-Q",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Manhwa / Isekai / Nivel Bugueado en Nivel 5",
+    "desc": "Ryu Han-bin es transportado a otro mundo pero su interfaz de juego se bugea, atrapándolo durante 22 años en una zona tutorial de monstruos de nivel infernal."
+  },
+  {
+    "id": "cat-villains-destined",
+    "title": "Villains Are Destined to Die",
+    "author": "Gwon Gyeoeul & SUOL",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Manhwa / Otome Isekai / Romance & Supervivencia",
+    "desc": "Una chica reencarna como Penélope Eckhart, la villana adoptada de un juego otome de dificultad extrema donde cada mala respuesta termina en su muerte inmediata."
+  },
+  {
+    "id": "cat-remarried-empress",
+    "title": "The Remarried Empress",
+    "author": "Alphatart & Sumpul",
+    "year": 2019,
+    "pages": 10,
+    "genre": "Webtoon / Drama Palaciego / Divorcio y Venganza",
+    "desc": "Navier Ellie Trovi, la perfecta emperatriz de Oriente, es traicionada por su esposo por una amante esclava. En el tribunal de divorcio, anuncia su boda con el rey vecino."
+  },
+  {
+    "id": "cat-who-made-me-princess",
+    "title": "Who Made Me a Princess",
+    "author": "Plutus & Spoon",
+    "year": 2017,
+    "pages": 10,
+    "genre": "Manhwa / Reencarnación / Lazos de Familia",
+    "desc": "Athanasia reencarna como la princesa desdichada que será ejecutada por su propio padre, el tiránico emperador Claude, ideando un plan para sobrevivir ganándose su cariño."
+  },
+  {
+    "id": "cat-true-beauty",
+    "title": "True Beauty (Secretos de Belleza)",
+    "author": "Yaongyi",
+    "year": 2018,
+    "pages": 10,
+    "genre": "Webtoon / Romance Escolar / Maquillaje y Autoestima",
+    "desc": "Jugyeong Lim domina el arte del maquillaje profesional tras años de acoso por su físico, convirtiéndose en la diosa de la escuela mientras dos apuestos chicos conocen su secreto."
+  },
+  {
+    "id": "cat-hardcore-leveling",
+    "title": "Hardcore Leveling Warrior",
+    "author": "Sehoon Kim",
+    "year": 2016,
+    "pages": 10,
+    "genre": "Webtoon / RPG de Fantasía / Apuestas y Nivel 1",
+    "desc": "El jugador número uno de Lucid Adventure pierde todo su equipamiento y estadísticas de nivel 99 tras una emboscada, empezando de cero con su habilidad única de Apostador."
+  },
+  {
+    "id": "cat-dice",
+    "title": "DICE: El Cubo que lo Cambia Todo",
+    "author": "Yun Hyunseok",
+    "year": 2013,
+    "pages": 10,
+    "genre": "Webtoon / Sobrenatural / Dados Mágicos",
+    "desc": "Dongtae es un perdedor integral hasta que obtiene un dado azul que le permite alterar sus atributos físicos e intelectuales como si la vida real fuera un juego de rol."
+  },
+  {
+    "id": "cat-unholy-blood",
+    "title": "Unholy Blood (White Blood)",
+    "author": "Lina Im",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Webtoon / Vampiros de Sangre Pura / Acción",
+    "desc": "Hayan Park es la última vampira de sangre pura que solo desea una vida normal, pero debe destruir a los siete señores vampiros que infectaron la ciudad para vengar a su tutor."
+  },
+  {
+    "id": "cat-killstagram",
+    "title": "Killstagram",
+    "author": "Ryoung",
+    "year": 2019,
+    "pages": 10,
+    "genre": "Webtoon / Thriller de Terror / Redes Sociales & Acoso",
+    "desc": "Remi Do es una influencer famosa de Instagram cuya vida de ensueño se convierte en una pesadilla sangrienta cuando un acosador psicópata rastrea cada una de sus fotos."
+  },
+  {
+    "id": "cat-shotgun-boy",
+    "title": "Shotgun Boy",
+    "author": "Carnby Kim & Hongpil",
+    "year": 2021,
+    "pages": 10,
+    "genre": "Manhwa / Terror y Monstruos / Precuela de Sweet Home",
+    "desc": "Gyuhwan, un estudiante intimidado que huye al bosque con una escopeta, debe convertirse en cazador cuando una raza de monstruos biomecánicos invade el campamento."
+  },
+  {
+    "id": "cat-manager-kim",
+    "title": "Manager Kim",
+    "author": "Taejun Pak & Jeong Gwang-sik",
+    "year": 2021,
+    "pages": 10,
+    "genre": "Manhwa / Acción / Fuerzas Especiales & Paternidad",
+    "desc": "El aparentemente ordinario oficinista Kim esconde un pasado como agente secreto de élite militar. Cuando su hija Minji desaparece secuestrada, desata una cacería implacable."
+  },
+  {
+    "id": "cat-gosu",
+    "title": "Gosu: El Maestro",
+    "author": "Giun Ryu & Munjeong Mun",
+    "year": 2015,
+    "pages": 10,
+    "genre": "Webtoon / Murim / Venganza y Dumplings",
+    "desc": "Gang Ryong entrena en las artes marciales más devastadoras para vengar a su maestro traicionado, solo para descubrir que todos los traidores ya han muerto de viejos."
+  },
+  {
+    "id": "cat-leviathan",
+    "title": "Leviathan (Deep Water)",
+    "author": "Lee Gyuntak",
+    "year": 2018,
+    "pages": 10,
+    "genre": "Manhwa / Postapocalíptico Marino / Monstruos Acuáticos",
+    "desc": "La Tierra se ha inundado por completo y la humanidad vive en barcos oxidados acechados por colosales bestias marinas. Bota y su hermana empuñan arpones para sobrevivir."
+  },
+  {
+    "id": "cat-player-cant-level-up",
+    "title": "The Player that Can't Level Up",
+    "author": "Gagah & Bang Eun-woo",
+    "year": 2021,
+    "pages": 10,
+    "genre": "Manhwa / Mazmorras / Armas Egos",
+    "desc": "A pesar de cumplir los requisitos para ser cazador, Kim Gi-gyu permanece en nivel 1 durante cinco años, hasta que despierta la habilidad única de comunicarse con espadas vivientes."
+  },
+  {
+    "id": "cat-solo-bug-player",
+    "title": "Solo Bug Player",
+    "author": "Cheongcho",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Manhwa / Isekai / Señor Feudal & Glitches",
+    "desc": "Un jugador experto en aprovechar errores de programación en un videojuego reencarna como Jared, un señor feudal obeso en un territorio pobre al que salvará con bugs."
+  },
+  {
+    "id": "cat-second-life-ranker",
+    "title": "Second Life Ranker",
+    "author": "Sadoyeon",
+    "year": 2019,
+    "pages": 10,
+    "genre": "Manhwa / Mazmorras / Torre del Sol Negro",
+    "desc": "Yeon-woo descubre un reloj de bolsillo dejado por su hermano gemelo asesinado en el Obelisco, la Torre de los Dioses del Sol, y escala sus pisos para vengarlo."
+  },
+  {
+    "id": "cat-murim-login",
+    "title": "Murim Login",
+    "author": "Zero-Big",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Manhwa / Fusión Murim & Hunters / Cápsula VR",
+    "desc": "Jin Tae-kyung es un cazador de rango bajo que encuentra una cápsula de realidad virtual que transporta su mente y cuerpo al salvaje mundo del Murim tradicional."
+  },
+  {
+    "id": "cat-doom-breaker",
+    "title": "Doom Breaker (Reincarnation of the Battle God)",
+    "author": "Blue-Deep",
+    "year": 2021,
+    "pages": 10,
+    "genre": "Webtoon / Fantasía Épica / Regresión Divina",
+    "desc": "Zephyr, el último humano en caer ante el dios de la destrucción Tartarus, recibe una segunda oportunidad de los dioses para regresar al pasado con todas sus habilidades."
+  },
+  {
+    "id": "cat-trash-count",
+    "title": "Trash of the Count's Family",
+    "author": "Yoo Ryeo Han",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Manhwa / Isekai / Vida Perezosa y Dragones",
+    "desc": "Kim Rok Soo despierta dentro de una novela como Cale Henituse, el hijo borracho e inútil del conde, pero sus intentos de vivir una vida tranquila solo atraen héroes y dragones."
+  },
+  {
+    "id": "cat-greatest-estate-developer",
+    "title": "The Greatest Estate Developer",
+    "author": "BK_Moon & Kim Hyunsoo",
+    "year": 2021,
+    "pages": 10,
+    "genre": "Manhwa / Comedia / Ingeniería Civil en Fantasía",
+    "desc": "Kim Su-ho, estudiante de ingeniería civil, reencarna como Lloyd Frontera, un noble arruinado, y decide salvar el feudo construyendo calefacciones, puentes y presas hidráulicas."
+  },
+  {
+    "id": "cat-pick-me-up",
+    "title": "Pick Me Up, Infinite Gacha",
+    "author": "Hermit & WASP",
+    "year": 2022,
+    "pages": 10,
+    "genre": "Manhwa / Gacha / Héroe de 1 Estrella",
+    "desc": "Loki, el jugador número uno del juego de móvil gacha más difícil del mundo, es absorbido por el juego como Han Yslat, un personaje novato de una sola estrella condenado a morir."
+  },
+  {
+    "id": "cat-tyrant-tower-defense",
+    "title": "Tyrant of the Tower Defense Game",
+    "author": "Ryu Eun-garam",
+    "year": 2022,
+    "pages": 10,
+    "genre": "Manhwa / Defensa de Torres / Estrategia Brutal",
+    "desc": "Un jugador hardcore supera en dificultad pesadilla un juego de estrategia y reencarna como el príncipe Ash en la fortaleza de Crossroad defendiéndose de hordas infinitas."
+  },
+  {
+    "id": "cat-damn-reincarnation",
+    "title": "Damn Reincarnation",
+    "author": "Mogins",
+    "year": 2022,
+    "pages": 10,
+    "genre": "Manhwa / Reencarnación / El Guerrero Eugene",
+    "desc": "Hamel cayó en la guarida de los reyes demonio protegiendo a su amigo Vermouth. Trescientos años después, reencarna como descendiente de su propio camarada."
+  },
+  {
+    "id": "cat-deadbeat-noble",
+    "title": "Reformation of the Deadbeat Noble",
+    "author": "Idol P",
+    "year": 2021,
+    "pages": 10,
+    "genre": "Manhwa / Superación / La Espada del Esfuerzo",
+    "desc": "Airen Farreira, apodado el noble holgazán que dormía para escapar de sus traumas, sueña con un espadachín anónimo que blande su arma durante décadas e inicia su entrenamiento."
+  },
+  {
+    "id": "cat-infinite-leveling-murim",
+    "title": "Infinite Leveling: Murim",
+    "author": "Gonbung",
+    "year": 2021,
+    "pages": 10,
+    "genre": "Manhwa / Murim / Misiones Diarias",
+    "desc": "Un soldado de infantería sin talento que murió miserablemente en el campo de batalla reencarna a sus 14 años con un sistema de misiones y entrenamiento infinito."
+  },
+  {
+    "id": "cat-peerless-dad",
+    "title": "Peerless Dad",
+    "author": "Noh Kyungchan",
+    "year": 2018,
+    "pages": 10,
+    "genre": "Manhwa / Murim / Padre Soltero & Artes Marciales",
+    "desc": "Noh Ga-jang es un artista marcial formidable que cree erróneamente que es débil y busca trabajo como guardia mercenario para criar con ternura a sus tres hijos trillizos."
+  },
+  {
+    "id": "cat-red-storm",
+    "title": "Red Storm",
+    "author": "Noh Kyungchan",
+    "year": 2012,
+    "pages": 10,
+    "genre": "Manhwa / Desierto / Guerreros de la Tormenta Roja",
+    "desc": "Yulian Provoke, joven guerrero de la tribu Pareia en un vasto desierto, entrena con un misterioso maestro de otra dimensión para unificar las tierras áridas."
+  },
+  {
+    "id": "cat-the-breaker",
+    "title": "The Breaker",
+    "author": "Jeon Geuk-jin & Park Jin-hwan",
+    "year": 2007,
+    "pages": 10,
+    "genre": "Manhwa / Artes Marciales Modernas / Murim",
+    "desc": "Shi-Woon Yi, acosado a diario en la escuela, convence a su excéntrico profesor suplente Chun-Woo Han de entrenarlo en el secreto y letal mundo subterráneo del Murim."
+  },
+  {
+    "id": "cat-the-breaker-new-waves",
+    "title": "The Breaker: New Waves",
+    "author": "Jeon Geuk-jin",
+    "year": 2010,
+    "pages": 10,
+    "genre": "Manhwa / Secuela / El Heredero sin Centro de Qi",
+    "desc": "Con su centro de energía destruido, Shi-Woon debe asumir el liderazgo del clan Sun-Woo en medio de una guerra abierta entre facciones del Murim de Seúl."
+  },
+  {
+    "id": "cat-the-horizon",
+    "title": "The Horizon",
+    "author": "JH",
+    "year": 2016,
+    "pages": 10,
+    "genre": "Webtoon / Drama Psicológico / Niños en la Guerra",
+    "desc": "Dos niños huérfanos caminan en silencio por una carretera interminable en medio de una guerra devastadora, buscando un horizonte de paz en una obra maestra de pura emoción."
+  },
+  {
+    "id": "cat-i-shall-master-family",
+    "title": "I Shall Master This Family (Lombardi)",
+    "author": "Kim Roah",
+    "year": 2021,
+    "pages": 10,
+    "genre": "Manhwa / Otome / Política Familiar y Negocios",
+    "desc": "Florentia reencarna por segunda vez en la familia noble Lombardi decidida a no dejar que sus incompetentes primos arruinen la casa, aspirando a ser la matriarca."
+  },
+  {
+    "id": "cat-father-dont-want-marriage",
+    "title": "Father, I Don't Want This Marriage",
+    "author": "Hong Heesu",
+    "year": 2021,
+    "pages": 10,
+    "genre": "Manhwa / Romance / Malentendidos Nobles",
+    "desc": "Jubellian, creyendo que su frío padre duque planea casarla con el sanguinario príncipe heredero, contrata a un novio falso sin sospechar la verdadera identidad del príncipe."
+  },
+  {
+    "id": "cat-business-proposal",
+    "title": "A Business Proposal",
+    "author": "HaeHwa & Narak",
+    "year": 2018,
+    "pages": 10,
+    "genre": "Webtoon / Comedia Romántica / Cita a Ciegas",
+    "desc": "Shin Ha-ri va a una cita a ciegas fingiendo ser su amiga rica para espantar al pretendiente, solo para descubrir que el hombre es Kang Tae-mu, el nuevo CEO de su empresa."
+  },
+  {
+    "id": "cat-secretary-kim",
+    "title": "What's Wrong with Secretary Kim?",
+    "author": "Jung Kyung-yoon",
+    "year": 2016,
+    "pages": 10,
+    "genre": "Webtoon / Romance / El Narcisista y su Asistente",
+    "desc": "Tras nueve años de servicio impecable, la talentosa secretaria Kim Mi-so presenta su renuncia. Su jefe narcisista Lee Young-joon hará lo impensable para que no se marche."
+  },
+  {
+    "id": "cat-cheese-in-the-trap",
+    "title": "Cheese in the Trap",
+    "author": "Soonkki",
+    "year": 2010,
+    "pages": 10,
+    "genre": "Webtoon / Misterio Romántico / Vida Universitaria",
+    "desc": "Hong Seol regresa a la universidad tras un receso y se cruza con Yoo Jung, el estudiante modelo perfecto cuya amable sonrisa parece esconder intenciones siniestras."
+  },
+  {
+    "id": "cat-unordinary",
+    "title": "unOrdinary",
+    "author": "uru-chan",
+    "year": 2016,
+    "pages": 10,
+    "genre": "Webtoon / Superpoderes / Jerarquía y Venganza",
+    "desc": "En una escuela donde el estatus social se decide por el nivel de poder, John finge ser un chico sin habilidades (\"Cripple\"), guardando un secreto oscuro y temible."
+  },
+  {
+    "id": "cat-purple-hyacinth",
+    "title": "Purple Hyacinth",
+    "author": "Ephemerys & Sophism",
+    "year": 2019,
+    "pages": 10,
+    "genre": "Webtoon / Misterio Noir / Detector de Mentiras",
+    "desc": "Lauren Sinclair, una oficial de policía con la capacidad de detectar mentiras, forma una alianza secreta con Kieran White, el asesino más letal de la secta Fantasmas."
+  },
+  {
+    "id": "cat-castle-swimmer",
+    "title": "Castle Swimmer",
+    "author": "Wendy Lian Martin",
+    "year": 2019,
+    "pages": 10,
+    "genre": "Webtoon / Fantasía Submarina / Profecía de Amor",
+    "desc": "Kappa es el Faro destinado a guiar a las criaturas del mar hacia su salvación; Siren es el príncipe tiburón cuya profecía le exige sacrificar al Faro para liberar a su clan."
+  },
+  {
+    "id": "cat-the-gamer",
+    "title": "The Gamer",
+    "author": "Sung Sang-Young",
+    "year": 2013,
+    "pages": 10,
+    "genre": "Webtoon / Habilidades RPG en la Vida Real",
+    "desc": "Han Jee-Han descubre que el mundo real tiene propiedades de videojuego donde él puede subir de nivel sus habilidades durmiendo o estudiando matemáticas."
+  },
+  {
+    "id": "cat-hooky",
+    "title": "Hooky",
+    "author": "Míriam Bonastre Tur",
+    "year": 2015,
+    "pages": 10,
+    "genre": "Webtoon / Brujería / Hermandad & Aventura",
+    "desc": "Dani y Dorian pierden el autobús escolar hacia la academia de magia, desatando una encantadora y peligrosa aventura que los confrontará con una profecía siniestra."
+  },
+  {
+    "id": "cat-school-bus-graveyard",
+    "title": "School Bus Graveyard",
+    "author": "lilredbeany",
+    "year": 2021,
+    "pages": 10,
+    "genre": "Webtoon / Terror / Dimensión Fantasma Nocturna",
+    "desc": "Un grupo de estudiantes de secundaria en Savannah queda maldito tras una excursión escolar: cada medianoche son transportados a una dimensión donde monstruos los cazan."
+  },
+  {
+    "id": "cat-jungle-juice",
+    "title": "Jungle Juice",
+    "author": "Hyeong Eun & Juder",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Webtoon / Acción / Insectos y Genética",
+    "desc": "Jang Su-chan usa un insecticida misterioso y despierta con alas de libélula en su espalda, siendo reclutado en Nest, una universidad secreta para humanos con ADN de insecto."
+  },
+  {
+    "id": "cat-get-schooled",
+    "title": "Get Schooled (True Education)",
+    "author": "Chae Yong-taek & Han Ga-ram",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Webtoon / Acción / Ministerio de Educación",
+    "desc": "Tras el colapso de la autoridad en las aulas, el gobierno crea la Oficina de Protección de Derechos Docentes con inspectores autorizados a utilizar fuerza correctiva."
+  },
+  {
+    "id": "cat-questism",
+    "title": "Questism (Quest Supremacy)",
+    "author": "YuNuni & PTJ",
+    "year": 2021,
+    "pages": 10,
+    "genre": "Webtoon / Sistema RPG / Pandillas de Gangbuk",
+    "desc": "Suhyeon Kim es un estudiante debilucho que recibe una ventana de sistema que le otorga cartas de habilidades y misiones para conquistar las escuelas de Seúl."
+  },
+  {
+    "id": "cat-study-group",
+    "title": "Study Group",
+    "author": "Shin Hyung-wook & Ryu Seung-yeon",
+    "year": 2019,
+    "pages": 10,
+    "genre": "Webtoon / Artes Marciales / Bruce Lee Escolar",
+    "desc": "Gamin Yoon solo quiere ingresar a la universidad, pero asiste a la peor preparatoria del país. Para defender su grupo de estudio, emplea el temible Jeet Kune Do."
+  },
+  {
+    "id": "cat-to-not-die",
+    "title": "To Not Die",
+    "author": "Parae & Lim Jin-hwan",
+    "year": 2021,
+    "pages": 10,
+    "genre": "Webtoon / Acción Urbana / Jóvenes Fugitivos",
+    "desc": "Dajun Im decide poner fin a su sufrimiento tras meses de acoso, pero en el último momento jura vivir para destruirlos a todos, uniéndose a una familia de chicos de la calle."
+  },
+  {
+    "id": "cat-designated-bully",
+    "title": "Designated Bully (The Bully In Charge)",
+    "author": "Grimzo",
+    "year": 2022,
+    "pages": 10,
+    "genre": "Webtoon / Peleas / Pacificador Escolar",
+    "desc": "Daegun Kwon, un joven legendario en el bajo mundo escolar, es contratado por una fundación para ingresar a la secundaria Daemyung y dominar a los abusadores."
+  },
+  {
+    "id": "cat-rooftop-sword-master",
+    "title": "Rooftop Sword Master",
+    "author": "Kim Min-seok",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Manhwa / Venganza Extrema / La Espada Gigante",
+    "desc": "Tras quedar en coma por una golpiza de hijos de magnates corruptos, Koo Se-kwang despierta cuando una gigantesca espada cae del cielo en su azotea otorgándole fuerza colosal."
+  },
+  {
+    "id": "cat-leveling-with-gods",
+    "title": "Leveling Up With the Gods",
+    "author": "Black Ajin",
+    "year": 2021,
+    "pages": 10,
+    "genre": "Manhwa / Regresión / Batalla contra Dioses Antiguos",
+    "desc": "Kim YuWon regresa en el tiempo tras la aniquilación de los dioses olímpicos por los Dioses Exteriores de Lovecraft para escalar la Torre más rápido que nadie."
+  },
+  {
+    "id": "cat-disaster-class-hero",
+    "title": "Return of the Disaster-Class Hero",
+    "author": "SAN.G",
+    "year": 2021,
+    "pages": 10,
+    "genre": "Manhwa / Venganza / El Santo número 13",
+    "desc": "Lee Gun, el héroe más fuerte de la humanidad traicionado por los 12 santos en la Torre del Demonio, regresa veinte años después para cobrarse cada una de sus deudas."
+  },
+  {
+    "id": "cat-archmage-4000-years",
+    "title": "The Archmage Returns After 4000 Years",
+    "author": "Barnacle",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Manhwa / Reencarnación / El Gran Mago Lucas",
+    "desc": "Lucas Traumen, el gran mago sellado durante cuatro milenios por los Semidioses, despierta en el débil cuerpo de Frey Blake, el peor estudiante de la academia mágica."
+  },
+  {
+    "id": "cat-swordmasters-son",
+    "title": "Swordmaster's Youngest Son",
+    "author": "AZI",
+    "year": 2022,
+    "pages": 10,
+    "genre": "Manhwa / Reencarnación / Clan Runcandel",
+    "desc": "Jin Runcandel, expulsado de su clan de espadachines por incompetente, firma un pacto con el dios de las sombras Solderet y retrocede en el tiempo para convertirse en patriarca."
+  },
+  {
+    "id": "cat-standard-reincarnation",
+    "title": "Standard of Reincarnation",
+    "author": "Kim Won-ho",
+    "year": 2022,
+    "pages": 10,
+    "genre": "Manhwa / Artes Marciales / Familia Samion",
+    "desc": "Daven nació con un solo brazo en la más prestigiosa familia de espadachines y fue traicionado, pero reencarna 500 años después con dos brazos sanos y recuerdos intactos."
+  },
+  {
+    "id": "cat-poison-dragon",
+    "title": "Poison Dragon: Legend of an Asura",
+    "author": "Jung Gwang-sik",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Manhwa / Murim / Venenos Médicos & Venganza",
+    "desc": "Jin Ja-gang es el único sobreviviente de la Secta de la Medicina del Dragón tras ser aniquilada. Absorbiendo venenos mortales en su cuerpo, renace como el Asura del Veneno."
+  },
+  {
+    "id": "cat-lightning-degree",
+    "title": "Lightning Degree (Master of Lightning)",
+    "author": "Do-joon",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Manhwa / Murim / Entrenamiento del Rayo",
+    "desc": "Ryu-Yeon pierde a su padre y es adoptado por un maestro vagabundo que lo somete a un entrenamiento doméstico absurdo que sin saberlo lo vuelve invencible como el rayo."
+  },
+  {
+    "id": "cat-martial-peak",
+    "title": "Martial Peak",
+    "author": "Momo",
+    "year": 2018,
+    "pages": 10,
+    "genre": "Manhua / Cultivación / El Libro Negro",
+    "desc": "Yang Kai era un humilde limpiador en la Secta Lingxiao hasta que encuentra el misterioso Libro Negro Sin Letras que despierta su físico marcial divino."
+  },
+  {
+    "id": "cat-tales-demons-gods",
+    "title": "Tales of Demons and Gods",
+    "author": "Mad Snail",
+    "year": 2015,
+    "pages": 10,
+    "genre": "Manhua / Cultivación / El Libro del Espíritu Demoníaco",
+    "desc": "Nie Li, el espiritista demoníaco más poderoso, muere en combate contra el Sabio Emperador y reencarna a sus 13 años en la Ciudad de la Gloria con todos sus recuerdos."
+  },
+  {
+    "id": "cat-apotheosis",
+    "title": "Apotheosis: Ascensión a Dios",
+    "author": "Ranzhi",
+    "year": 2015,
+    "pages": 10,
+    "genre": "Manhua / Acción / El Cuerpo de Arma Divina",
+    "desc": "Luo Zheng pasa de ser el heredero traicionado a esclavo de entrenamiento, hasta que desbloquea una técnica prohibida que convierte los golpes de sus enemigos en poder puro."
+  },
+  {
+    "id": "cat-battle-through-heavens",
+    "title": "Battle Through the Heavens (Doupo Cangqiong)",
+    "author": "Tian Can Tu Dou",
+    "year": 2012,
+    "pages": 10,
+    "genre": "Manhua / Alquimia / Fuego Celestial",
+    "desc": "Xiao Yan pierde todo su talento repentinamente cuando el espíritu de Yao Lao despierta en el anillo de su madre, guiándolo para dominar los Fuegos Celestiales."
+  },
+  {
+    "id": "cat-magic-emperor",
+    "title": "Magic Emperor (The Servant is the Demon King)",
+    "author": "Wuer Manhua",
+    "year": 2019,
+    "pages": 10,
+    "genre": "Manhua / Estrategia / El Emperador Demonio Zhuo Yifan",
+    "desc": "Zhuo Yifan, el Emperador Demonio traicionado por su discípulo, reencarna en el débil sirviente de la familia Luo y utiliza su fría astucia para gobernar el imperio."
+  },
+  {
+    "id": "cat-release-that-witch",
+    "title": "Release That Witch",
+    "author": "Er Mu",
+    "year": 2019,
+    "pages": 10,
+    "genre": "Manhua / Isekai / Tecnología y Brujería Industrial",
+    "desc": "Chen Yan reencarna como Roland Wimbledon, un príncipe desterrado a una frontera nevada, y decide salvar a las brujas perseguidas para impulsar una revolución industrial mágica."
+  },
+  {
+    "id": "cat-i-am-fated-villain",
+    "title": "I Am the Fated Villain",
+    "author": "Tian Fu",
+    "year": 2021,
+    "pages": 10,
+    "genre": "Manhua / Antihéroe / El Villano del Destino",
+    "desc": "Gu Changge transmigra como el joven maestro de un clan sagrado del reino superior cuyo rol es aplastar a los supuestos elegidos del cielo y arrebatarles su suerte."
+  },
+  {
+    "id": "cat-all-heavenly-dao",
+    "title": "Top Tier Providence",
+    "author": "I Love Tofu",
+    "year": 2022,
+    "pages": 10,
+    "genre": "Manhua / Comedia / Cultivo Pasivo en Solitario",
+    "desc": "Han Jue reencarna en un mundo de cultivación con un sistema que le permite subir de nivel evitando los conflictos y meditando en silencio en su cueva durante siglos."
+  },
+  {
+    "id": "cat-soul-land",
+    "title": "Soul Land (Douluo Dalu)",
+    "author": "Tang Jia San Shao",
+    "year": 2011,
+    "pages": 10,
+    "genre": "Manhua / Espíritus Marciales / Hierba Azul Plateada",
+    "desc": "Tang San, discípulo expulsado de la secta Tang que dominaba los venenos, renace en Douluo Dalu despertando el espíritu marcial de la Hierba Azul Plateada y el Martillo昊天."
+  },
+  {
+    "id": "cat-versatile-mage",
+    "title": "Versatile Mage (Quanzhi Fashi)",
+    "author": "Chaos",
+    "year": 2015,
+    "pages": 10,
+    "genre": "Manhua / Magia Urbana / Mago Dual",
+    "desc": "Mo Fan despierta en un mundo idéntico al suyo pero donde la ciencia ha sido reemplazada por la magia elemental, despertando los elementos Fuego y Rayo desde su primer examen."
+  },
+  {
+    "id": "cat-star-martial-god",
+    "title": "Star Martial God Technique",
+    "author": "Mad Snail",
+    "year": 2016,
+    "pages": 10,
+    "genre": "Manhua / Artes Marciales Astrales / El Clan Qingyu",
+    "desc": "En un mundo de tres artes marciales, Ye Xinghe hereda la casi extinta Técnica Marcial de las Estrellas para salvar a su familia del exterminio a manos de la aristocracia."
+  },
+  {
+    "id": "cat-chronicles-heavenly-demon",
+    "title": "Chronicles of Heavenly Demon",
+    "author": "Il-Hwang",
+    "year": 2018,
+    "pages": 10,
+    "genre": "Manhwa / Murim / Lanza del Demonio Celestial",
+    "desc": "Woon-seong es ejecutado falsamente y reencarna como un niño novato en la Cueva de los Demonios, empuñando la lanza para vengar la muerte de su maestro del Monte Hua."
+  },
+  {
+    "id": "cat-reincarnated-assassin",
+    "title": "Reincarnated as an Assassin",
+    "author": "Geul Jangi",
+    "year": 2022,
+    "pages": 10,
+    "genre": "Manhwa / Acción / El Heredero de la Espada",
+    "desc": "El perro de caza de la casa imperial es traicionado y asesinado tras completar su última misión, despertando como el hijo menor de la familia de asesinos más letal del continente."
+  },
+  {
+    "id": "cat-wild-west-murim",
+    "title": "Wild West Murim",
+    "author": "Grimm",
+    "year": 2022,
+    "pages": 10,
+    "genre": "Manhwa / Western & Murim / Pistolas y Espadas",
+    "desc": "En una frontera desértica donde los forajidos usan artes marciales y revólveres de seis tiros, un cazarrecompensas solitario imparte justicia con su katana y sombrero de ala ancha."
+  },
+  {
+    "id": "cat-player-who-returned",
+    "title": "The Player Who Returned After 10,000 Years",
+    "author": "Butterfly Valley",
+    "year": 2022,
+    "pages": 10,
+    "genre": "Manhwa / Demonios / El Monarca del Infierno",
+    "desc": "Kang Woo cayó al Infierno y devoró a millones de demonios hasta convertirse en el soberano indiscutible. Diez mil años después, logra regresar a la Tierra para comer comida coreana."
+  },
+  {
+    "id": "cat-chronicles-martial-god",
+    "title": "Chronicles of the Martial God’s Return",
+    "author": "Myosu",
+    "year": 2022,
+    "pages": 10,
+    "genre": "Manhwa / Murim / Padre Adoptivo Invencible",
+    "desc": "Dan Sa-yu despierta de mil años de cautiverio bajo una montaña y adopta a una pequeña niña huérfana llamada Somi, jurando proteger su infancia pacífica de cualquier secta."
+  },
+  {
+    "id": "cat-murim-rpg-simulation",
+    "title": "Murim RPG Simulation (Heavenly Demon Cult)",
+    "author": "Gyo-jin & Park Hyung-jun",
+    "year": 2022,
+    "pages": 10,
+    "genre": "Manhwa / Elecciones & Opciones Múltiples",
+    "desc": "Seol Hwi es un explorador novato del Culto Demoníaco que muere en su primera misión, pero el tiempo se detiene y una ventana con tres opciones de diálogo aparece frente a sus ojos."
+  },
+  {
+    "id": "cat-past-life-returner",
+    "title": "Past Life Returner",
+    "author": "Toika",
+    "year": 2022,
+    "pages": 10,
+    "genre": "Manhwa / Finanzas & Cazadores / Regresión",
+    "desc": "Sun-hoo regresa al año 1997 con la memoria de las crisis financieras y la posterior invasión de monstruos, acumulando billones de dólares en Wall Street para preparar la defensa de la Tierra."
+  },
+  {
+    "id": "cat-youngest-son-master",
+    "title": "The Youngest Son of a Rich Family (Reborn Rich)",
+    "author": "San Kyeong",
+    "year": 2022,
+    "pages": 10,
+    "genre": "Manhwa / Reencarnación / Chaebol & Finanzas",
+    "desc": "Yoon Hyun-woo es asesinado tras encubrir los fraudes del Grupo Soonyang y despierta en 1987 en el cuerpo de Jin Do-jun, el nieto menor del fundador del conglomerado más rico de Corea."
+  },
+  {
+    "id": "cat-novel-extra",
+    "title": "The Novel's Extra",
+    "author": "Jee Gab Song",
+    "year": 2022,
+    "pages": 10,
+    "genre": "Manhwa / Isekai / El Personaje Secundario con Pistola",
+    "desc": "Kim Hajin es absorbido por su propia novela web inacabada, pero no como el protagonista ni el villano, sino como Chundong, un personaje de relleno que usa armas de fuego."
+  },
+  {
+    "id": "cat-helmut-forsaken-child",
+    "title": "Helmut: The Forsaken Child",
+    "author": "Kim Eon",
+    "year": 2022,
+    "pages": 10,
+    "genre": "Manhwa / Fantasía Oscura / Niño Lobo & Espadachín",
+    "desc": "Abandonado al nacer en el Bosque de las Bestias Demoniacas, Helmut es criado por bestias mágicas y un maestro espadachín errante antes de salir al mundo de los humanos."
+  },
+  {
+    "id": "cat-academys-undercover-professor",
+    "title": "Academy's Undercover Professor",
+    "author": "Sayren",
+    "year": 2022,
+    "pages": 10,
+    "genre": "Manhwa / Misterio / Mago Fugitivo en la Academia",
+    "desc": "Gerrard, un fugitivo con múltiples identidades falsas, se ve forzado a suplantar al profesor Alexander en la prestigiosa Academia Seoren mientras oculta sus secretos de la Inquisición."
+  },
+  {
+    "id": "cat-drug-eating-genius-mage",
+    "title": "Drug-Eating Genius Mage",
+    "author": "Sal G",
+    "year": 2022,
+    "pages": 10,
+    "genre": "Manhwa / Cyberpunk & Magia / El Hechicero Enfermo",
+    "desc": "Lenok despierta en la megaciudad cyberpunk de Balkis con un cuerpo frágil y adicto a medicamentos, pero con un intelecto y una comprensión mágica que desafían las leyes del mundo."
+  },
+  {
+    "id": "cat-the-live",
+    "title": "The Live",
+    "author": "Chae-Hoo",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Manhwa / Fantasía / Diario del Futuro & Resurrección",
+    "desc": "Kim Yun-jae pierde a su esposa e hija en un trágico accidente. Un día recibe un diario misterioso que predice el futuro y le promete reencontrarse con su familia si supera los desafíos del Mundo Paralelo."
+  }
+]
