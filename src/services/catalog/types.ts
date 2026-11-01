@@ -12,7 +12,7 @@ export interface CatalogItem {
   description: string;
   coverGradient: { from: string; to: string; accent: string };
   badgeText: string;
-  createFile: () => Promise<File>;
+  createFile: (onProgress?: (msg: string, percent: number) => void) => Promise<File>;
 }
 
 export interface ComicPanelData {

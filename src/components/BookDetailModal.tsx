@@ -13,10 +13,18 @@ import {
   Edit3,
   Star,
   Layers,
+  RefreshCw,
+  DownloadCloud,
 } from 'lucide-react';
 import type { Book } from '../types';
 import { useApp } from '../context/AppContext';
 import { createOptimizedThumbnail } from '../utils/thumbnail';
+import {
+  checkForNewEpisodes,
+  downloadAndMergeNewEpisodes,
+  type MangaUpdateCheckResult,
+  type UpdateDownloadProgress,
+} from '../services/mangaUpdateService';
 
 interface BookDetailModalProps {
   book: Book | null;
@@ -25,7 +33,7 @@ interface BookDetailModalProps {
 }
 
 export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, onClose }) => {
-  const { categories, editBook, deleteBookById, openReader, updateBookProgress } = useApp();
+  const { categories, editBook, deleteBookById, openReader, updateBookProgress, refreshLibrary } = useApp();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -42,6 +50,11 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
   const [isProcessingCover, setIsProcessingCover] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
 
+  const [isCheckingEpisodes, setIsCheckingEpisodes] = useState(false);
+  const [isDownloadingEpisodes, setIsDownloadingEpisodes] = useState(false);
+  const [updateResult, setUpdateResult] = useState<MangaUpdateCheckResult | null>(null);
+  const [updateProgress, setUpdateProgress] = useState<UpdateDownloadProgress | null>(null);
+
   useEffect(() => {
     if (book) {
       setTitle(book.title);
@@ -55,6 +68,10 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
       setAssignedCats(book.categoryIds || []);
       setIsEditingDescription(false);
       setNotification(null);
+      setIsCheckingEpisodes(false);
+      setIsDownloadingEpisodes(false);
+      setUpdateResult(null);
+      setUpdateProgress(null);
     }
   }, [book]);
 
@@ -121,6 +138,56 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
       showNotice('Progreso reiniciado a la página 1');
     }
   };
+
+  const handleCheckForNewEpisodes = async () => {
+    if (!book) return;
+    setIsCheckingEpisodes(true);
+    setUpdateResult(null);
+    try {
+      const result = await checkForNewEpisodes(book);
+      setUpdateResult(result);
+      if (result.hasUpdates) {
+        showNotice(`¡${result.newChapters.length} episodios nuevos encontrados!`);
+      } else {
+        showNotice(result.message);
+      }
+    } catch (err: any) {
+      showNotice(err.message || 'Error al buscar nuevos episodios.');
+    } finally {
+      setIsCheckingEpisodes(false);
+    }
+  };
+
+  const handleDownloadNewEpisodes = async () => {
+    if (!book || !updateResult || updateResult.newChapters.length === 0) return;
+    setIsDownloadingEpisodes(true);
+    try {
+      const { updatedBook, addedPages } = await downloadAndMergeNewEpisodes(
+        book,
+        updateResult.newChapters,
+        p => setUpdateProgress(p)
+      );
+      await refreshLibrary();
+      showNotice(`¡Manga actualizado! Se añadieron ${addedPages} páginas nuevas.`);
+      setUpdateResult({
+        ...updateResult,
+        hasUpdates: false,
+        message: `Manga al día. Se agregaron ${addedPages} páginas nuevas (Total: ${updatedBook.totalPages} páginas).`,
+        newChapters: [],
+      });
+      setUpdateProgress(null);
+    } catch (err: any) {
+      showNotice(err.message || 'Error al descargar nuevos episodios.');
+    } finally {
+      setIsDownloadingEpisodes(false);
+    }
+  };
+
+  const isManga =
+    book.format === 'cbz' ||
+    book.format === 'cbr' ||
+    book.format === 'zip' ||
+    (book.categoryIds && book.categoryIds.includes('cat-manga'));
 
   const handleDelete = async () => {
     if (window.confirm(`¿Eliminar "${book.title}"? Se borrará la copia local del libro en la aplicación.`)) {
@@ -295,6 +362,81 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
               </div>
             </div>
           </div>
+
+          {/* GESTOR DE EPISODIOS Y ACTUALIZACIONES DE MANGA / CÓMIC */}
+          {isManga && (
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-50/70 to-indigo-50/40 dark:from-zinc-900/90 dark:to-zinc-950/70 border border-purple-200/80 dark:border-purple-900/40 space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                    <RefreshCw className={`w-4 h-4 ${isCheckingEpisodes ? 'animate-spin' : ''}`} />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6]">
+                      Episodios y Capítulos
+                    </h4>
+                    <p className="text-[10px] text-[#881337]/70 dark:text-zinc-400">
+                      Actualiza la obra con los nuevos capítulos publicados en línea
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleCheckForNewEpisodes}
+                  disabled={isCheckingEpisodes || isDownloadingEpisodes}
+                  className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition-all active:scale-95 cursor-pointer shrink-0"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isCheckingEpisodes ? 'animate-spin' : ''}`} />
+                  <span>{isCheckingEpisodes ? 'Buscando...' : 'Buscar nuevos episodios'}</span>
+                </button>
+              </div>
+
+              {/* Status and Results Banner */}
+              {updateResult && (
+                <div className="p-3 rounded-xl bg-white/90 dark:bg-zinc-800/90 border border-purple-100 dark:border-zinc-700 space-y-2.5 animate-in fade-in duration-200">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <p className="text-xs font-bold text-purple-950 dark:text-purple-200">
+                        {updateResult.hasUpdates
+                          ? `¡Se encontraron ${updateResult.newChapters.length} episodios nuevos!`
+                          : 'Obra al día'}
+                      </p>
+                      <p className="text-[11px] text-purple-800/80 dark:text-zinc-300 mt-0.5">
+                        {updateResult.message}
+                      </p>
+                    </div>
+                    {updateResult.hasUpdates && !isDownloadingEpisodes && (
+                      <button
+                        type="button"
+                        onClick={handleDownloadNewEpisodes}
+                        className="shrink-0 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+                      >
+                        <DownloadCloud className="w-3.5 h-3.5" />
+                        <span>Descargar todos los episodios</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Real-time Progress when downloading new episodes */}
+                  {isDownloadingEpisodes && updateProgress && (
+                    <div className="space-y-1.5 pt-1 border-t border-purple-100 dark:border-zinc-700/60">
+                      <div className="flex items-center justify-between text-[10px] font-semibold text-purple-900 dark:text-zinc-300">
+                        <span className="truncate">{updateProgress.message}</span>
+                        <span>{updateProgress.percent}%</span>
+                      </div>
+                      <div className="w-full bg-purple-100 dark:bg-zinc-700 h-2 rounded-full overflow-hidden">
+                        <div
+                          className="bg-gradient-to-r from-purple-600 to-pink-500 h-full transition-all duration-300"
+                          style={{ width: `${updateProgress.percent}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* SINOPSIS / RESUMEN DE LA OBRA */}
           <div className="p-4 rounded-2xl bg-gradient-to-br from-rose-50/60 to-pink-50/30 dark:from-zinc-900/80 dark:to-zinc-950/60 border border-rose-200/80 dark:border-zinc-800">

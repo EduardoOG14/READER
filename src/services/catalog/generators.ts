@@ -318,28 +318,50 @@ export function createMangaStoryPageSvg(
 }
 
 // ==========================================
-// 5. MangaDex Online Fetcher (Cover + Spanish Chapter)
+// 5. Download Progress Notification System
+// ==========================================
+type DownloadProgressListener = (title: string, message: string, percent: number) => void;
+const downloadProgressListeners = new Set<DownloadProgressListener>();
+
+export function subscribeDownloadProgress(listener: DownloadProgressListener): () => void {
+  downloadProgressListeners.add(listener);
+  return () => downloadProgressListeners.delete(listener);
+}
+
+export function notifyDownloadProgress(title: string, message: string, percent: number) {
+  downloadProgressListeners.forEach(listener => {
+    try {
+      listener(title, message, percent);
+    } catch {}
+  });
+}
+
+// ==========================================
+// 6. MangaDex Online Fetcher (Full Series & Chapters)
 // ==========================================
 export async function fetchMangaDexOnlineData(title: string): Promise<{
   coverBlob?: Blob;
   pages?: { name: string; blob: Blob }[];
 }> {
   try {
+    notifyDownloadProgress(title, 'Buscando obra en MangaDex...', 10);
     const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(title)}&limit=1&includes[]=cover_art`;
     const searchRes = await fetch(searchUrl, {
-      signal: AbortSignal.timeout(4500),
+      signal: AbortSignal.timeout(5000),
     });
     if (!searchRes.ok) return {};
     const searchData = await searchRes.json();
     const manga = searchData?.data?.[0];
     if (!manga) return {};
 
+    notifyDownloadProgress(title, 'Descargando portada oficial en alta definición...', 20);
+
     let coverBlob: Blob | undefined;
     const coverRel = manga.relationships?.find((r: any) => r.type === 'cover_art');
     if (coverRel?.attributes?.fileName) {
       try {
         const coverUrl = `https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}.512.jpg`;
-        const cRes = await fetch(coverUrl, { signal: AbortSignal.timeout(4500) });
+        const cRes = await fetch(coverUrl, { signal: AbortSignal.timeout(5000) });
         if (cRes.ok) {
           coverBlob = await cRes.blob();
         }
@@ -348,41 +370,81 @@ export async function fetchMangaDexOnlineData(title: string): Promise<{
       }
     }
 
-    // Try finding Spanish chapter
+    // Try finding all Spanish chapters (download complete manga series)
     let pages: { name: string; blob: Blob }[] = [];
     try {
-      const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?translatedLanguage[]=es&translatedLanguage[]=es-la&includeEmptyPages=0&includeExternalUrl=0&order[chapter]=asc&limit=1`;
-      const feedRes = await fetch(feedUrl, { signal: AbortSignal.timeout(4500) });
+      notifyDownloadProgress(title, 'Consultando episodios completos en español...', 25);
+      const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?translatedLanguage[]=es&translatedLanguage[]=es-la&includeEmptyPages=0&includeExternalUrl=0&order[chapter]=asc&limit=100`;
+      const feedRes = await fetch(feedUrl, { signal: AbortSignal.timeout(6000) });
       if (feedRes.ok) {
         const feedData = await feedRes.json();
-        const chapter = feedData?.data?.[0];
-        if (chapter) {
-          const atHomeRes = await fetch(`https://api.mangadex.org/at-home/server/${chapter.id}`, {
-            signal: AbortSignal.timeout(4500),
-          });
-          if (atHomeRes.ok) {
-            const atHomeData = await atHomeRes.json();
-            const dataSaverFiles = (atHomeData?.chapter?.dataSaver || []).slice(0, 10);
-            for (let i = 0; i < dataSaverFiles.length; i++) {
-              const file = dataSaverFiles[i];
-              const pUrl = `${atHomeData.baseUrl}/data-saver/${atHomeData.chapter.hash}/${file}`;
-              const pRes = await fetch(pUrl, { signal: AbortSignal.timeout(4000) });
-              if (pRes.ok) {
-                const blob = await pRes.blob();
-                const ext = file.split('.').pop() || 'jpg';
-                pages.push({
-                  name: `00${i + 1}_pagina.${ext}`,
-                  blob,
-                });
+        const chaptersList = feedData?.data || [];
+
+        // Group and de-duplicate unique chapters by chapter number
+        const uniqueChapters = new Map<number, { id: string; chapter: number; pages: number }>();
+        for (const ch of chaptersList) {
+          const chNum = parseFloat(ch.attributes.chapter);
+          if (!isNaN(chNum)) {
+            const numPages = ch.attributes.pages || 0;
+            if (!uniqueChapters.has(chNum) || numPages > (uniqueChapters.get(chNum)?.pages || 0)) {
+              uniqueChapters.set(chNum, {
+                id: ch.id,
+                chapter: chNum,
+                pages: numPages,
+              });
+            }
+          }
+        }
+
+        const sortedChapters = Array.from(uniqueChapters.values()).sort((a, b) => a.chapter - b.chapter);
+        // Download all available unique chapters (up to 30 chapters per initial pack)
+        const chaptersToDownload = sortedChapters.slice(0, 30);
+        const totalChapters = chaptersToDownload.length;
+
+        for (let chIdx = 0; chIdx < totalChapters; chIdx++) {
+          const ch = chaptersToDownload[chIdx];
+          const chNum = ch.chapter;
+          const chapterBasePercent = 30 + Math.round((chIdx / totalChapters) * 65);
+
+          notifyDownloadProgress(
+            title,
+            `Descargando episodio ${chNum} (${chIdx + 1} de ${totalChapters})...`,
+            chapterBasePercent
+          );
+
+          try {
+            const atHomeRes = await fetch(`https://api.mangadex.org/at-home/server/${ch.id}`, {
+              signal: AbortSignal.timeout(6000),
+            });
+            if (atHomeRes.ok) {
+              const atHomeData = await atHomeRes.json();
+              const pageFiles: string[] = atHomeData?.chapter?.dataSaver || atHomeData?.chapter?.data || [];
+              for (let pIdx = 0; pIdx < pageFiles.length; pIdx++) {
+                const file = pageFiles[pIdx];
+                const pUrl = `${atHomeData.baseUrl}/data-saver/${atHomeData.chapter.hash}/${file}`;
+                const pRes = await fetch(pUrl, { signal: AbortSignal.timeout(5000) });
+                if (pRes.ok) {
+                  const blob = await pRes.blob();
+                  const ext = file.split('.').pop() || 'jpg';
+                  const paddedCh = String(Math.floor(chNum)).padStart(3, '0');
+                  const paddedPage = String(pIdx + 1).padStart(3, '0');
+                  pages.push({
+                    name: `ch_${paddedCh}_p${paddedPage}.${ext}`,
+                    blob,
+                  });
+                }
               }
             }
+          } catch (e) {
+            console.warn(`[MangaGenerator] Error downloading chapter ${chNum}:`, e);
           }
         }
       }
     } catch (e) {
-      // Ignore chapter fetch error, illustrated fallback will be used
+      console.warn('[MangaGenerator] Chapter feed error:', e);
     }
 
+    notifyDownloadProgress(title, 'Consolidando archivo final de lectura...', 96);
     return { coverBlob, pages };
   } catch {
     return {};
@@ -390,7 +452,7 @@ export async function fetchMangaDexOnlineData(title: string): Promise<{
 }
 
 // ==========================================
-// 6. CBZ Generator for Manga, Manhwa, Comics
+// 7. CBZ Generator for Manga, Manhwa, Comics
 // ==========================================
 export async function generateMangaCbz(
   title: string,

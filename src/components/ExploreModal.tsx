@@ -406,7 +406,7 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
               <div className="min-w-0">
                 <p className="font-bold truncate">
                   {queueState.isProcessing
-                    ? `Guardando: ${queueState.activeItem?.item.title || 'obra'}...`
+                    ? (queueState.activeItem?.progressMessage || `Guardando: ${queueState.activeItem?.item.title || 'obra'}...`)
                     : 'Descargas finalizadas con éxito'}
                 </p>
                 <p className="text-[10px] text-slate-300">

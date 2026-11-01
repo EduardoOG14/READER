@@ -18,6 +18,7 @@ import { PullToRefresh } from './components/PullToRefresh';
 import type { Book } from './types';
 import { Loader2, CheckCircle2, Layers, ArrowLeft } from 'lucide-react';
 import { useBackHandler, subscribeExitToast } from './services/backButton';
+import { downloadQueue, type QueueState } from './services/downloadQueue';
 
 const LibraryView: React.FC = () => {
   const { filteredBooks, books, viewMode, isLoading, activeBook, closeReader, selectedCategoryId, categories, refreshLibrary } = useApp();
@@ -30,6 +31,11 @@ const LibraryView: React.FC = () => {
   const [showExitToast, setShowExitToast] = useState(false);
   const [groupBySeries, setGroupBySeries] = useState(false);
   const [selectedSeriesName, setSelectedSeriesName] = useState<string | null>(null);
+  const [queueState, setQueueState] = useState<QueueState>(downloadQueue.getState());
+
+  useEffect(() => {
+    return downloadQueue.subscribe(state => setQueueState(state));
+  }, []);
 
   useEffect(() => {
     return subscribeExitToast(visible => {
@@ -346,6 +352,27 @@ const LibraryView: React.FC = () => {
         isOpen={!!selectedBookForDetails}
         onClose={() => setSelectedBookForDetails(null)}
       />
+
+      {/* Floating Download Queue Pill across Library */}
+      {queueState.isProcessing && !activeBook && !isExploreOpen && (
+        <div
+          onClick={() => setIsExploreOpen(true)}
+          className="fixed bottom-24 sm:bottom-6 right-4 sm:right-6 z-40 bg-slate-900/95 dark:bg-zinc-800 text-white border border-rose-400/50 rounded-2xl px-4 py-2.5 shadow-2xl backdrop-blur-md flex items-center gap-3 text-xs font-semibold cursor-pointer animate-in fade-in slide-in-from-bottom-3 max-w-sm"
+        >
+          <Loader2 className="w-4 h-4 animate-spin text-rose-400 shrink-0" />
+          <div className="min-w-0 flex-1">
+            <p className="font-bold truncate text-[11px]">
+              {queueState.activeItem?.progressMessage || `Descargando: ${queueState.activeItem?.item.title}...`}
+            </p>
+            <div className="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden mt-1">
+              <div
+                className="bg-gradient-to-r from-rose-500 to-pink-400 h-full transition-all duration-300"
+                style={{ width: `${queueState.activeItem?.progressPercent || 15}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Android Double-Back Exit Toast */}
       {showExitToast && (

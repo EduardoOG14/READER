@@ -1,5 +1,6 @@
 import type { CatalogItem } from './catalogData';
 import { importBookFile } from './bookImporter';
+import { subscribeDownloadProgress } from './catalog/generators';
 
 export interface QueueItem {
   id: string;
@@ -7,6 +8,7 @@ export interface QueueItem {
   status: 'pending' | 'downloading' | 'completed' | 'error';
   error?: string;
   progressPercent: number;
+  progressMessage?: string;
 }
 
 type QueueListener = (status: QueueState) => void;
@@ -27,6 +29,17 @@ class DownloadQueueService {
   private isProcessing = false;
   private listeners: Set<QueueListener> = new Set();
   private onLibraryRefreshNeeded?: () => Promise<any>;
+
+  constructor() {
+    subscribeDownloadProgress((_title, message, percent) => {
+      const active = this.queue.find(q => q.status === 'downloading');
+      if (active) {
+        active.progressMessage = message;
+        active.progressPercent = Math.max(active.progressPercent, percent);
+        this.notify();
+      }
+    });
+  }
 
   public setRefreshHandler(handler: () => Promise<any>) {
     this.onLibraryRefreshNeeded = handler;
