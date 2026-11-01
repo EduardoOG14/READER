@@ -115,10 +115,16 @@ class DownloadQueueService {
       next.progressPercent = 75;
       this.notify();
 
-      // 2. Import into user's library
-      await importBookFile(file, [
-        next.item.category !== 'libros' ? 'cat-manga' : 'cat-books',
-      ]);
+      // 2. Import into user's library with catalog metadata
+      await importBookFile(
+        file,
+        [next.item.category !== 'libros' ? 'cat-manga' : 'cat-books'],
+        {
+          title: next.item.title,
+          author: next.item.author,
+          description: next.item.description,
+        }
+      );
 
       next.progressPercent = 100;
       next.status = 'completed';

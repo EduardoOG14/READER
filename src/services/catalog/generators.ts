@@ -1,6 +1,9 @@
 import JSZip from 'jszip';
 import type { ComicPanelData, BookChapterData } from './types';
 
+// ==========================================
+// 1. EPUB Book Vector Cover Generator
+// ==========================================
 export function createCoverSvg(
   title: string,
   author: string,
@@ -44,87 +47,421 @@ export function createCoverSvg(
   </svg>`;
 }
 
+// ==========================================
+// 2. Manga/Comic Tankobon Volume 1 Cover Generator
+// ==========================================
+export function createMangaCoverSvg(
+  title: string,
+  author: string,
+  category: 'manga' | 'manhwa' | 'comics' = 'manga',
+  fromColor = '#0f172a',
+  toColor = '#1e1b4b',
+  accentColor = '#e11d48'
+): string {
+  const safeTitle = title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeAuthor = author.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const tag =
+    category === 'manhwa'
+      ? 'WEBTOON ORIGINAL'
+      : category === 'comics'
+      ? 'COMIC BOOK ARCHIVE'
+      : 'SHONEN JUMP MANGA';
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1350" viewBox="0 0 900 1350">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="${fromColor}"/>
+      <stop offset="55%" stop-color="${toColor}"/>
+      <stop offset="100%" stop-color="#050608"/>
+    </linearGradient>
+    <pattern id="mangaHalftone" width="16" height="16" patternUnits="userSpaceOnUse">
+      <circle cx="8" cy="8" r="2.5" fill="${accentColor}" fill-opacity="0.14"/>
+    </pattern>
+    <linearGradient id="goldTitle" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="50%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#fef08a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Base & Halftone -->
+  <rect width="900" height="1350" fill="url(#bgGrad)"/>
+  <rect width="900" height="1350" fill="url(#mangaHalftone)"/>
+
+  <!-- Manga Outer Frame Borders -->
+  <rect x="25" y="25" width="850" height="1300" rx="16" fill="none" stroke="${accentColor}" stroke-opacity="0.55" stroke-width="3"/>
+  <rect x="36" y="36" width="828" height="1278" rx="12" fill="none" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1.5"/>
+
+  <!-- Top Category Banner -->
+  <path d="M 36 36 L 380 36 L 330 96 L 36 96 Z" fill="${accentColor}"/>
+  <text x="60" y="78" fill="#ffffff" font-size="22" font-family="'Impact', 'Arial Black', sans-serif" font-weight="900" letter-spacing="2">${tag}</text>
+
+  <!-- Volume Badge -->
+  <circle cx="790" cy="88" r="42" fill="#090a0f" stroke="${accentColor}" stroke-width="3"/>
+  <text x="790" y="80" fill="#94a3b8" font-size="12" font-family="system-ui, sans-serif" font-weight="bold" text-anchor="middle">VOL.</text>
+  <text x="790" y="110" fill="#ffffff" font-size="28" font-family="'Impact', sans-serif" font-weight="bold" text-anchor="middle">01</text>
+
+  <!-- Japanese Kanji Watermark -->
+  <text x="450" y="440" fill="#ffffff" fill-opacity="0.04" font-size="260" font-family="sans-serif" font-weight="900" text-anchor="middle">漫画</text>
+
+  <!-- Dynamic Center Manga Art Illustration -->
+  <g transform="translate(100, 240)">
+    <!-- Speed Aura -->
+    <circle cx="350" cy="300" r="260" fill="${accentColor}" fill-opacity="0.09"/>
+    <circle cx="350" cy="300" r="180" fill="#ffffff" fill-opacity="0.04"/>
+    
+    <!-- Manga Speed Rays -->
+    <path d="M 350 300 L 80 50 M 350 300 L 620 50 M 350 300 L 50 350 M 350 300 L 650 350 M 350 300 L 120 560 M 350 300 L 580 560" stroke="#ffffff" stroke-opacity="0.12" stroke-width="2"/>
+
+    <!-- Dynamic Hero Silhouette -->
+    <path d="M 350 140 C 370 140 385 160 385 185 C 385 200 375 215 360 225 L 390 290 L 460 320 L 450 340 L 380 320 L 370 410 L 420 510 L 380 520 L 350 440 L 320 520 L 280 510 L 330 410 L 320 320 L 250 340 L 240 320 L 310 290 L 340 225 C 325 215 315 200 315 185 C 315 160 330 140 350 140 Z" fill="#090a0f" stroke="${accentColor}" stroke-width="3" stroke-linejoin="round"/>
+    
+    <!-- Action Energy Blade / Blast -->
+    <line x1="200" y1="180" x2="490" y2="390" stroke="#38bdf8" stroke-width="5" stroke-linecap="round"/>
+
+    <!-- Japanese Sound Effect Onomatopoeia -->
+    <text x="520" y="220" fill="${accentColor}" font-size="70" font-family="'Impact', sans-serif" font-weight="900" stroke="#ffffff" stroke-width="2.5" transform="rotate(12 520 220)">ドドド!!</text>
+  </g>
+
+  <!-- Title & Author Card -->
+  <rect x="50" y="850" width="800" height="220" rx="16" fill="#06070a" fill-opacity="0.92" stroke="${accentColor}" stroke-opacity="0.6" stroke-width="2"/>
+  <text x="450" y="920" fill="url(#goldTitle)" font-size="44" font-family="system-ui, -apple-system, sans-serif" font-weight="900" text-anchor="middle" letter-spacing="1.5">${safeTitle.toUpperCase()}</text>
+  <text x="450" y="975" fill="#e2e8f0" font-size="22" font-family="serif" font-style="italic" text-anchor="middle">Obra de ${safeAuthor}</text>
+  
+  <rect x="250" y="1010" width="400" height="32" rx="16" fill="${accentColor}" fill-opacity="0.2" stroke="${accentColor}" stroke-width="1.5"/>
+  <text x="450" y="1032" fill="#f8fafc" font-size="14" font-family="sans-serif" font-weight="bold" text-anchor="middle" letter-spacing="2">EDICIÓN EN ESPAÑOL • TOMO 1</text>
+
+  <!-- Bottom Barcode & Publisher -->
+  <g transform="translate(80, 1150)">
+    <rect x="0" y="0" width="200" height="60" fill="#ffffff" rx="4"/>
+    <path d="M 12 10 L 12 50 M 18 10 L 18 50 M 26 10 L 26 50 M 32 10 L 32 50 M 42 10 L 42 50 M 52 10 L 52 50 M 58 10 L 58 50 M 68 10 L 68 50 M 78 10 L 78 50 M 86 10 L 86 50 M 94 10 L 94 50 M 106 10 L 106 50 M 118 10 L 118 50 M 128 10 L 128 50 M 138 10 L 138 50 M 148 10 L 148 50 M 158 10 L 158 50 M 168 10 L 168 50 M 178 10 L 178 50 M 188 10 L 188 50" stroke="#000000" stroke-width="3"/>
+    
+    <rect x="520" y="8" width="220" height="44" rx="8" fill="#1e1f2d" stroke="#64748b" stroke-width="1.5"/>
+    <text x="630" y="36" fill="#f1f5f9" font-size="14" font-family="'Impact', sans-serif" letter-spacing="2" text-anchor="middle">READER ARCHIVE</text>
+  </g>
+</svg>`;
+}
+
+// ==========================================
+// 3. Manga Color Splash / Portadilla Generator
+// ==========================================
+export function createMangaSplashPageSvg(
+  title: string,
+  author: string,
+  category: 'manga' | 'manhwa' | 'comics' = 'manga',
+  description?: string
+): string {
+  const safeTitle = title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeAuthor = author.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const categoryLabel = category === 'manhwa' ? 'WEBTOON' : category === 'comics' ? 'CÓMIC' : 'MANGA';
+  const quote = description
+    ? description.slice(0, 160)
+    : `Una obra cumbre de ${safeAuthor}, adaptada íntegramente al español para disfrutar en cualquier momento y lugar.`;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1350" viewBox="0 0 900 1350">
+  <defs>
+    <radialGradient id="splashAura" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="60%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </radialGradient>
+    <pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="10" cy="10" r="2" fill="#6366f1" fill-opacity="0.12"/>
+    </pattern>
+  </defs>
+
+  <rect width="900" height="1350" fill="url(#splashAura)"/>
+  <rect width="900" height="1350" fill="url(#dots)"/>
+
+  <!-- Border Frame -->
+  <rect x="35" y="35" width="830" height="1280" rx="12" fill="none" stroke="#e2e8f0" stroke-opacity="0.25" stroke-width="2"/>
+
+  <!-- Top Series Kanji Header -->
+  <text x="450" y="160" fill="#ffffff" fill-opacity="0.08" font-size="140" font-family="sans-serif" font-weight="900" text-anchor="middle">第一章</text>
+
+  <g transform="translate(100, 240)">
+    <!-- Chapter Banner -->
+    <rect x="150" y="0" width="400" height="40" rx="20" fill="#dc2626"/>
+    <text x="350" y="26" fill="#ffffff" font-size="16" font-family="sans-serif" font-weight="bold" text-anchor="middle" letter-spacing="3">CAPÍTULO 1 • EL COMIENZO</text>
+
+    <!-- Main Stylized Title -->
+    <text x="350" y="130" fill="#ffffff" font-size="52" font-family="system-ui, -apple-system, sans-serif" font-weight="900" text-anchor="middle" letter-spacing="2">${safeTitle.toUpperCase()}</text>
+    <text x="350" y="175" fill="#38bdf8" font-size="22" font-family="serif" font-style="italic" text-anchor="middle">Guion y Dibujo: ${safeAuthor}</text>
+
+    <!-- Inked Manga Slash Effect -->
+    <path d="M 50 320 L 650 320" stroke="#f43f5e" stroke-width="4" stroke-linecap="round"/>
+    <line x1="80" y1="330" x2="620" y2="330" stroke="#cbd5e1" stroke-width="1.5" stroke-opacity="0.4"/>
+
+    <!-- Dramatic Opening Synopsis Quote -->
+    <rect x="40" y="380" width="620" height="240" rx="16" fill="#030712" fill-opacity="0.8" stroke="#334155" stroke-width="1.5"/>
+    <text x="70" y="440" fill="#f8fafc" font-size="20" font-family="'Georgia', serif" font-style="italic">«${quote.slice(0, 55)}</text>
+    <text x="70" y="475" fill="#f8fafc" font-size="20" font-family="'Georgia', serif" font-style="italic">${quote.slice(55, 110)}</text>
+    <text x="70" y="510" fill="#f8fafc" font-size="20" font-family="'Georgia', serif" font-style="italic">${quote.slice(110, 160)}...»</text>
+    
+    <text x="70" y="580" fill="#94a3b8" font-size="14" font-family="sans-serif">Traducción oficial al castellano • Colección READER</text>
+  </g>
+
+  <!-- Big Japanese Impact Sound -->
+  <text x="450" y="1060" fill="#ef4444" font-size="80" font-family="'Impact', sans-serif" font-weight="900" stroke="#ffffff" stroke-width="3" text-anchor="middle">ズバッ!!</text>
+
+  <!-- Bottom Page indicator -->
+  <text x="450" y="1270" fill="#64748b" font-size="14" font-family="sans-serif" text-anchor="middle">Página de Apertura • READER ${categoryLabel}</text>
+</svg>`;
+}
+
+// ==========================================
+// 4. Authentic Manga Story Page Generator
+// ==========================================
+export function createMangaStoryPageSvg(
+  title: string,
+  author: string,
+  pageNum: number,
+  totalPages: number,
+  chapterTitle: string,
+  sceneName: string,
+  dialogue: string,
+  narrativeText: string,
+  category: 'manga' | 'manhwa' | 'comics' = 'manga'
+): string {
+  const safeTitle = title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeAuthor = author.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeScene = sceneName.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeChap = chapterTitle.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeDia = dialogue.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeNar = narrativeText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const catShort = category === 'manhwa' ? 'Webtoon' : category === 'comics' ? 'Cómic' : 'Manga';
+
+  const soundFx =
+    pageNum % 3 === 1
+      ? 'ゴゴゴ!!'
+      : pageNum % 3 === 2
+      ? 'ドドン!!'
+      : 'ズバッ!!';
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1350" viewBox="0 0 900 1350">
+  <defs>
+    <pattern id="halftone_${pageNum}" width="10" height="10" patternUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="1.5" fill="#94a3b8" fill-opacity="0.32"/>
+    </pattern>
+    <linearGradient id="pGrad_${pageNum}" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Traditional Manga Margin -->
+  <rect width="900" height="1350" fill="#090a0f"/>
+
+  <!-- PANEL 1: Top Wide Cinematic Establishing Shot -->
+  <g transform="translate(30, 30)">
+    <rect width="840" height="420" fill="url(#pGrad_${pageNum})" stroke="#1e293b" stroke-width="4"/>
+    <rect x="0" y="0" width="840" height="420" fill="url(#halftone_${pageNum})"/>
+
+    <!-- Speedlines / Horizon Sky -->
+    <path d="M 0 0 L 840 420 M 200 0 L 840 280 M 0 200 L 600 420" stroke="#000000" stroke-opacity="0.08" stroke-width="3"/>
+
+    <!-- Top Scene Narrative Caption Box -->
+    <rect x="25" y="25" width="480" height="70" rx="4" fill="#000000" fill-opacity="0.85"/>
+    <text x="45" y="55" fill="#f8fafc" font-size="16" font-family="'Georgia', serif" font-style="italic">«${safeNar.slice(0, 52)}...»</text>
+    <text x="45" y="78" fill="#94a3b8" font-size="12" font-family="sans-serif">${safeChap} • ${safeScene} • Edición Oficial</text>
+
+    <!-- Japanese Dramatic Sound Effect -->
+    <text x="680" y="240" fill="#000000" font-size="95" font-family="'Impact', sans-serif" font-weight="900" stroke="#ffffff" stroke-width="4" transform="rotate(-6 680 240)">${soundFx}</text>
+
+    <!-- Character Silhouette in Panel 1 -->
+    <path d="M 380 220 C 390 220 400 230 400 245 C 400 255 395 265 385 270 L 400 310 L 440 330 L 435 345 L 390 330 L 385 410 L 415 420 L 375 420 L 365 360 L 350 420 L 320 420 L 350 330 L 310 345 L 305 330 L 345 310 L 360 270 C 350 265 345 255 345 245 C 345 230 355 220 380 220 Z" fill="#0f172a"/>
+  </g>
+
+  <!-- PANEL 2: Bottom-Left Dynamic Action Shot -->
+  <g transform="translate(30, 470)">
+    <rect width="405" height="790" fill="#ffffff" stroke="#1e293b" stroke-width="4"/>
+    
+    <!-- Manga Action Radiating Burst Lines -->
+    <path d="M 200 400 L 0 0 M 200 400 L 405 0 M 200 400 L 0 790 M 200 400 L 405 790 M 200 400 L 0 400 M 200 400 L 405 400" stroke="#000000" stroke-opacity="0.12" stroke-width="2"/>
+    
+    <!-- Big Japanese Climax Sound Effect -->
+    <text x="140" y="280" fill="#dc2626" font-size="110" font-family="'Impact', sans-serif" font-weight="900" stroke="#ffffff" stroke-width="5" transform="rotate(8 140 280)">ドドン!!</text>
+
+    <!-- Speech Bubble with Directional Pointer Tail -->
+    <rect x="35" y="460" width="335" height="170" rx="24" fill="#ffffff" stroke="#000000" stroke-width="3"/>
+    <polygon points="120,630 145,630 110,670" fill="#ffffff" stroke="#000000" stroke-width="3"/>
+    <polygon points="121,626 144,626 111,666" fill="#ffffff"/>
+    
+    <text x="60" y="515" fill="#000000" font-size="20" font-family="system-ui, sans-serif" font-weight="bold">${safeDia.slice(0, 24)}</text>
+    ${safeDia.length > 24 ? `<text x="60" y="550" fill="#1e293b" font-size="18" font-family="system-ui, sans-serif" font-weight="600">${safeDia.slice(24, 60)}</text>` : ''}
+    ${safeDia.length > 60 ? `<text x="60" y="582" fill="#334155" font-size="16" font-family="system-ui, sans-serif">${safeDia.slice(60, 100)}</text>` : ''}
+  </g>
+
+  <!-- PANEL 3: Bottom-Right Climax / Narrative Resolution Shot -->
+  <g transform="translate(455, 470)">
+    <rect width="415" height="790" fill="#0f172a" stroke="#1e293b" stroke-width="4"/>
+    <rect x="0" y="0" width="415" height="790" fill="url(#halftone_${pageNum})"/>
+
+    <!-- Inked Energy Blade Cut -->
+    <path d="M 30 720 L 380 80" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+    <path d="M 40 730 L 390 90" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Japanese Shonen Sound Effect -->
+    <text x="240" y="420" fill="#ffffff" font-size="80" font-family="'Impact', sans-serif" font-weight="900" stroke="#000000" stroke-width="4" transform="rotate(-15 240 420)">ズバッ!!</text>
+
+    <!-- Narrative Monologue Box -->
+    <rect x="30" y="520" width="355" height="190" rx="8" fill="#000000" fill-opacity="0.9" stroke="#cbd5e1" stroke-width="1.5"/>
+    <text x="50" y="565" fill="#f8fafc" font-size="17" font-family="'Georgia', serif" font-style="italic">«En este mundo, cada paso</text>
+    <text x="50" y="598" fill="#f8fafc" font-size="17" font-family="'Georgia', serif" font-style="italic">determina tu destino.»</text>
+    <text x="50" y="640" fill="#38bdf8" font-size="14" font-family="sans-serif" font-weight="bold">¡La determinación no vacilará jamás!</text>
+  </g>
+
+  <!-- Footer Pagination -->
+  <rect x="30" y="1285" width="840" height="40" fill="#090a0f"/>
+  <text x="450" y="1312" fill="#64748b" font-size="14" font-family="system-ui, monospace" text-anchor="middle">${safeTitle} • ${safeAuthor} • ${catShort} • Pág. ${pageNum} / ${totalPages}</text>
+</svg>`;
+}
+
+// ==========================================
+// 5. MangaDex Online Fetcher (Cover + Spanish Chapter)
+// ==========================================
+export async function fetchMangaDexOnlineData(title: string): Promise<{
+  coverBlob?: Blob;
+  pages?: { name: string; blob: Blob }[];
+}> {
+  try {
+    const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(title)}&limit=1&includes[]=cover_art`;
+    const searchRes = await fetch(searchUrl, {
+      signal: AbortSignal.timeout(4500),
+    });
+    if (!searchRes.ok) return {};
+    const searchData = await searchRes.json();
+    const manga = searchData?.data?.[0];
+    if (!manga) return {};
+
+    let coverBlob: Blob | undefined;
+    const coverRel = manga.relationships?.find((r: any) => r.type === 'cover_art');
+    if (coverRel?.attributes?.fileName) {
+      try {
+        const coverUrl = `https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}.512.jpg`;
+        const cRes = await fetch(coverUrl, { signal: AbortSignal.timeout(4500) });
+        if (cRes.ok) {
+          coverBlob = await cRes.blob();
+        }
+      } catch (e) {
+        // Fallback to vector cover
+      }
+    }
+
+    // Try finding Spanish chapter
+    let pages: { name: string; blob: Blob }[] = [];
+    try {
+      const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?translatedLanguage[]=es&translatedLanguage[]=es-la&includeEmptyPages=0&includeExternalUrl=0&order[chapter]=asc&limit=1`;
+      const feedRes = await fetch(feedUrl, { signal: AbortSignal.timeout(4500) });
+      if (feedRes.ok) {
+        const feedData = await feedRes.json();
+        const chapter = feedData?.data?.[0];
+        if (chapter) {
+          const atHomeRes = await fetch(`https://api.mangadex.org/at-home/server/${chapter.id}`, {
+            signal: AbortSignal.timeout(4500),
+          });
+          if (atHomeRes.ok) {
+            const atHomeData = await atHomeRes.json();
+            const dataSaverFiles = (atHomeData?.chapter?.dataSaver || []).slice(0, 10);
+            for (let i = 0; i < dataSaverFiles.length; i++) {
+              const file = dataSaverFiles[i];
+              const pUrl = `${atHomeData.baseUrl}/data-saver/${atHomeData.chapter.hash}/${file}`;
+              const pRes = await fetch(pUrl, { signal: AbortSignal.timeout(4000) });
+              if (pRes.ok) {
+                const blob = await pRes.blob();
+                const ext = file.split('.').pop() || 'jpg';
+                pages.push({
+                  name: `00${i + 1}_pagina.${ext}`,
+                  blob,
+                });
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      // Ignore chapter fetch error, illustrated fallback will be used
+    }
+
+    return { coverBlob, pages };
+  } catch {
+    return {};
+  }
+}
+
+// ==========================================
+// 6. CBZ Generator for Manga, Manhwa, Comics
+// ==========================================
 export async function generateMangaCbz(
   title: string,
   author: string,
-  pagesData: ComicPanelData[]
+  pagesData: ComicPanelData[],
+  category: 'manga' | 'manhwa' | 'comics' = 'manga',
+  description?: string
 ): Promise<File> {
   const zip = new JSZip();
 
-  for (const p of pagesData) {
-    const safeTitle = title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const safeAuthor = author.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const safeChapter = p.chapter.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const safeScene = p.scene.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const safeDialogue = p.dialogue.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const safePanel = p.panelText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  // Try fetching genuine MangaDex assets (Cover + Spanish Chapter)
+  let onlineData: { coverBlob?: Blob; pages?: { name: string; blob: Blob }[] } = {};
+  try {
+    onlineData = await fetchMangaDexOnlineData(title);
+  } catch (err) {
+    console.warn('[MangaGenerator] Online fetch unavailable, using illustrated art:', err);
+  }
 
-    const pageSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1350" viewBox="0 0 900 1350">
-      <rect width="900" height="1350" fill="#090a0f"/>
-      <rect x="25" y="25" width="850" height="1300" rx="10" fill="#12131a" stroke="#27273a" stroke-width="3"/>
-      
-      <!-- Header banner -->
-      <rect x="35" y="35" width="830" height="60" rx="6" fill="#1e1f2d"/>
-      <text x="55" y="72" fill="#a5b4fc" font-size="20" font-family="system-ui, sans-serif" font-weight="bold">${safeTitle.toUpperCase()} — EN ESPAÑOL</text>
-      <text x="840" y="72" fill="#94a3b8" font-size="16" font-family="monospace" text-anchor="end">Pág. ${p.number} / ${pagesData.length}</text>
+  // 1. Cover: First entry in zip is 000_portada so it naturally becomes the book cover
+  if (onlineData.coverBlob && onlineData.coverBlob.size > 1000) {
+    zip.file('000_portada.jpg', onlineData.coverBlob);
+  } else {
+    const coverSvg = createMangaCoverSvg(title, author, category);
+    zip.file('000_portada.svg', coverSvg);
+  }
 
-      <!-- Panel 1: Main scene -->
-      <rect x="45" y="115" width="810" height="480" rx="8" fill="#181a24" stroke="#3b3d54" stroke-width="2"/>
-      <text x="65" y="150" fill="#f43f5e" font-size="13" font-family="sans-serif" font-weight="bold" letter-spacing="1">ESCENA: ${safeScene.toUpperCase()}</text>
-      
-      <!-- Dialogue Bubble 1 -->
-      <rect x="75" y="180" width="480" height="130" rx="20" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
-      <polygon points="120,310 145,310 130,335" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
-      <text x="95" y="215" fill="#0f172a" font-size="17" font-family="sans-serif" font-weight="bold">${safeDialogue.slice(0, 38)}</text>
-      ${safeDialogue.length > 38 ? `<text x="95" y="245" fill="#0f172a" font-size="16" font-family="sans-serif">${safeDialogue.slice(38, 80)}</text>` : ''}
-      ${safeDialogue.length > 80 ? `<text x="95" y="272" fill="#334155" font-size="15" font-family="sans-serif">${safeDialogue.slice(80, 130)}</text>` : ''}
+  // 2. Story Pages
+  if (onlineData.pages && onlineData.pages.length > 0) {
+    // Real Spanish chapter scans from MangaDex!
+    for (const p of onlineData.pages) {
+      zip.file(p.name, p.blob);
+    }
+  } else {
+    // Authentic illustrated manga story package
+    const splashSvg = createMangaSplashPageSvg(title, author, category, description || pagesData[0]?.panelText);
+    zip.file('001_portadilla.svg', splashSvg);
 
-      <!-- Center artwork illustration placeholder -->
-      <circle cx="680" cy="350" r="110" fill="#312e81" fill-opacity="0.3" stroke="#6366f1" stroke-width="3"/>
-      <polygon points="680,270 750,390 610,390" fill="#4338ca" fill-opacity="0.4"/>
-      <text x="680" y="360" fill="#c7d2fe" font-size="15" font-family="sans-serif" font-weight="bold" text-anchor="middle">PANEL DE ACCIÓN</text>
-
-      <!-- Narrative box -->
-      <rect x="75" y="500" width="750" height="70" rx="8" fill="#030712" fill-opacity="0.8" stroke="#475569" stroke-width="1.5"/>
-      <text x="95" y="542" fill="#e2e8f0" font-size="15" font-family="serif" font-style="italic">"${safePanel}"</text>
-
-      <!-- Panel 2: Bottom secondary scene -->
-      <rect x="45" y="620" width="400" height="620" rx="8" fill="#141620" stroke="#313346" stroke-width="2"/>
-      <text x="65" y="660" fill="#38bdf8" font-size="14" font-family="sans-serif" font-weight="bold">DETALLE / IMPACTO</text>
-      <circle cx="245" cy="900" r="120" fill="#0f172a" stroke="#0284c7" stroke-width="2" stroke-dasharray="6 6"/>
-      <text x="245" y="895" fill="#f8fafc" font-size="18" font-family="sans-serif" font-weight="bold" text-anchor="middle">${safeChapter}</text>
-      <text x="245" y="930" fill="#94a3b8" font-size="13" font-family="sans-serif" text-anchor="middle">Edición Traducida al Español</text>
-
-      <!-- Panel 3: Climax right scene -->
-      <rect x="455" y="620" width="400" height="620" rx="8" fill="#141620" stroke="#313346" stroke-width="2"/>
-      <text x="475" y="660" fill="#a855f7" font-size="14" font-family="sans-serif" font-weight="bold">DESARROLLO NARRATIVO</text>
-      
-      <!-- Speech bubble 2 -->
-      <rect x="480" y="700" width="350" height="150" rx="18" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
-      <polygon points="560,850 580,850 570,875" fill="#ffffff"/>
-      <text x="500" y="745" fill="#0f172a" font-size="17" font-family="sans-serif" font-weight="bold">¡No me rendiré jamás!</text>
-      <text x="500" y="775" fill="#334155" font-size="15" font-family="sans-serif">Este es mi camino y lucharé</text>
-      <text x="500" y="802" fill="#334155" font-size="15" font-family="sans-serif">hasta alcanzar la victoria.</text>
-
-      <!-- Bottom footer -->
-      <rect x="35" y="1265" width="830" height="40" rx="4" fill="#090a0f"/>
-      <text x="450" y="1290" fill="#64748b" font-size="12" font-family="sans-serif" text-anchor="middle">${safeTitle} • ${safeAuthor} • Lector de Manga READER</text>
-    </svg>`;
-
-    zip.file(`page_${String(p.number).padStart(3, '0')}.svg`, pageSvg);
+    const totalStoryPages = pagesData.length;
+    for (let i = 0; i < pagesData.length; i++) {
+      const p = pagesData[i];
+      const storySvg = createMangaStoryPageSvg(
+        title,
+        author,
+        i + 1,
+        totalStoryPages,
+        p.chapter,
+        p.scene,
+        p.dialogue,
+        p.panelText,
+        category
+      );
+      zip.file(`page_${String(i + 2).padStart(3, '0')}.svg`, storySvg);
+    }
   }
 
   const blob = await zip.generateAsync({ type: 'blob' });
-  const safeName = title.replace(/[^a-zA-Z0-9_-]/g, '_') + '.cbz';
-  return new File([blob], safeName, { type: 'application/x-cbz' });
+  // Clean filename without converting spaces to underscores!
+  const cleanFileName = `${title.replace(/[\\/:*?"<>|]/g, '').trim()}.cbz`;
+  return new File([blob], cleanFileName, { type: 'application/x-cbz' });
 }
 
+// ==========================================
+// 7. EPUB Book File Generator
+// ==========================================
 export async function generateBookFile(
   title: string,
   author: string,
   chapters: BookChapterData[]
 ): Promise<File> {
-  const safeName = title.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const safeTitle = title.replace(/[\\/:*?"<>|]/g, '').trim();
+  const safeId = title.replace(/[^a-zA-Z0-9_-]/g, '_');
 
   const zip = new JSZip();
   zip.file('mimetype', 'application/epub+zip', { compression: 'STORE' });
@@ -190,7 +527,7 @@ export async function generateBookFile(
     <dc:title>${title.replace(/&/g, '&amp;')}</dc:title>
     <dc:creator>${author.replace(/&/g, '&amp;')}</dc:creator>
     <dc:language>es</dc:language>
-    <dc:identifier id="BookID">urn:uuid:${safeName}</dc:identifier>
+    <dc:identifier id="BookID">urn:uuid:${safeId}</dc:identifier>
     <meta name="cover" content="cover-image"/>
   </metadata>
   <manifest>
@@ -204,7 +541,7 @@ export async function generateBookFile(
   const ncx = `<?xml version="1.0" encoding="UTF-8"?>
 <ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
   <head>
-    <meta name="dtb:uid" content="urn:uuid:${safeName}"/>
+    <meta name="dtb:uid" content="urn:uuid:${safeId}"/>
     <meta name="dtb:depth" content="1"/>
   </head>
   <docTitle><text>${title.replace(/&/g, '&amp;')}</text></docTitle>
@@ -217,9 +554,12 @@ export async function generateBookFile(
   zip.file('OEBPS/toc.ncx', ncx);
 
   const blob = await zip.generateAsync({ type: 'blob' });
-  return new File([blob], safeName + '.epub', { type: 'application/epub+zip' });
+  return new File([blob], `${safeTitle}.epub`, { type: 'application/epub+zip' });
 }
 
+// ==========================================
+// 8. Book Chapter Data Generator
+// ==========================================
 export function createDefaultBookChapters(
   title: string,
   author: string,
@@ -241,11 +581,14 @@ export function createDefaultBookChapters(
   ];
 }
 
+// ==========================================
+// 9. Manga Panel Data Generator (Narrative-Rich)
+// ==========================================
 export function createDefaultMangaPanels(
   title: string,
   author: string,
   description: string,
-  category: 'manga' | 'manhwa' | 'comics'
+  category: 'manga' | 'manhwa' | 'comics' = 'manga'
 ): ComicPanelData[] {
   const categoryLabel = category === 'manhwa' ? 'Webtoon' : category === 'comics' ? 'Cómic' : 'Manga';
 
@@ -253,16 +596,16 @@ export function createDefaultMangaPanels(
     {
       number: 1,
       chapter: 'Capítulo 1: El Despertar',
-      scene: 'Inicio de la Historia',
+      scene: 'Inicio de la Aventura',
       panelText: `${description.slice(0, 110)}...`,
-      dialogue: `¡Este es el comienzo de mi historia en ${title}!`
+      dialogue: `¡No me rendiré jamás en ${title}! ¡Este es el camino que he elegido seguir!`
     },
     {
       number: 2,
-      chapter: 'Capítulo 1: El Encuentro del Destino',
+      chapter: 'Capítulo 1: Choque de Voluntades',
       scene: 'Campo de Batalla',
-      panelText: 'Una presencia sobrehumana irrumpe en escena mientras las miradas se cruzan con tensión electrizante.',
-      dialogue: 'Si quieres dar un paso adelante... ¡primero tendrás que superarme a mí!'
+      panelText: 'Una presencia arrolladora irrumpe en escena mientras las miradas se cruzan con tensión electrizante.',
+      dialogue: 'Si quieres dar un paso adelante... ¡primero tendrás que superarme a mí con todo tu poder!'
     },
     {
       number: 3,
@@ -273,10 +616,10 @@ export function createDefaultMangaPanels(
     },
     {
       number: 4,
-      chapter: 'Capítulo 1: Hacia el Nuevo Mundo',
+      chapter: 'Capítulo 1: Hacia el Horizonte',
       scene: 'Horizonte Épico',
-      panelText: `Una obra cumbre del ${categoryLabel} por ${author}, adaptada íntegramente al español para disfrutar sin conexión.`,
-      dialogue: '¡Nuestra aventura apenas acaba de comenzar!'
+      panelText: `Una obra cumbre del ${categoryLabel} creada por ${author}, adaptada íntegramente al español para disfrutar sin conexión.`,
+      dialogue: '¡Nuestra aventura apenas acaba de comenzar... hacia lo desconocido!'
     }
   ];
 }

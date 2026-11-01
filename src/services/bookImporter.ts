@@ -20,7 +20,8 @@ export function detectFormat(filename: string): BookFormat | null {
 
 export async function importBookFile(
   file: File,
-  targetCategoryIds: string[] = []
+  targetCategoryIds: string[] = [],
+  initialMeta?: Partial<Book>
 ): Promise<Book> {
   const format = detectFormat(file.name);
   if (!format) {
@@ -30,20 +31,27 @@ export async function importBookFile(
   const bookId = `book_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
   const buffer = await file.arrayBuffer();
 
-  let title = file.name.replace(/\.[^/.]+$/, '').trim();
-  let author: string | undefined;
+  // Strip underscores and normalize title: e.g. "Black_Clover" -> "Black Clover"
+  let title =
+    initialMeta?.title ||
+    file.name
+      .replace(/\.[^/.]+$/, '')
+      .replace(/_+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  let author: string | undefined = initialMeta?.author;
   let totalPages = 1;
-  let coverUrl: string | undefined;
-  let description: string | undefined;
+  let coverUrl: string | undefined = initialMeta?.coverUrl;
+  let description: string | undefined = initialMeta?.description;
 
   // Format-specific metadata and cover extraction
   if (format === 'pdf') {
     try {
       const pdfMeta = await parsePdfFile(buffer);
       totalPages = pdfMeta.totalPages;
-      if (pdfMeta.title) title = pdfMeta.title;
-      if (pdfMeta.author) author = pdfMeta.author;
-      if (pdfMeta.coverUrl) coverUrl = pdfMeta.coverUrl;
+      if (pdfMeta.title && !initialMeta?.title) title = pdfMeta.title;
+      if (pdfMeta.author && !author) author = pdfMeta.author;
+      if (pdfMeta.coverUrl && !coverUrl) coverUrl = pdfMeta.coverUrl;
     } catch (e) {
       console.warn('PDF parse error, using fallback:', e);
     }
@@ -51,7 +59,7 @@ export async function importBookFile(
     try {
       const mangaMeta = await parseMangaArchive(buffer);
       totalPages = mangaMeta.totalPages;
-      if (mangaMeta.coverUrl) coverUrl = mangaMeta.coverUrl;
+      if (mangaMeta.coverUrl && !coverUrl) coverUrl = mangaMeta.coverUrl;
     } catch (e) {
       console.warn('Manga parse error:', e);
     }
@@ -59,10 +67,10 @@ export async function importBookFile(
     try {
       const epubMeta = await parseEpubFile(buffer);
       totalPages = epubMeta.totalPages;
-      if (epubMeta.title) title = epubMeta.title;
-      if (epubMeta.author) author = epubMeta.author;
-      if (epubMeta.description) description = epubMeta.description;
-      if (epubMeta.coverUrl) coverUrl = epubMeta.coverUrl;
+      if (epubMeta.title && !initialMeta?.title) title = epubMeta.title;
+      if (epubMeta.author && !author) author = epubMeta.author;
+      if (epubMeta.description && !description) description = epubMeta.description;
+      if (epubMeta.coverUrl && !coverUrl) coverUrl = epubMeta.coverUrl;
     } catch (e) {
       console.warn('EPUB parse error:', e);
     }
@@ -71,7 +79,7 @@ export async function importBookFile(
       const text = new TextDecoder('utf-8').decode(buffer);
       const textMeta = parseTextFile(text, file.name);
       totalPages = textMeta.totalPages;
-      coverUrl = textMeta.coverUrl;
+      if (!coverUrl) coverUrl = textMeta.coverUrl;
     } catch (e) {
       console.warn('Text parse error:', e);
     }

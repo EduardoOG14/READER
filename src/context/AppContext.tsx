@@ -16,6 +16,8 @@ import {
 } from '../services/storage';
 import { importBookFile } from '../services/bookImporter';
 import { loadDemoContent } from '../services/sampleData';
+import { SPANISH_CATALOG } from '../services/catalogData';
+import { createMangaCoverSvg } from '../services/catalog/generators';
 
 export type SortOption = 'recent' | 'title' | 'progress' | 'dateAdded';
 export type ViewMode = 'grid' | 'list';
@@ -79,10 +81,65 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       await requestPersistentStorage();
 
       try {
-        // 2. Load books safely with fallback
+        // 2. Load books safely with fallback & self-healing migration
         try {
           const loadedBooks = await getAllBooks();
-          setBooks(loadedBooks);
+          const healedBooks = await Promise.all(
+            loadedBooks.map(async book => {
+              let changed = false;
+              let title = book.title;
+              let author = book.author;
+              let coverUrl = book.coverUrl;
+
+              // 1. Clean titles with underscores (e.g. "Slam_Dunk" -> "Slam Dunk")
+              if (title.includes('_')) {
+                const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+                const normTitle = norm(title);
+                const match = SPANISH_CATALOG.find(
+                  c =>
+                    norm(c.title) === normTitle ||
+                    normTitle.includes(norm(c.title)) ||
+                    norm(c.title).includes(normTitle)
+                );
+                if (match) {
+                  title = match.title;
+                  if (!author || author === 'Autor Desconocido') author = match.author;
+                } else {
+                  title = title.replace(/__/g, ' (').replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
+                  if (title.includes('(') && !title.includes(')')) title += ')';
+                }
+                changed = true;
+              }
+
+              // 2. Upgrade wireframe mock covers
+              const isWireframe =
+                !coverUrl ||
+                coverUrl.includes('PANEL') ||
+                coverUrl.includes('6366f1') ||
+                coverUrl.includes('c7d2fe');
+
+              if (isWireframe && (book.format === 'cbz' || book.format === 'cbr' || book.format === 'zip')) {
+                const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+                const match = SPANISH_CATALOG.find(c => norm(c.title) === norm(title));
+                coverUrl = createMangaCoverSvg(
+                  title,
+                  author || 'Manga',
+                  match?.category === 'libros' ? 'manga' : match?.category || 'manga'
+                );
+                changed = true;
+              }
+
+              if (changed) {
+                const updated: Book = { ...book, title, author, coverUrl };
+                try {
+                  await saveBook(updated);
+                } catch {}
+                return updated;
+              }
+              return book;
+            })
+          );
+          setBooks(healedBooks);
         } catch (err) {
           console.error('Error loading books:', err);
         }
