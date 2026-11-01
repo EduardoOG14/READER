@@ -87,22 +87,24 @@ export async function checkForNewEpisodes(book: Book): Promise<MangaUpdateCheckR
       };
     }
 
-    // Fetch Spanish chapters
-    const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?translatedLanguage[]=es&translatedLanguage[]=es-la&includeEmptyPages=0&includeExternalUrl=0&order[chapter]=asc&limit=100`;
-    const feedRes = await fetch(feedUrl, { signal: AbortSignal.timeout(6000) });
-    if (!feedRes.ok) {
-      return {
-        hasUpdates: false,
-        mangaTitle: cleanTitle,
-        currentHighestChapter: 1,
-        totalAvailableChapters: 0,
-        newChapters: [],
-        message: 'No se pudieron consultar los episodios disponibles.',
-      };
-    }
+    // Fetch all Spanish chapters with limit=500 and pagination
+    let chaptersList: any[] = [];
+    let offset = 0;
+    let totalToFetch = 1;
 
-    const feedData = await feedRes.json();
-    const chaptersList = feedData?.data || [];
+    while (offset < totalToFetch && offset < 1000) {
+      const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?translatedLanguage[]=es&translatedLanguage[]=es-la&includeEmptyPages=0&includeExternalUrl=0&order[chapter]=asc&limit=500&offset=${offset}`;
+      const feedRes = await fetch(feedUrl, { signal: AbortSignal.timeout(7000) });
+      if (!feedRes.ok) break;
+
+      const feedData = await feedRes.json();
+      const batch = feedData?.data || [];
+      if (batch.length === 0) break;
+
+      chaptersList.push(...batch);
+      totalToFetch = feedData?.total || batch.length;
+      offset += batch.length;
+    }
 
     // Group and de-duplicate unique chapters
     const uniqueChapters = new Map<number, ChapterInfo>();
@@ -274,4 +276,63 @@ export async function downloadAndMergeNewEpisodes(
   });
 
   return { updatedBook, addedPages: totalAddedPages };
+}
+
+// 4. Download ALL available episodes in full (from chapter 1 onwards in one click)
+export async function downloadAllAvailableEpisodes(
+  book: Book,
+  onProgress?: (p: UpdateDownloadProgress) => void
+): Promise<{ updatedBook: Book; totalPages: number }> {
+  const cleanTitle = book.title.replace(/[\\/:*?"<>|]/g, '').trim();
+
+  const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=1`;
+  const searchRes = await fetch(searchUrl, { signal: AbortSignal.timeout(5000) });
+  if (!searchRes.ok) throw new Error('No se pudo conectar con MangaDex.');
+
+  const searchData = await searchRes.json();
+  const manga = searchData?.data?.[0];
+  if (!manga) throw new Error(`«${cleanTitle}» no se encontró en MangaDex.`);
+
+  // Paginate all Spanish chapters
+  let chaptersList: any[] = [];
+  let offset = 0;
+  let totalToFetch = 1;
+
+  while (offset < totalToFetch && offset < 1000) {
+    const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?translatedLanguage[]=es&translatedLanguage[]=es-la&includeEmptyPages=0&includeExternalUrl=0&order[chapter]=asc&limit=500&offset=${offset}`;
+    const feedRes = await fetch(feedUrl, { signal: AbortSignal.timeout(7000) });
+    if (!feedRes.ok) break;
+
+    const feedData = await feedRes.json();
+    const batch = feedData?.data || [];
+    if (batch.length === 0) break;
+
+    chaptersList.push(...batch);
+    totalToFetch = feedData?.total || batch.length;
+    offset += batch.length;
+  }
+
+  const uniqueChapters = new Map<number, ChapterInfo>();
+  for (const ch of chaptersList) {
+    const chNum = parseFloat(ch.attributes.chapter);
+    if (!isNaN(chNum)) {
+      const pages = ch.attributes.pages || 0;
+      if (!uniqueChapters.has(chNum) || pages > (uniqueChapters.get(chNum)?.pages || 0)) {
+        uniqueChapters.set(chNum, {
+          id: ch.id,
+          chapter: chNum,
+          title: ch.attributes.title || `Capítulo ${chNum}`,
+          pages,
+        });
+      }
+    }
+  }
+
+  const allChapters = Array.from(uniqueChapters.values()).sort((a, b) => a.chapter - b.chapter);
+  if (allChapters.length === 0) {
+    throw new Error('No se encontraron capítulos en español para esta obra.');
+  }
+
+  const { updatedBook, addedPages } = await downloadAndMergeNewEpisodes(book, allChapters, onProgress);
+  return { updatedBook, totalPages: addedPages };
 }

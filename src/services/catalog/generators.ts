@@ -370,16 +370,31 @@ export async function fetchMangaDexOnlineData(title: string): Promise<{
       }
     }
 
-    // Try finding all Spanish chapters (download complete manga series)
+    // Try finding all Spanish chapters (download complete manga series with all episodes)
     let pages: { name: string; blob: Blob }[] = [];
     try {
-      notifyDownloadProgress(title, 'Consultando episodios completos en español...', 25);
-      const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?translatedLanguage[]=es&translatedLanguage[]=es-la&includeEmptyPages=0&includeExternalUrl=0&order[chapter]=asc&limit=100`;
-      const feedRes = await fetch(feedUrl, { signal: AbortSignal.timeout(6000) });
-      if (feedRes.ok) {
-        const feedData = await feedRes.json();
-        const chaptersList = feedData?.data || [];
+      notifyDownloadProgress(title, 'Consultando todos los episodios disponibles...', 25);
+      
+      // Fetch all chapters with limit=500 and pagination
+      let chaptersList: any[] = [];
+      let offset = 0;
+      let totalToFetch = 1;
 
+      while (offset < totalToFetch && offset < 1000) {
+        const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?translatedLanguage[]=es&translatedLanguage[]=es-la&includeEmptyPages=0&includeExternalUrl=0&order[chapter]=asc&limit=500&offset=${offset}`;
+        const feedRes = await fetch(feedUrl, { signal: AbortSignal.timeout(7000) });
+        if (!feedRes.ok) break;
+
+        const feedData = await feedRes.json();
+        const batch = feedData?.data || [];
+        if (batch.length === 0) break;
+
+        chaptersList.push(...batch);
+        totalToFetch = feedData?.total || batch.length;
+        offset += batch.length;
+      }
+
+      if (chaptersList.length > 0) {
         // Group and de-duplicate unique chapters by chapter number
         const uniqueChapters = new Map<number, { id: string; chapter: number; pages: number }>();
         for (const ch of chaptersList) {
@@ -397,12 +412,11 @@ export async function fetchMangaDexOnlineData(title: string): Promise<{
         }
 
         const sortedChapters = Array.from(uniqueChapters.values()).sort((a, b) => a.chapter - b.chapter);
-        // Download all available unique chapters (up to 30 chapters per initial pack)
-        const chaptersToDownload = sortedChapters.slice(0, 30);
-        const totalChapters = chaptersToDownload.length;
+        // Download ALL available unique chapters in full
+        const totalChapters = sortedChapters.length;
 
         for (let chIdx = 0; chIdx < totalChapters; chIdx++) {
-          const ch = chaptersToDownload[chIdx];
+          const ch = sortedChapters[chIdx];
           const chNum = ch.chapter;
           const chapterBasePercent = 30 + Math.round((chIdx / totalChapters) * 65);
 
@@ -426,7 +440,7 @@ export async function fetchMangaDexOnlineData(title: string): Promise<{
                 if (pRes.ok) {
                   const blob = await pRes.blob();
                   const ext = file.split('.').pop() || 'jpg';
-                  const paddedCh = String(Math.floor(chNum)).padStart(3, '0');
+                  const paddedCh = String(Math.floor(chNum)).padStart(4, '0');
                   const paddedPage = String(pIdx + 1).padStart(3, '0');
                   pages.push({
                     name: `ch_${paddedCh}_p${paddedPage}.${ext}`,

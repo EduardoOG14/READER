@@ -22,6 +22,7 @@ import { createOptimizedThumbnail } from '../utils/thumbnail';
 import {
   checkForNewEpisodes,
   downloadAndMergeNewEpisodes,
+  downloadAllAvailableEpisodes,
   type MangaUpdateCheckResult,
   type UpdateDownloadProgress,
 } from '../services/mangaUpdateService';
@@ -178,6 +179,42 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
       setUpdateProgress(null);
     } catch (err: any) {
       showNotice(err.message || 'Error al descargar nuevos episodios.');
+    } finally {
+      setIsDownloadingEpisodes(false);
+    }
+  };
+
+  const handleDownloadAllSeries = async () => {
+    if (!book) return;
+    if (!window.confirm(`¿Descargar todos los episodios disponibles de «${book.title}»?`)) return;
+    setIsDownloadingEpisodes(true);
+    setUpdateProgress({
+      currentChapterNum: 1,
+      currentChapterIndex: 1,
+      totalChaptersToDownload: 1,
+      currentPageIndex: 0,
+      totalPagesInChapter: 0,
+      percent: 5,
+      message: 'Conectando con MangaDex para consultar la serie completa...',
+    });
+    try {
+      const { updatedBook, totalPages } = await downloadAllAvailableEpisodes(
+        book,
+        p => setUpdateProgress(p)
+      );
+      await refreshLibrary();
+      showNotice(`¡Manga completo descargado con éxito! (${totalPages} páginas locales).`);
+      setUpdateResult({
+        hasUpdates: false,
+        mangaTitle: book.title,
+        currentHighestChapter: 0,
+        totalAvailableChapters: 0,
+        newChapters: [],
+        message: `Serie completa descargada al día (Total: ${updatedBook.totalPages} páginas locales).`,
+      });
+      setUpdateProgress(null);
+    } catch (err: any) {
+      showNotice(err.message || 'Error al descargar la serie completa.');
     } finally {
       setIsDownloadingEpisodes(false);
     }
@@ -381,15 +418,29 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleCheckForNewEpisodes}
-                  disabled={isCheckingEpisodes || isDownloadingEpisodes}
-                  className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition-all active:scale-95 cursor-pointer shrink-0"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${isCheckingEpisodes ? 'animate-spin' : ''}`} />
-                  <span>{isCheckingEpisodes ? 'Buscando...' : 'Buscar nuevos episodios'}</span>
-                </button>
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleCheckForNewEpisodes}
+                    disabled={isCheckingEpisodes || isDownloadingEpisodes}
+                    className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
+                    title="Comprobar si hay nuevos episodios disponibles"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isCheckingEpisodes ? 'animate-spin' : ''}`} />
+                    <span>{isCheckingEpisodes ? 'Buscando...' : 'Buscar nuevos episodios'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleDownloadAllSeries}
+                    disabled={isCheckingEpisodes || isDownloadingEpisodes}
+                    className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
+                    title="Descargar todos los episodios disponibles de la serie completa en un solo clic"
+                  >
+                    <DownloadCloud className="w-3.5 h-3.5" />
+                    <span>Descargar TODO</span>
+                  </button>
+                </div>
               </div>
 
               {/* Status and Results Banner */}
@@ -413,7 +464,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                         className="shrink-0 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
                       >
                         <DownloadCloud className="w-3.5 h-3.5" />
-                        <span>Descargar todos los episodios</span>
+                        <span>Descargar TODO ({updateResult.newChapters.length} episodios)</span>
                       </button>
                     )}
                   </div>
