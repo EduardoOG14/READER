@@ -575,9 +575,31 @@ export async function generateBookFile(
   <meta charset="utf-8"/>
   <title>${ch.title.replace(/&/g, '&amp;')}</title>
   <style>
-    body { font-family: serif; line-height: 1.7; margin: 5%; text-align: justify; }
-    h1 { text-align: center; color: #1e293b; margin-top: 10%; margin-bottom: 5%; }
-    p { margin-bottom: 1em; text-indent: 1.5em; }
+    body {
+      font-family: serif;
+      line-height: 1.75;
+      margin: 0;
+      padding: 24px 28px 90px 24px;
+      text-align: justify;
+      -webkit-hyphens: none;
+      hyphens: none;
+      word-break: normal;
+      overflow-wrap: break-word;
+    }
+    h1 {
+      text-align: center;
+      margin-top: 1.2em;
+      margin-bottom: 0.8em;
+    }
+    p {
+      margin-bottom: 1em;
+      text-indent: 1.25em;
+      padding-right: 8px;
+      -webkit-hyphens: none;
+      hyphens: none;
+      word-break: normal;
+      overflow-wrap: break-word;
+    }
   </style>
 </head>
 <body>

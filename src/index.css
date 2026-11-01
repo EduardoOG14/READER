@@ -105,3 +105,13 @@ html, body, #root {
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
+
+/* Universal Reader Typography: No hyphenation cutting words, comfortable word wrap */
+.reader-text, [data-reader-content] {
+  -webkit-hyphens: none !important;
+  -moz-hyphens: none !important;
+  -ms-hyphens: none !important;
+  hyphens: none !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+}

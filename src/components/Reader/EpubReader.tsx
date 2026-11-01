@@ -110,31 +110,45 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
       style.innerHTML = `
         html, body {
           margin: 0 !important;
-          padding: 16px 18px 60px 18px !important;
+          padding: 24px 28px 90px 24px !important;
+          box-sizing: border-box !important;
           background-color: ${bgColor} !important;
           color: ${textColor} !important;
           font-family: ${fontFamily} !important;
           font-size: ${settings.fontSize}px !important;
-          line-height: ${settings.lineHeight || 1.7} !important;
-          text-align: justify !important;
+          line-height: ${settings.lineHeight || 1.75} !important;
+          text-align: ${settings.textAlign || 'justify'} !important;
           text-justify: inter-word !important;
-          -webkit-hyphens: auto !important;
-          hyphens: auto !important;
-          word-wrap: break-word !important;
+          -webkit-hyphens: none !important;
+          -moz-hyphens: none !important;
+          -ms-hyphens: none !important;
+          hyphens: none !important;
+          word-break: normal !important;
           overflow-wrap: break-word !important;
+          word-wrap: break-word !important;
         }
         p {
-          margin: 0 0 0.85em 0 !important;
+          margin: 0 0 0.9em 0 !important;
           text-indent: 1.25em !important;
-          text-align: justify !important;
-          line-height: ${settings.lineHeight || 1.7} !important;
+          text-align: ${settings.textAlign || 'justify'} !important;
+          line-height: ${settings.lineHeight || 1.75} !important;
+          padding-right: 8px !important;
+          -webkit-hyphens: none !important;
+          -moz-hyphens: none !important;
+          -ms-hyphens: none !important;
+          hyphens: none !important;
+          word-break: normal !important;
+          overflow-wrap: break-word !important;
         }
         h1, h2, h3, h4 {
           text-align: center !important;
           font-weight: bold !important;
+          color: ${textColor} !important;
           margin-top: 1.2em !important;
           margin-bottom: 0.8em !important;
           line-height: 1.3 !important;
+          -webkit-hyphens: none !important;
+          hyphens: none !important;
         }
         img {
           max-width: 100% !important;
@@ -234,8 +248,8 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
       let textColor = '#1e293b';
       const preset = settings.readingThemePreset || (settings.theme === 'dark' ? 'emerald' : 'day');
       if (preset === 'emerald') {
-        bgColor = '#061a12';
-        textColor = '#d1fae5';
+        bgColor = '#18191c';
+        textColor = '#e4e4e7';
       } else if (preset === 'oled') {
         bgColor = '#000000';
         textColor = '#f1f5f9';
@@ -260,7 +274,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
   // Outer container color based on preset
   let containerBg = '#f7f4ed';
   const preset = settings.readingThemePreset || (settings.theme === 'dark' ? 'emerald' : 'day');
-  if (preset === 'emerald') containerBg = '#061a12';
+  if (preset === 'emerald') containerBg = '#18191c';
   if (preset === 'oled') containerBg = '#000000';
   if (preset === 'sepia') containerBg = '#ece4d0';
   if (preset === 'sakura') containerBg = '#fdf2f4';

@@ -146,19 +146,22 @@ export const TextReader: React.FC<TextReaderProps> = ({
         onClick={handleContainerClick}
         className={`w-full h-full overflow-y-auto select-none transition-colors duration-200 ${themeContainerStyle}`}
       >
-        <div className={`w-full max-w-3xl mx-auto px-4 sm:px-8 py-6 pb-20 ${fontClass}`}>
+        <div className={`w-full max-w-2xl mx-auto px-6 sm:px-10 md:px-16 pt-14 pb-32 ${fontClass}`}>
           {rawParagraphs.map((para, idx) => (
             <p
               key={idx}
-              className="mb-3 transition-all"
+              className="mb-4 transition-all pr-2 sm:pr-4"
               style={{
                 fontSize: `${settings.fontSize}px`,
-                lineHeight: settings.lineHeight || 1.7,
-                textAlign: 'justify',
+                lineHeight: settings.lineHeight || 1.75,
+                textAlign: settings.textAlign || 'justify',
                 textJustify: 'inter-word',
                 textIndent: '1.25em',
-                hyphens: 'auto',
-                WebkitHyphens: 'auto',
+                hyphens: 'none',
+                WebkitHyphens: 'none',
+                msHyphens: 'none',
+                wordBreak: 'normal',
+                overflowWrap: 'break-word',
               }}
             >
               {para}
@@ -177,11 +180,15 @@ export const TextReader: React.FC<TextReaderProps> = ({
     >
       <div className={`w-full max-w-2xl rounded-2xl p-6 sm:p-10 shadow-lg border my-auto transition-colors duration-200 ${themeContainerStyle} ${fontClass}`}>
         <div
-          className="whitespace-pre-wrap leading-relaxed transition-all"
+          className="whitespace-pre-wrap leading-relaxed transition-all pr-2"
           style={{
             fontSize: `${settings.fontSize}px`,
-            lineHeight: settings.lineHeight || 1.6,
+            lineHeight: settings.lineHeight || 1.7,
             textAlign: settings.textAlign || 'left',
+            hyphens: 'none',
+            WebkitHyphens: 'none',
+            wordBreak: 'normal',
+            overflowWrap: 'break-word',
           }}
         >
           {activeContent}
