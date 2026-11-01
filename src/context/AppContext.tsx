@@ -17,7 +17,12 @@ import {
 import { importBookFile } from '../services/bookImporter';
 import { loadDemoContent } from '../services/sampleData';
 import { SPANISH_CATALOG } from '../services/catalogData';
-import { createMangaCoverSvg } from '../services/catalog/generators';
+import {
+  isMockCover,
+  fetchOfficialCoverUrl,
+  createClassicBookCoverSvg,
+  createMangaTankobonCoverSvg,
+} from '../services/coverFetcher';
 
 export type SortOption = 'recent' | 'title' | 'progress' | 'dateAdded';
 export type ViewMode = 'grid' | 'list';
@@ -111,21 +116,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                 changed = true;
               }
 
-              // 2. Upgrade wireframe mock covers
-              const isWireframe =
-                !coverUrl ||
-                coverUrl.includes('PANEL') ||
-                coverUrl.includes('6366f1') ||
-                coverUrl.includes('c7d2fe');
+              // 2. Eliminate all mock / wireframe covers immediately
+              const needsCoverUpgrade = isMockCover(coverUrl);
 
-              if (isWireframe && (book.format === 'cbz' || book.format === 'cbr' || book.format === 'zip')) {
+              if (needsCoverUpgrade) {
                 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
                 const match = SPANISH_CATALOG.find(c => norm(c.title) === norm(title));
-                coverUrl = createMangaCoverSvg(
-                  title,
-                  author || 'Manga',
-                  match?.category === 'libros' ? 'manga' : match?.category || 'manga'
-                );
+                const isBook =
+                  book.format === 'epub' ||
+                  book.format === 'txt' ||
+                  book.format === 'pdf' ||
+                  match?.category === 'libros';
+
+                // Initial elegant vector fallback (leather-embossed book or clean tankobon)
+                coverUrl = isBook
+                  ? `data:image/svg+xml;utf8,${encodeURIComponent(createClassicBookCoverSvg(title, author || 'Clásico Universal'))}`
+                  : `data:image/svg+xml;utf8,${encodeURIComponent(createMangaTankobonCoverSvg(title, author || 'Manga', (match?.category as any) || 'manga'))}`;
                 changed = true;
               }
 
@@ -140,6 +146,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             })
           );
           setBooks(healedBooks);
+
+          // 3. Asynchronously enhance existing books with REAL official covers from MangaDex / OpenLibrary
+          setTimeout(async () => {
+            for (const book of healedBooks) {
+              if (isMockCover(book.coverUrl) || book.coverUrl?.startsWith('data:image/svg+xml')) {
+                try {
+                  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+                  const match = SPANISH_CATALOG.find(c => norm(c.title) === norm(book.title));
+                  const category = match?.category || (book.format === 'epub' || book.format === 'txt' ? 'libros' : 'manga');
+                  const officialUrl = await fetchOfficialCoverUrl(book.title, book.author, category);
+                  if (officialUrl) {
+                    const enhanced: Book = { ...book, coverUrl: officialUrl };
+                    await saveBook(enhanced);
+                    setBooks(prev => prev.map(b => (b.id === book.id ? enhanced : b)));
+                  }
+                } catch {}
+              }
+            }
+          }, 600);
         } catch (err) {
           console.error('Error loading books:', err);
         }

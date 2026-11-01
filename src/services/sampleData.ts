@@ -1,6 +1,7 @@
 import JSZip from 'jszip';
 import { saveBook, saveBookFile } from './storage';
 import type { Book } from '../types';
+import { createMangaTankobonCoverSvg } from './coverFetcher';
 
 export async function loadDemoContent(): Promise<Book[]> {
   const books: Book[] = [];
@@ -35,23 +36,8 @@ export async function loadDemoContent(): Promise<Book[]> {
     const mangaId = `book_demo_manga_${Date.now()}`;
     const mangaStorageKey = await saveBookFile(mangaId, 'Manga_Demo_Cap1.cbz', mangaBuffer);
 
-    // Cover SVG
-    const coverSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="420" viewBox="0 0 300 420">
-      <defs>
-        <linearGradient id="mgrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#4c1d95"/>
-          <stop offset="100%" stop-color="#1e1b4b"/>
-        </linearGradient>
-      </defs>
-      <rect width="300" height="420" rx="8" fill="url(#mgrad)"/>
-      <rect x="15" y="15" width="270" height="390" rx="6" fill="none" stroke="#7c3aed" stroke-width="2"/>
-      <text x="25" y="50" fill="#c4b5fd" font-size="12" font-family="sans-serif" font-weight="bold" letter-spacing="2">SHONEN MANGA</text>
-      <text x="25" y="100" fill="#ffffff" font-size="24" font-family="sans-serif" font-weight="bold">El Viajero</text>
-      <text x="25" y="130" fill="#a78bfa" font-size="20" font-family="sans-serif" font-weight="bold">de las Sombras</text>
-      <circle cx="150" cy="240" r="60" fill="#5b21b6" stroke="#8b5cf6" stroke-width="2"/>
-      <text x="150" y="247" fill="#ffffff" font-size="16" font-family="sans-serif" font-weight="bold" text-anchor="middle">CAPÍTULO 1</text>
-      <text x="25" y="380" fill="#94a3b8" font-size="12" font-family="sans-serif">5 Páginas • HD</text>
-    </svg>`;
+    // Tankobon Cover SVG
+    const coverSvg = createMangaTankobonCoverSvg('El Viajero de las Sombras', 'K. Tanaka', 'manga');
 
     const mangaBook: Book = {
       id: mangaId,

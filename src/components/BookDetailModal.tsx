@@ -23,6 +23,7 @@ import type { Book } from '../types';
 import { useApp } from '../context/AppContext';
 import { createOptimizedThumbnail } from '../utils/thumbnail';
 import { useBackHandler } from '../services/backButton';
+import { fetchOfficialCoverUrl } from '../services/coverFetcher';
 import {
   checkForNewEpisodes,
   downloadAndMergeNewEpisodes,
@@ -130,6 +131,29 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+    }
+  };
+
+  const handleFetchRealCover = async () => {
+    if (!book) return;
+    setIsProcessingCover(true);
+    try {
+      const isBook =
+        book.format === 'epub' ||
+        book.format === 'txt' ||
+        (book.categoryIds && book.categoryIds.includes('cat-books'));
+      const realCover = await fetchOfficialCoverUrl(book.title, book.author, isBook ? 'libros' : 'manga');
+      if (realCover) {
+        setCoverUrl(realCover);
+        await editBook(book.id, { coverUrl: realCover });
+        showNotice('¡Portada oficial encontrada y actualizada con éxito!');
+      } else {
+        showNotice('No se encontró una portada oficial para esta obra en los servidores.');
+      }
+    } catch (e: any) {
+      showNotice(e.message || 'Error al buscar portada oficial.');
+    } finally {
+      setIsProcessingCover(false);
     }
   };
 
@@ -332,41 +356,54 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
         {/* Hero Card: Cover + Titles + Primary READ NOW Button */}
         <div className="p-4 sm:p-5 border-b border-rose-100/80 dark:border-zinc-800/80 bg-gradient-to-b from-[#fff5f8]/40 to-white dark:from-zinc-900/40 dark:to-[#18191c] shrink-0">
           <div className="flex gap-4 items-center">
-            {/* Book Cover with 1-tap change */}
-            <div className="relative group w-24 sm:w-28 aspect-[3/4.2] rounded-2xl overflow-hidden bg-rose-100 dark:bg-zinc-800 shrink-0 shadow-md border border-rose-200/80 dark:border-zinc-700">
-              {coverUrl ? (
-                <img
-                  src={coverUrl}
-                  alt={book.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                />
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center text-rose-300 dark:text-zinc-500">
-                  <BookOpen className="w-8 h-8 mb-1" />
-                  <span className="text-[9px] font-semibold opacity-70">Sin Portada</span>
-                </div>
-              )}
+            {/* Book Cover with 1-tap change & online search */}
+            <div className="flex flex-col items-center shrink-0">
+              <div className="relative group w-24 sm:w-28 aspect-[3/4.2] rounded-2xl overflow-hidden bg-rose-100 dark:bg-zinc-800 shadow-md border border-rose-200/80 dark:border-zinc-700">
+                {coverUrl ? (
+                  <img
+                    src={coverUrl}
+                    alt={book.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-rose-300 dark:text-zinc-500">
+                    <BookOpen className="w-8 h-8 mb-1" />
+                    <span className="text-[9px] font-semibold opacity-70">Sin Portada</span>
+                  </div>
+                )}
 
-              {/* Cover overlay button */}
+                {/* Cover overlay button */}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isProcessingCover}
+                  className="absolute inset-0 bg-black/55 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 text-white p-2 text-center cursor-pointer"
+                  title="Cambiar la imagen de portada"
+                >
+                  <Camera className="w-5 h-5 stroke-[2.2]" />
+                  <span className="text-[9px] font-bold">Cambiar</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isProcessingCover}
+                  className="sm:hidden absolute bottom-1.5 right-1.5 p-1.5 rounded-full bg-black/60 text-white shadow-xs"
+                  title="Cambiar portada"
+                >
+                  <Camera className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
               <button
                 type="button"
-                onClick={() => fileInputRef.current?.click()}
+                onClick={handleFetchRealCover}
                 disabled={isProcessingCover}
-                className="absolute inset-0 bg-black/55 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 text-white p-2 text-center cursor-pointer"
-                title="Cambiar la imagen de portada"
+                className="mt-1.5 w-24 text-[10px] text-rose-600 dark:text-rose-400 font-bold flex items-center justify-center gap-1 hover:underline cursor-pointer text-center"
+                title="Buscar portada oficial online en alta resolución"
               >
-                <Camera className="w-5 h-5 stroke-[2.2]" />
-                <span className="text-[9px] font-bold">Cambiar</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isProcessingCover}
-                className="sm:hidden absolute bottom-1.5 right-1.5 p-1.5 rounded-full bg-black/60 text-white shadow-xs"
-                title="Cambiar portada"
-              >
-                <Camera className="w-3.5 h-3.5" />
+                <Sparkles className="w-3 h-3 shrink-0" />
+                <span className="truncate">{isProcessingCover ? 'Buscando...' : 'Portada Oficial'}</span>
               </button>
             </div>
 
@@ -535,7 +572,51 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                     </div>
                   )}
                 </div>
-              ) : null}
+              ) : (
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-50/80 to-teal-50/50 dark:from-zinc-900/90 dark:to-zinc-950/70 border border-emerald-200/80 dark:border-emerald-900/40 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                        <DownloadCloud className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6]">
+                          Edición Completa & Portada Oficial
+                        </h4>
+                        <p className="text-[10.5px] text-[#881337]/70 dark:text-zinc-400">
+                          Descarga el texto completo íntegro (100+ capítulos) y la portada oficial
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleDownloadAllSeries}
+                    disabled={isDownloadingEpisodes}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
+                  >
+                    <DownloadCloud className="w-4 h-4" />
+                    <span>{isDownloadingEpisodes ? 'Descargando...' : 'Descargar Obra Completa y Portada Oficial'}</span>
+                  </button>
+
+                  {/* Real-time Progress Bar for Books */}
+                  {isDownloadingEpisodes && updateProgress && (
+                    <div className="p-3 rounded-xl bg-white/95 dark:bg-zinc-800/95 border border-emerald-200 dark:border-zinc-700 space-y-2 animate-in fade-in duration-150">
+                      <div className="flex items-center justify-between text-[11px] font-bold text-emerald-950 dark:text-zinc-200">
+                        <span className="truncate">{updateProgress.message}</span>
+                        <span>{updateProgress.percent}%</span>
+                      </div>
+                      <div className="w-full bg-emerald-100 dark:bg-zinc-700 h-2.5 rounded-full overflow-hidden">
+                        <div
+                          className="bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 h-full transition-all duration-300 rounded-full"
+                          style={{ width: `${updateProgress.percent}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Reading Progress Card */}
               <div className="p-4 bg-rose-50/50 dark:bg-zinc-900/60 rounded-2xl border border-rose-200/70 dark:border-zinc-800 space-y-3">

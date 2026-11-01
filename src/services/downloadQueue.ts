@@ -1,6 +1,7 @@
 import type { CatalogItem } from './catalogData';
 import { importBookFile } from './bookImporter';
 import { subscribeDownloadProgress } from './catalog/generators';
+import { fetchOfficialCoverUrl } from './coverFetcher';
 
 export interface QueueItem {
   id: string;
@@ -122,13 +123,23 @@ class DownloadQueueService {
       next.progressPercent = 40;
       this.notify();
 
-      // 1. Generate local file (EPUB or CBZ)
+      // 1. Fetch official real cover in parallel or prior
+      let officialCoverUrl: string | null = null;
+      try {
+        officialCoverUrl = await fetchOfficialCoverUrl(
+          next.item.title,
+          next.item.author,
+          next.item.category
+        );
+      } catch {}
+
+      // 2. Generate local file (EPUB or CBZ)
       const file = await next.item.createFile();
 
-      next.progressPercent = 75;
+      next.progressPercent = 80;
       this.notify();
 
-      // 2. Import into user's library with catalog metadata
+      // 3. Import into user's library with catalog metadata and real official cover
       await importBookFile(
         file,
         [next.item.category !== 'libros' ? 'cat-manga' : 'cat-books'],
@@ -136,6 +147,7 @@ class DownloadQueueService {
           title: next.item.title,
           author: next.item.author,
           description: next.item.description,
+          coverUrl: officialCoverUrl || undefined,
         }
       );
 
