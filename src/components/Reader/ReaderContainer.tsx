@@ -3,18 +3,11 @@ import {
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
-  Sliders,
+  SlidersHorizontal,
   Loader2,
-  Maximize,
-  Minimize,
-  Volume2,
-  Zap,
   Bookmark as BookmarkIcon,
-  List,
-  Scroll,
-  BookOpen,
-  Smartphone,
   Search,
+  BookOpen,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { getBookFile } from '../../services/storage';
@@ -56,8 +49,7 @@ export const ReaderContainer: React.FC = () => {
     settings.orientationLock || 'auto'
   );
 
-  const toggleOrientationLock = async () => {
-    const next = orientationMode === 'auto' ? 'portrait' : orientationMode === 'portrait' ? 'landscape' : 'auto';
+  const changeOrientation = async (next: 'auto' | 'portrait' | 'landscape') => {
     setOrientationMode(next);
     updateSettings({ orientationLock: next });
 
@@ -501,119 +493,37 @@ export const ReaderContainer: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-1 shrink-0">
-          {/* Dedicated Reading Mode Button */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* 1. Quick Search Button */}
           <button
-            onClick={toggleReadingMode}
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-xs ${
-              isContinuousReading
-                ? 'bg-rose-500/30 text-rose-300 dark:bg-zinc-700/50 dark:text-zinc-200 border border-rose-400/50 dark:border-zinc-500/60 ring-2 ring-rose-400/20 dark:ring-zinc-400/20'
-                : 'text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-zinc-800 border border-slate-700/60'
-            }`}
-            title={isContinuousReading ? 'Modo Continuo (Activo - Clic para Modo Paginado)' : 'Modo Paginado (Activo - Clic para Modo Continuo)'}
+            onClick={() => setShowSearchDrawer(true)}
+            className="p-2 sm:p-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-zinc-800 transition-all active:scale-90 cursor-pointer"
+            title="Buscar texto en el libro"
           >
-            {isContinuousReading ? (
-              <Scroll className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-            ) : (
-              <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-            )}
-            <span className="text-[11px] sm:text-xs">
-              {isContinuousReading ? 'Modo Continuo' : 'Modo Paginado'}
-            </span>
-            {isContinuousReading && (
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-400 dark:bg-zinc-400 animate-pulse hidden sm:inline-block" />
-            )}
+            <Search className="w-5 h-5 stroke-[2.2]" />
           </button>
 
-          {/* TTS Audio Reading Button (MoonReader) */}
-          <button
-            onClick={() => setShowTtsModal(prev => !prev)}
-            className={`p-2 rounded-xl transition-colors ${
-              showTtsModal
-                ? 'bg-blue-600/30 text-blue-400 border border-blue-500/40'
-                : 'text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-emerald-900/40'
-            }`}
-            title="Lectura en voz alta (TTS)"
-          >
-            <Volume2 className="w-4 h-4" />
-          </button>
-
-          {/* Auto-Scroll / Auto-Advance Button (MoonReader) */}
-          <button
-            onClick={() => setShowAutoScroll(prev => !prev)}
-            className={`p-2 rounded-xl transition-colors ${
-              showAutoScroll
-                ? 'bg-emerald-500/30 text-emerald-400 border border-emerald-500/40'
-                : 'text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-emerald-900/40'
-            }`}
-            title="Lectura automática manos libres"
-          >
-            <Zap className="w-4 h-4" />
-          </button>
-
-          {/* Instant Bookmark current page (MoonReader) */}
+          {/* 2. Quick Bookmark Toggle Button */}
           <button
             onClick={handleToggleCurrentBookmark}
-            className={`p-2 rounded-xl transition-colors ${
+            className={`p-2 sm:p-2.5 rounded-xl transition-all active:scale-90 cursor-pointer ${
               isCurrentBookmarked
-                ? 'bg-amber-500/30 text-amber-400 border border-amber-500/40'
-                : 'text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-emerald-900/40'
+                ? 'bg-amber-500/25 text-amber-400 border border-amber-500/40 ring-2 ring-amber-400/20'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-zinc-800'
             }`}
             title={isCurrentBookmarked ? 'Eliminar marcador de esta página' : 'Guardar marcador en esta página'}
           >
-            <BookmarkIcon className={`w-4 h-4 ${isCurrentBookmarked ? 'fill-amber-400' : ''}`} />
+            <BookmarkIcon className={`w-5 h-5 stroke-[2.2] ${isCurrentBookmarked ? 'fill-amber-400' : ''}`} />
           </button>
 
-          {/* Bookmarks List Drawer (MoonReader) */}
-          <button
-            onClick={() => setShowBookmarksDrawer(true)}
-            className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-emerald-900/40 transition-colors relative"
-            title="Ver todos los marcadores"
-          >
-            <List className="w-4 h-4" />
-            {currentBookmarks.length > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-400 ring-2 ring-slate-900" />
-            )}
-          </button>
-
-          {/* Search inside Book */}
-          <button
-            onClick={() => setShowSearchDrawer(true)}
-            className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-zinc-800 transition-colors"
-            title="Buscar texto en el libro"
-          >
-            <Search className="w-4 h-4" />
-          </button>
-
-          {/* Orientation Lock (Auto / Vertical / Horizontal) */}
-          <button
-            onClick={toggleOrientationLock}
-            className={`p-2 rounded-xl transition-colors ${
-              orientationMode !== 'auto'
-                ? 'bg-rose-500/30 text-rose-300 dark:bg-zinc-700 dark:text-zinc-200 border border-rose-400/50 dark:border-zinc-500'
-                : 'text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-zinc-800'
-            }`}
-            title={`Bloqueo de rotación: ${orientationMode === 'portrait' ? 'Vertical' : orientationMode === 'landscape' ? 'Horizontal' : 'Auto'}`}
-          >
-            <Smartphone className={`w-4 h-4 ${orientationMode === 'landscape' ? 'rotate-90' : ''}`} />
-          </button>
-
-          {/* MoonReader Reading Settings & Themes */}
+          {/* 3. Ergonomic Reader Menu / Controls Bottom Sheet Trigger */}
           <button
             onClick={() => setShowSettingsSheet(true)}
-            className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-emerald-900/40 transition-colors"
-            title="Ajustes de lectura y temas"
+            className="flex items-center gap-1.5 py-1.5 px-3 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-200 hover:text-white border border-slate-700 dark:border-zinc-700 transition-all active:scale-95 cursor-pointer shadow-xs ml-0.5"
+            title="Ajustes de lectura, modo y herramientas"
           >
-            <Sliders className="w-4 h-4" />
-          </button>
-
-          {/* Fullscreen toggle */}
-          <button
-            onClick={toggleFullscreen}
-            className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-emerald-900/40 transition-colors hidden sm:block"
-            title="Pantalla completa"
-          >
-            {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+            <SlidersHorizontal className="w-4 h-4 stroke-[2.2]" />
+            <span className="text-xs font-bold hidden sm:inline">Menú</span>
           </button>
         </div>
       </div>
@@ -806,12 +716,30 @@ export const ReaderContainer: React.FC = () => {
         }}
       />
 
-      {/* Settings Bottom Sheet (MoonReader Themes & Options) */}
+      {/* Settings & Controls Bottom Sheet (MoonReader Themes, Tools & Ergonomic Controls) */}
       <FilterSettingsSheet
         isOpen={showSettingsSheet}
         onClose={() => setShowSettingsSheet(false)}
         isManga={isManga}
         isTextBased={isTextBased}
+        isContinuousReading={isContinuousReading}
+        onToggleReadingMode={toggleReadingMode}
+        orientationMode={orientationMode}
+        onChangeOrientation={changeOrientation}
+        isFullscreen={isFullscreen}
+        onToggleFullscreen={toggleFullscreen}
+        onOpenTts={() => setShowTtsModal(true)}
+        onToggleAutoScroll={() => setShowAutoScroll(prev => !prev)}
+        isAutoScrollActive={showAutoScroll}
+        onOpenBookmarks={() => setShowBookmarksDrawer(true)}
+        bookmarksCount={currentBookmarks.length}
+        onOpenSearch={() => setShowSearchDrawer(true)}
+        smartTrimMargins={settings.smartTrimMargins}
+        onToggleSmartTrim={() => {
+          const next = !settings.smartTrimMargins;
+          updateSettings({ smartTrimMargins: next });
+          showToast(next ? 'Recorte inteligente activado' : 'Recorte desactivado');
+        }}
       />
 
       {/* In-Book Full Text Search Drawer */}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Plus, Trash2, Edit2, Check, Tag } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useBackHandler } from '../services/backButton';
 import type { Category } from '../types';
 
 interface CategoryManagerModalProps {
@@ -27,6 +28,14 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({ isOp
   const [selectedColor, setSelectedColor] = useState(PRESET_COLORS[0]);
   const [editingCatId, setEditingCatId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
+
+  useBackHandler(() => {
+    if (isOpen) {
+      onClose();
+      return true;
+    }
+    return false;
+  }, 100, isOpen);
 
   if (!isOpen) return null;
 

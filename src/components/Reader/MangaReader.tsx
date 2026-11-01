@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import JSZip from 'jszip';
-import { ZoomIn, ZoomOut, Lock, Unlock, Crop } from 'lucide-react';
+import { Lock, Unlock } from 'lucide-react';
 import { isImageFile, naturalSort } from '../../services/parsers/mangaParser';
 import { useApp } from '../../context/AppContext';
 
@@ -78,7 +78,7 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
   onToggleControls,
   showControls,
 }) => {
-  const { settings, activeBook, updateSettings } = useApp();
+  const { settings, activeBook } = useApp();
   const [zip, setZip] = useState<JSZip | null>(null);
   const [pageFilenames, setPageFilenames] = useState<string[]>([]);
   const [pageUrls, setPageUrls] = useState<Map<number, string>>(new Map());
@@ -377,78 +377,43 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
     );
   }
 
-  // Floating Zoom Controls Bar
-  const renderZoomBar = () => (
-    <div
-      onClick={e => e.stopPropagation()}
-      className={`fixed top-14 sm:top-16 right-3 sm:right-6 z-40 bg-slate-900/90 dark:bg-zinc-900/95 backdrop-blur-md border border-slate-700/80 dark:border-zinc-700 rounded-2xl px-2 py-1.5 flex items-center gap-1 shadow-2xl transition-all duration-200 ${
-        showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
-      }`}
-    >
-      {/* Zoom Lock Button */}
-      <button
-        onClick={toggleZoomLock}
-        className={`p-2 rounded-xl transition-all cursor-pointer ${
-          isZoomLocked
-            ? 'bg-zinc-700 text-zinc-100 border border-zinc-500 ring-2 ring-zinc-400/20 shadow-xs'
-            : 'text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-zinc-800'
+  // Subtle floating indicator only when zoomed in (to avoid obstructing the manga art)
+  const renderZoomBar = () => {
+    if (scale === 1.0 && !isZoomLocked) return null;
+
+    return (
+      <div
+        onClick={e => e.stopPropagation()}
+        className={`fixed top-16 right-4 z-40 bg-slate-900/90 dark:bg-zinc-900/95 backdrop-blur-md border border-slate-700/80 dark:border-zinc-700 rounded-2xl px-3 py-1.5 flex items-center gap-2 shadow-2xl transition-all duration-200 ${
+          showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
         }`}
-        title={isZoomLocked ? `Zoom fijado al manga (${Math.round(scale * 100)}%)` : 'Fijar zoom actual al manga'}
       >
-        {isZoomLocked ? <Lock className="w-4 h-4 text-zinc-100" /> : <Unlock className="w-4 h-4 text-slate-400" />}
-      </button>
+        <button
+          onClick={toggleZoomLock}
+          className={`p-1.5 rounded-xl transition-all cursor-pointer ${
+            isZoomLocked
+              ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
+              : 'text-slate-400 hover:text-white dark:hover:text-zinc-200'
+          }`}
+          title={isZoomLocked ? `Zoom fijado (${Math.round(scale * 100)}%)` : 'Fijar zoom actual a este manga'}
+        >
+          {isZoomLocked ? <Lock className="w-3.5 h-3.5 stroke-[2.2]" /> : <Unlock className="w-3.5 h-3.5" />}
+        </button>
 
-      {/* Zoom In */}
-      <button
-        onClick={() => setScale(s => Math.min(Number((s + 0.15).toFixed(2)), 3.0))}
-        disabled={scale >= 3.0}
-        className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
-        title="Acercar (Zoom +)"
-      >
-        <ZoomIn className="w-4 h-4" />
-      </button>
-
-      {/* Reset Zoom Percent */}
-      <button
-        onClick={() => {
-          setScale(1.0);
-          setPanOffset({ x: 0, y: 0 });
-        }}
-        className="px-2 py-1 text-[11px] font-mono font-bold text-slate-300 hover:text-white dark:hover:text-zinc-100 hover:bg-slate-800 dark:hover:bg-zinc-800 rounded-xl transition-colors cursor-pointer"
-        title="Restablecer tamaño normal (100%)"
-      >
-        {Math.round(scale * 100)}%
-      </button>
-
-      {/* Zoom Out */}
-      <button
-        onClick={() => setScale(s => Math.max(Number((s - 0.15).toFixed(2)), 0.8))}
-        disabled={scale <= 0.8}
-        className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
-        title="Alejar (Zoom -)"
-      >
-        <ZoomOut className="w-4 h-4" />
-      </button>
-
-      {/* Smart Trim Margins */}
-      <button
-        onClick={() => {
-          const next = !settings.smartTrimMargins;
-          updateSettings({ smartTrimMargins: next });
-          setZoomToast(next ? 'Recorte inteligente activado' : 'Recorte de bordes desactivado');
-          setTimeout(() => setZoomToast(null), 2000);
-        }}
-        className={`p-2 rounded-xl transition-colors cursor-pointer ${
-          settings.smartTrimMargins
-            ? 'bg-rose-500/40 text-rose-300 dark:bg-zinc-700 dark:text-zinc-200'
-            : 'text-slate-400 hover:text-white hover:bg-slate-800 dark:hover:bg-zinc-800'
-        }`}
-        title={settings.smartTrimMargins ? 'Recorte inteligente activo' : 'Activar recorte de bordes en blanco'}
-      >
-        <Crop className="w-4 h-4" />
-      </button>
-    </div>
-  );
+        <button
+          onClick={() => {
+            setScale(1.0);
+            setPanOffset({ x: 0, y: 0 });
+          }}
+          className="text-xs font-mono font-bold text-slate-200 hover:text-white dark:hover:text-zinc-100 flex items-center gap-1 cursor-pointer"
+          title="Toca para restablecer al 100%"
+        >
+          <span>{Math.round(scale * 100)}%</span>
+          <span className="text-[10px] text-slate-400 font-sans font-normal underline ml-0.5">Restablecer</span>
+        </button>
+      </div>
+    );
+  };
 
   // --- Render Mode: Webtoon (Continuous vertical cascade with responsive zoom) ---
   if (settings.mangaDirection === 'webtoon') {

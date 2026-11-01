@@ -15,10 +15,14 @@ import {
   Layers,
   RefreshCw,
   DownloadCloud,
+  Clock,
+  Sparkles,
+  Info,
 } from 'lucide-react';
 import type { Book } from '../types';
 import { useApp } from '../context/AppContext';
 import { createOptimizedThumbnail } from '../utils/thumbnail';
+import { useBackHandler } from '../services/backButton';
 import {
   checkForNewEpisodes,
   downloadAndMergeNewEpisodes,
@@ -33,11 +37,14 @@ interface BookDetailModalProps {
   onClose: () => void;
 }
 
+type ModalTab = 'episodes' | 'synopsis' | 'collection';
+
 export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, onClose }) => {
   const { categories, editBook, deleteBookById, openReader, updateBookProgress, refreshLibrary } = useApp();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [activeTab, setActiveTab] = useState<ModalTab>('episodes');
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [description, setDescription] = useState('');
@@ -56,6 +63,15 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
   const [updateResult, setUpdateResult] = useState<MangaUpdateCheckResult | null>(null);
   const [updateProgress, setUpdateProgress] = useState<UpdateDownloadProgress | null>(null);
 
+  // Android Back Button handler
+  useBackHandler(() => {
+    if (isOpen) {
+      onClose();
+      return true;
+    }
+    return false;
+  }, 100, isOpen);
+
   useEffect(() => {
     if (book) {
       setTitle(book.title);
@@ -73,6 +89,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
       setIsDownloadingEpisodes(false);
       setUpdateResult(null);
       setUpdateProgress(null);
+      setActiveTab('episodes');
     }
   }, [book]);
 
@@ -80,7 +97,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
 
   const showNotice = (msg: string) => {
     setNotification(msg);
-    setTimeout(() => setNotification(null), 3000);
+    setTimeout(() => setNotification(null), 3200);
   };
 
   const toggleCategory = (catId: string) => {
@@ -94,19 +111,17 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
     editBook(book.id, { categoryIds: next });
   };
 
-  // Manual Cover Change Handler
   const handleCoverFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setIsProcessingCover(true);
     try {
-      // Optimize & convert user image into a permanent, lightweight thumbnail (~30KB)
       const optimizedThumbnail = await createOptimizedThumbnail(file, 320, 460, 0.8);
       if (optimizedThumbnail) {
         setCoverUrl(optimizedThumbnail);
         await editBook(book.id, { coverUrl: optimizedThumbnail });
-        showNotice('¡Portada actualizada y guardada localmente!');
+        showNotice('¡Portada actualizada y guardada!');
       }
     } catch {
       alert('No se pudo procesar la imagen seleccionada.');
@@ -125,12 +140,17 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
       description: description.trim() || undefined,
       categoryIds: assignedCats,
       series: series.trim() || undefined,
-      seriesOrder: typeof seriesOrder === 'number' && !isNaN(seriesOrder) ? seriesOrder : typeof seriesOrder === 'string' && seriesOrder.trim() ? Number(seriesOrder) : undefined,
+      seriesOrder:
+        typeof seriesOrder === 'number' && !isNaN(seriesOrder)
+          ? seriesOrder
+          : typeof seriesOrder === 'string' && seriesOrder.trim()
+          ? Number(seriesOrder)
+          : undefined,
       rating: rating > 0 ? rating : undefined,
       review: review.trim() || undefined,
     });
     setIsEditingDescription(false);
-    showNotice('¡Cambios guardados con éxito!');
+    showNotice('¡Detalles guardados exitosamente!');
   };
 
   const handleResetProgress = async () => {
@@ -198,10 +218,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
       message: 'Conectando con MangaDex para consultar la serie completa...',
     });
     try {
-      const { updatedBook, totalPages } = await downloadAllAvailableEpisodes(
-        book,
-        p => setUpdateProgress(p)
-      );
+      const { updatedBook, totalPages } = await downloadAllAvailableEpisodes(book, p => setUpdateProgress(p));
       await refreshLibrary();
       showNotice(`¡Manga completo descargado con éxito! (${totalPages} páginas locales).`);
       setUpdateResult({
@@ -254,19 +271,23 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
 
   const getFormatBadge = (format: string) => {
     switch (format) {
-      case 'pdf': return 'bg-rose-500 text-white';
+      case 'pdf':
+        return 'bg-rose-500 text-white';
       case 'cbz':
       case 'cbr':
-      case 'zip': return 'bg-purple-600 text-white';
-      case 'epub': return 'bg-emerald-600 text-white';
-      default: return 'bg-sky-600 text-white';
+      case 'zip':
+        return 'bg-purple-600 text-white';
+      case 'epub':
+        return 'bg-emerald-600 text-white';
+      default:
+        return 'bg-sky-600 text-white';
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/65 backdrop-blur-xs animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-xl bg-white dark:bg-[#18191c] border border-rose-200 dark:border-zinc-700/80 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 max-h-[92vh] flex flex-col text-[#4c0519] dark:text-[#f3f4f6]"
+        className="relative w-full max-w-xl bg-white dark:bg-[#18191c] border-t sm:border border-rose-200 dark:border-zinc-700/80 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom sm:zoom-in-95 duration-200 max-h-[92vh] flex flex-col text-[#4c0519] dark:text-[#f3f4f6]"
         onClick={e => e.stopPropagation()}
       >
         {/* Hidden File Input for changing cover */}
@@ -278,67 +299,66 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
           onChange={handleCoverFileChange}
         />
 
-        {/* Modal Header */}
-        <div className="p-4 sm:p-5 border-b border-rose-100 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-[#fff5f8]/70 dark:bg-zinc-900/70">
-          <div className="flex items-center gap-2">
+        {/* Temporary Notification Banner */}
+        {notification && (
+          <div className="bg-emerald-600 text-white text-xs font-bold py-2 px-4 text-center animate-in fade-in duration-200 shrink-0 shadow-md">
+            {notification}
+          </div>
+        )}
+
+        {/* Modal Top Bar */}
+        <div className="px-4 py-3 sm:px-5 sm:py-3.5 border-b border-rose-100 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-[#fff5f8]/80 dark:bg-zinc-900/80">
+          <div className="flex items-center gap-2 min-w-0">
             <span
-              className={`text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider ${getFormatBadge(
+              className={`text-[9.5px] font-black px-2.5 py-0.5 rounded-md uppercase tracking-wider shadow-2xs ${getFormatBadge(
                 book.format
               )}`}
             >
               {book.format.toUpperCase()}
             </span>
-            <h3 className="text-sm sm:text-base font-bold text-[#4c0519] dark:text-[#f3f4f6] truncate max-w-[280px] sm:max-w-md">
-              {book.title}
-            </h3>
+            <span className="text-xs font-bold text-rose-900/60 dark:text-zinc-400 truncate">
+              Detalles de la Obra
+            </span>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full text-rose-400 dark:text-zinc-400 hover:bg-rose-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+            className="p-2 -mr-1 rounded-full text-rose-400 dark:text-zinc-400 hover:bg-rose-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+            title="Cerrar ventana"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 stroke-[2.2]" />
           </button>
         </div>
 
-        {/* Temporary Notification Banner */}
-        {notification && (
-          <div className="bg-emerald-500 text-white text-xs font-bold py-1.5 px-4 text-center animate-in fade-in duration-200 shrink-0">
-            {notification}
-          </div>
-        )}
-
-        {/* Scrollable Content Body */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
-          {/* Top Section: Cover with Change Cover Button + Info */}
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 items-center sm:items-start">
-            {/* Book Cover with Hover / Tap to change */}
-            <div className="relative group w-32 aspect-[3/4.2] rounded-2xl overflow-hidden bg-rose-100 dark:bg-zinc-800 shrink-0 shadow-md border border-rose-200/80 dark:border-zinc-700">
+        {/* Hero Card: Cover + Titles + Primary READ NOW Button */}
+        <div className="p-4 sm:p-5 border-b border-rose-100/80 dark:border-zinc-800/80 bg-gradient-to-b from-[#fff5f8]/40 to-white dark:from-zinc-900/40 dark:to-[#18191c] shrink-0">
+          <div className="flex gap-4 items-center">
+            {/* Book Cover with 1-tap change */}
+            <div className="relative group w-24 sm:w-28 aspect-[3/4.2] rounded-2xl overflow-hidden bg-rose-100 dark:bg-zinc-800 shrink-0 shadow-md border border-rose-200/80 dark:border-zinc-700">
               {coverUrl ? (
                 <img
                   src={coverUrl}
                   alt={book.title}
-                  className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-200"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                 />
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center text-rose-300 dark:text-zinc-500">
-                  <BookOpen className="w-10 h-10 mb-1" />
-                  <span className="text-[10px] font-semibold opacity-70">Sin Portada</span>
+                  <BookOpen className="w-8 h-8 mb-1" />
+                  <span className="text-[9px] font-semibold opacity-70">Sin Portada</span>
                 </div>
               )}
 
-              {/* Change Cover Overlay / Button */}
+              {/* Cover overlay button */}
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isProcessingCover}
-                className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 text-white p-2 text-center cursor-pointer"
+                className="absolute inset-0 bg-black/55 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 text-white p-2 text-center cursor-pointer"
                 title="Cambiar la imagen de portada"
               >
-                <Camera className="w-6 h-6 stroke-[2]" />
-                <span className="text-[10px] font-bold">Cambiar Portada</span>
+                <Camera className="w-5 h-5 stroke-[2.2]" />
+                <span className="text-[9px] font-bold">Cambiar</span>
               </button>
 
-              {/* Mobile button visible on phone */}
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
@@ -350,345 +370,417 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
               </button>
             </div>
 
-            {/* Editable Title, Author & Metadata */}
-            <div className="flex-1 w-full space-y-2.5">
+            {/* Title, Author & Meta */}
+            <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
               <div>
-                <label className="text-[10px] font-bold text-rose-900/60 dark:text-zinc-400 uppercase tracking-wider block mb-1">
-                  Título de la Obra
-                </label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={e => setTitle(e.target.value)}
-                  className="w-full text-sm font-bold bg-rose-50/50 dark:bg-zinc-900/80 border border-rose-200 dark:border-zinc-700 rounded-xl px-3 py-1.5 text-[#4c0519] dark:text-[#f3f4f6] outline-none focus:ring-1 focus:ring-rose-400 dark:focus:ring-zinc-500"
-                />
+                <h3 className="text-base sm:text-lg font-black text-[#4c0519] dark:text-[#f3f4f6] line-clamp-2 leading-tight">
+                  {book.title}
+                </h3>
+                <p className="text-xs text-[#881337]/75 dark:text-zinc-400 font-medium truncate mt-0.5">
+                  {book.author || 'Autor desconocido'}
+                </p>
+                <div className="flex flex-wrap items-center gap-2 text-[11px] text-[#881337]/70 dark:text-zinc-400 font-medium mt-1.5">
+                  <span className="font-bold text-[#4c0519] dark:text-zinc-200">{book.totalPages} págs</span>
+                  <span>•</span>
+                  <span>{formatFileSize(book.fileSize)}</span>
+                  <span>•</span>
+                  <span>{formatDate(book.dateAdded)}</span>
+                </div>
               </div>
 
-              <div>
-                <label className="text-[10px] font-bold text-rose-900/60 dark:text-zinc-400 uppercase tracking-wider block mb-1">
-                  Autor / Creador
-                </label>
-                <input
-                  type="text"
-                  placeholder="Autor desconocido"
-                  value={author}
-                  onChange={e => setAuthor(e.target.value)}
-                  className="w-full text-xs bg-rose-50/50 dark:bg-zinc-900/80 border border-rose-200 dark:border-zinc-700 rounded-xl px-3 py-1.5 text-[#881337] dark:text-zinc-300 outline-none focus:ring-1 focus:ring-rose-400 dark:focus:ring-zinc-500"
-                />
-              </div>
-
-              {/* Quick specs */}
-              <div className="flex flex-wrap items-center gap-2 text-xs text-[#881337]/75 dark:text-zinc-400 pt-1">
-                <span>Páginas: <strong className="text-[#4c0519] dark:text-[#f3f4f6]">{book.totalPages}</strong></span>
-                <span>•</span>
-                <span>Tamaño: <strong className="text-[#4c0519] dark:text-[#f3f4f6]">{formatFileSize(book.fileSize)}</strong></span>
-                <span>•</span>
-                <span>Añadido: <strong className="text-[#4c0519] dark:text-[#f3f4f6]">{formatDate(book.dateAdded)}</strong></span>
-              </div>
-
-              {/* Button to manually change cover on desktop */}
-              <div className="pt-1">
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-zinc-800 hover:bg-rose-100 dark:hover:bg-zinc-700 border border-rose-200/80 dark:border-zinc-700 text-[11px] font-bold text-rose-700 dark:text-zinc-200 transition-colors cursor-pointer"
-                >
-                  <Upload className="w-3.5 h-3.5" />
-                  <span>Subir nueva imagen de portada</span>
-                </button>
-              </div>
+              {/* PRIMARY ACTION: Continuar o Comenzar Lectura */}
+              <button
+                type="button"
+                onClick={handleStartReading}
+                className="mt-3 w-full flex items-center justify-center gap-2 bg-gradient-to-r from-rose-500 via-pink-500 to-rose-400 dark:from-zinc-100 dark:via-zinc-200 dark:to-zinc-300 dark:text-zinc-950 text-white font-bold py-2.5 px-4 rounded-xl text-xs sm:text-sm shadow-md shadow-rose-500/25 active:scale-98 transition-all cursor-pointer"
+              >
+                <Play className="w-4 h-4 fill-current stroke-[1.5]" />
+                <span>
+                  {book.progress > 0 && book.progress < 100
+                    ? `Continuar (Pág ${book.currentPage} de ${book.totalPages} • ${book.progress}%)`
+                    : 'Comenzar Lectura'}
+                </span>
+              </button>
             </div>
           </div>
+        </div>
 
-          {/* GESTOR DE EPISODIOS Y ACTUALIZACIONES DE MANGA / CÓMIC */}
-          {isManga && (
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-50/70 to-indigo-50/40 dark:from-zinc-900/90 dark:to-zinc-950/70 border border-purple-200/80 dark:border-purple-900/40 space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
-                    <RefreshCw className={`w-4 h-4 ${isCheckingEpisodes ? 'animate-spin' : ''}`} />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6]">
-                      Episodios y Capítulos
-                    </h4>
-                    <p className="text-[10px] text-[#881337]/70 dark:text-zinc-400">
-                      Actualiza la obra con los nuevos capítulos publicados en línea
-                    </p>
-                  </div>
-                </div>
+        {/* Tab Navigation Segmented Bar (Thumb-friendly & High-contrast) */}
+        <div className="px-4 py-2 border-b border-rose-100 dark:border-zinc-800 bg-[#fff5f8]/50 dark:bg-zinc-900/50 flex items-center gap-1.5 shrink-0">
+          <button
+            type="button"
+            onClick={() => setActiveTab('episodes')}
+            className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
+              activeTab === 'episodes'
+                ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
+                : 'text-[#881337]/70 dark:text-zinc-400 hover:bg-rose-100/60 dark:hover:bg-zinc-800'
+            }`}
+          >
+            {isManga ? 'Episodios & Lectura' : 'Lectura & Progreso'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('synopsis')}
+            className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
+              activeTab === 'synopsis'
+                ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
+                : 'text-[#881337]/70 dark:text-zinc-400 hover:bg-rose-100/60 dark:hover:bg-zinc-800'
+            }`}
+          >
+            Sinopsis & Ficha
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('collection')}
+            className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
+              activeTab === 'collection'
+                ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
+                : 'text-[#881337]/70 dark:text-zinc-400 hover:bg-rose-100/60 dark:hover:bg-zinc-800'
+            }`}
+          >
+            Reseña & Colección
+          </button>
+        </div>
 
-                <div className="flex flex-wrap items-center gap-2 shrink-0">
-                  <button
-                    type="button"
-                    onClick={handleCheckForNewEpisodes}
-                    disabled={isCheckingEpisodes || isDownloadingEpisodes}
-                    className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
-                    title="Comprobar si hay nuevos episodios disponibles"
-                  >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isCheckingEpisodes ? 'animate-spin' : ''}`} />
-                    <span>{isCheckingEpisodes ? 'Buscando...' : 'Buscar nuevos episodios'}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleDownloadAllSeries}
-                    disabled={isCheckingEpisodes || isDownloadingEpisodes}
-                    className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
-                    title="Descargar todos los episodios disponibles de la serie completa en un solo clic"
-                  >
-                    <DownloadCloud className="w-3.5 h-3.5" />
-                    <span>Descargar TODO</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Status and Results Banner */}
-              {updateResult && (
-                <div className="p-3 rounded-xl bg-white/90 dark:bg-zinc-800/90 border border-purple-100 dark:border-zinc-700 space-y-2.5 animate-in fade-in duration-200">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div>
-                      <p className="text-xs font-bold text-purple-950 dark:text-purple-200">
-                        {updateResult.hasUpdates
-                          ? `¡Se encontraron ${updateResult.newChapters.length} episodios nuevos!`
-                          : 'Obra al día'}
-                      </p>
-                      <p className="text-[11px] text-purple-800/80 dark:text-zinc-300 mt-0.5">
-                        {updateResult.message}
-                      </p>
+        {/* Tab Content Area */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+          {/* TAB 1: EPISODIOS & LECTURA */}
+          {activeTab === 'episodes' && (
+            <div className="space-y-4 animate-in fade-in duration-150">
+              {/* Manga / Comic Multi-Episode & Update Actions */}
+              {isManga ? (
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-50/80 to-indigo-50/50 dark:from-zinc-900/90 dark:to-zinc-950/70 border border-purple-200/80 dark:border-purple-900/40 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                        <RefreshCw className={`w-4 h-4 ${isCheckingEpisodes ? 'animate-spin' : ''}`} />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6]">
+                          Episodios y Capítulos Online
+                        </h4>
+                        <p className="text-[10.5px] text-[#881337]/70 dark:text-zinc-400">
+                          Sincroniza y descarga automáticamente desde la fuente original
+                        </p>
+                      </div>
                     </div>
-                    {updateResult.hasUpdates && !isDownloadingEpisodes && (
-                      <button
-                        type="button"
-                        onClick={handleDownloadNewEpisodes}
-                        className="shrink-0 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
-                      >
-                        <DownloadCloud className="w-3.5 h-3.5" />
-                        <span>Descargar TODO ({updateResult.newChapters.length} episodios)</span>
-                      </button>
-                    )}
                   </div>
 
-                  {/* Real-time Progress when downloading new episodes */}
+                  {/* 2 Main Action Buttons: Buscar Nuevos & Descargar TODO */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                    <button
+                      type="button"
+                      onClick={handleCheckForNewEpisodes}
+                      disabled={isCheckingEpisodes || isDownloadingEpisodes}
+                      className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
+                      title="Comprobar si hay nuevos episodios disponibles"
+                    >
+                      <RefreshCw className={`w-4 h-4 ${isCheckingEpisodes ? 'animate-spin' : ''}`} />
+                      <span>{isCheckingEpisodes ? 'Buscando...' : 'Buscar nuevos episodios'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleDownloadAllSeries}
+                      disabled={isCheckingEpisodes || isDownloadingEpisodes}
+                      className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
+                      title="Descargar todos los episodios disponibles de la serie completa"
+                    >
+                      <DownloadCloud className="w-4 h-4" />
+                      <span>Descargar TODO</span>
+                    </button>
+                  </div>
+
+                  {/* Status Banner when checking or download progress */}
+                  {updateResult && (
+                    <div className="p-3 rounded-xl bg-white/95 dark:bg-zinc-800/95 border border-purple-100 dark:border-zinc-700 space-y-2 animate-in fade-in duration-200">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                          <p className="text-xs font-bold text-purple-950 dark:text-purple-200">
+                            {updateResult.hasUpdates
+                              ? `¡Se encontraron ${updateResult.newChapters.length} episodios nuevos!`
+                              : 'Obra al día'}
+                          </p>
+                          <p className="text-[11px] text-purple-800/80 dark:text-zinc-300 mt-0.5">
+                            {updateResult.message}
+                          </p>
+                        </div>
+                        {updateResult.hasUpdates && !isDownloadingEpisodes && (
+                          <button
+                            type="button"
+                            onClick={handleDownloadNewEpisodes}
+                            className="shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+                          >
+                            <DownloadCloud className="w-3.5 h-3.5" />
+                            <span>Descargar ({updateResult.newChapters.length} cap.)</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Real-time Progress Bar */}
                   {isDownloadingEpisodes && updateProgress && (
-                    <div className="space-y-1.5 pt-1 border-t border-purple-100 dark:border-zinc-700/60">
-                      <div className="flex items-center justify-between text-[10px] font-semibold text-purple-900 dark:text-zinc-300">
+                    <div className="p-3 rounded-xl bg-white/95 dark:bg-zinc-800/95 border border-purple-200 dark:border-zinc-700 space-y-2 animate-in fade-in duration-150">
+                      <div className="flex items-center justify-between text-[11px] font-bold text-purple-950 dark:text-zinc-200">
                         <span className="truncate">{updateProgress.message}</span>
                         <span>{updateProgress.percent}%</span>
                       </div>
-                      <div className="w-full bg-purple-100 dark:bg-zinc-700 h-2 rounded-full overflow-hidden">
+                      <div className="w-full bg-purple-100 dark:bg-zinc-700 h-2.5 rounded-full overflow-hidden">
                         <div
-                          className="bg-gradient-to-r from-purple-600 to-pink-500 h-full transition-all duration-300"
+                          className="bg-gradient-to-r from-purple-600 via-pink-500 to-rose-500 h-full transition-all duration-300 rounded-full"
                           style={{ width: `${updateProgress.percent}%` }}
                         />
                       </div>
                     </div>
                   )}
                 </div>
-              )}
+              ) : null}
+
+              {/* Reading Progress Card */}
+              <div className="p-4 bg-rose-50/50 dark:bg-zinc-900/60 rounded-2xl border border-rose-200/70 dark:border-zinc-800 space-y-3">
+                <div className="flex justify-between items-center text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6]">
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="w-4 h-4 text-rose-500 dark:text-zinc-400" />
+                    Progreso de lectura personal
+                  </span>
+                  <span className="text-rose-600 dark:text-zinc-200 font-extrabold text-sm">
+                    {book.progress}%
+                  </span>
+                </div>
+
+                <div className="w-full h-3 bg-rose-200/50 dark:bg-zinc-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-rose-500 to-pink-500 dark:from-zinc-200 dark:to-zinc-400 rounded-full transition-all duration-300"
+                    style={{ width: `${Math.max(3, book.progress)}%` }}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] text-[#881337]/75 dark:text-zinc-400 pt-0.5">
+                  <span>Página {book.currentPage} de {book.totalPages}</span>
+                  <button
+                    type="button"
+                    onClick={handleResetProgress}
+                    className="font-bold text-[#881337]/80 hover:text-rose-600 dark:text-zinc-300 dark:hover:text-white flex items-center gap-1 transition-colors cursor-pointer"
+                  >
+                    <RotateCcw className="w-3 h-3" /> Reiniciar a pág. 1
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
-          {/* SINOPSIS / RESUMEN DE LA OBRA */}
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-rose-50/60 to-pink-50/30 dark:from-zinc-900/80 dark:to-zinc-950/60 border border-rose-200/80 dark:border-zinc-800">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-1.5">
-                <FileText className="w-4 h-4 text-rose-500 dark:text-zinc-400" />
-                <h4 className="text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6] uppercase tracking-wider">
-                  Sinopsis / Resumen
-                </h4>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsEditingDescription(!isEditingDescription)}
-                className="text-[11px] font-semibold text-rose-600 dark:text-zinc-300 hover:underline flex items-center gap-1 cursor-pointer"
-              >
-                <Edit3 className="w-3 h-3" />
-                <span>{isEditingDescription ? 'Listo' : 'Editar sinopsis'}</span>
-              </button>
-            </div>
-
-            {isEditingDescription ? (
-              <textarea
-                rows={4}
-                value={description}
-                onChange={e => setDescription(e.target.value)}
-                placeholder="Escribe o pega una breve sinopsis o resumen de esta obra..."
-                className="w-full text-xs p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-rose-200 dark:border-zinc-700 text-[#4c0519] dark:text-[#f3f4f6] outline-none"
-              />
-            ) : description ? (
-              <p className="text-xs text-[#881337]/90 dark:text-zinc-300 leading-relaxed max-h-36 overflow-y-auto whitespace-pre-line pr-1">
-                {description}
-              </p>
-            ) : (
-              <p className="text-xs text-[#881337]/60 dark:text-zinc-400 italic">
-                Esta obra no tiene sinopsis registrada aún. Toca en «Editar sinopsis» para añadir un resumen.
-              </p>
-            )}
-          </div>
-
-          {/* AGRUPACIÓN POR SAGA O COLECCIÓN */}
-          <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-zinc-900/60 border border-slate-200/80 dark:border-zinc-800 space-y-2">
-            <div className="flex items-center gap-1.5">
-              <Layers className="w-4 h-4 text-purple-500 dark:text-purple-400" />
-              <h4 className="text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6] uppercase tracking-wider">
-                Saga o Colección
-              </h4>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <div className="sm:col-span-2">
-                <label className="text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider block mb-1">
-                  Nombre de la Saga / Serie
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ej: One Piece, Dune, Batman..."
-                  value={series}
-                  onChange={e => setSeries(e.target.value)}
-                  className="w-full text-xs p-2 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 text-[#4c0519] dark:text-[#f3f4f6] outline-none"
-                />
-              </div>
-              <div>
-                <label className="text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider block mb-1">
-                  Tomo / Volumen Nº
-                </label>
-                <input
-                  type="number"
-                  placeholder="Ej: 1"
-                  value={seriesOrder}
-                  onChange={e => setSeriesOrder(e.target.value)}
-                  className="w-full text-xs p-2 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 text-[#4c0519] dark:text-[#f3f4f6] outline-none"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* CALIFICACIÓN Y RESEÑA PERSONAL */}
-          <div className="p-3.5 rounded-2xl bg-amber-500/10 dark:bg-zinc-900/60 border border-amber-500/25 dark:border-zinc-800 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6] uppercase tracking-wider">
-                Tu Calificación & Reseña
-              </span>
-              <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map(s => (
+          {/* TAB 2: SINOPSIS & FICHA TÉCNICA */}
+          {activeTab === 'synopsis' && (
+            <div className="space-y-4 animate-in fade-in duration-150">
+              {/* Sinopsis Card */}
+              <div className="p-4 rounded-2xl bg-rose-50/50 dark:bg-zinc-900/60 border border-rose-200/70 dark:border-zinc-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <FileText className="w-4 h-4 text-rose-500 dark:text-zinc-400" />
+                    <h4 className="text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6] uppercase tracking-wider">
+                      Sinopsis / Resumen
+                    </h4>
+                  </div>
                   <button
-                    key={s}
                     type="button"
-                    onClick={() => setRating(s)}
-                    className="cursor-pointer hover:scale-110 transition-transform p-0.5"
+                    onClick={() => setIsEditingDescription(!isEditingDescription)}
+                    className="text-xs font-bold text-rose-600 dark:text-zinc-300 hover:underline flex items-center gap-1 cursor-pointer"
                   >
-                    <Star
-                      className={`w-4 h-4 ${
-                        s <= rating
-                          ? 'fill-amber-400 text-amber-400 drop-shadow-xs'
-                          : 'text-slate-300 dark:text-zinc-600'
-                      }`}
-                    />
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span>{isEditingDescription ? 'Listo' : 'Editar sinopsis'}</span>
                   </button>
-                ))}
+                </div>
+
+                {isEditingDescription ? (
+                  <textarea
+                    rows={5}
+                    value={description}
+                    onChange={e => setDescription(e.target.value)}
+                    placeholder="Escribe o pega una breve sinopsis o resumen de esta obra..."
+                    className="w-full text-xs p-3 rounded-xl bg-white dark:bg-zinc-900 border border-rose-200 dark:border-zinc-700 text-[#4c0519] dark:text-[#f3f4f6] outline-none leading-relaxed"
+                  />
+                ) : description ? (
+                  <p className="text-xs text-[#881337]/90 dark:text-zinc-300 leading-relaxed whitespace-pre-line max-h-48 overflow-y-auto pr-1">
+                    {description}
+                  </p>
+                ) : (
+                  <p className="text-xs text-[#881337]/60 dark:text-zinc-400 italic py-2">
+                    Esta obra no tiene sinopsis registrada aún. Toca en «Editar sinopsis» para añadir un resumen.
+                  </p>
+                )}
+              </div>
+
+              {/* Technical Specifications */}
+              <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-zinc-900/60 border border-slate-200/80 dark:border-zinc-800 space-y-3">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6] uppercase tracking-wider">
+                  <Info className="w-4 h-4 text-purple-500 dark:text-purple-400" />
+                  <span>Ficha Técnica y Archivo</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5 text-xs">
+                  <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-800/80 border border-slate-200/60 dark:border-zinc-700/60">
+                    <span className="text-[10px] text-slate-500 dark:text-zinc-400 block font-bold uppercase">Formato</span>
+                    <span className="font-mono font-bold uppercase text-[#4c0519] dark:text-zinc-200">{book.format}</span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-800/80 border border-slate-200/60 dark:border-zinc-700/60">
+                    <span className="text-[10px] text-slate-500 dark:text-zinc-400 block font-bold uppercase">Páginas Totales</span>
+                    <span className="font-mono font-bold text-[#4c0519] dark:text-zinc-200">{book.totalPages}</span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-800/80 border border-slate-200/60 dark:border-zinc-700/60">
+                    <span className="text-[10px] text-slate-500 dark:text-zinc-400 block font-bold uppercase">Tamaño Local</span>
+                    <span className="font-mono font-bold text-[#4c0519] dark:text-zinc-200">{formatFileSize(book.fileSize)}</span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-800/80 border border-slate-200/60 dark:border-zinc-700/60">
+                    <span className="text-[10px] text-slate-500 dark:text-zinc-400 block font-bold uppercase">Fecha de Agregado</span>
+                    <span className="font-bold text-[#4c0519] dark:text-zinc-200">{formatDate(book.dateAdded)}</span>
+                  </div>
+                </div>
+
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white dark:bg-zinc-800 hover:bg-rose-50 dark:hover:bg-zinc-700 border border-rose-200/80 dark:border-zinc-700 text-xs font-bold text-rose-700 dark:text-zinc-200 transition-colors cursor-pointer"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Subir nueva imagen de portada desde el dispositivo</span>
+                  </button>
+                </div>
               </div>
             </div>
-            <textarea
-              rows={2}
-              placeholder="Escribe tus notas, reflexiones o reseña personal sobre esta obra..."
-              value={review}
-              onChange={e => setReview(e.target.value)}
-              className="w-full text-xs p-2 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 text-[#4c0519] dark:text-[#f3f4f6] outline-none resize-none leading-relaxed"
-            />
-          </div>
+          )}
 
-          {/* Reading progress bar */}
-          <div className="p-3.5 bg-rose-50/40 dark:bg-zinc-900/50 rounded-2xl border border-rose-200/60 dark:border-zinc-800">
-            <div className="flex justify-between items-center text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6] mb-2">
-              <span>Progreso de lectura</span>
-              <span className="text-rose-600 dark:text-zinc-200 font-extrabold">
-                {book.progress}% (Página {book.currentPage} de {book.totalPages})
-              </span>
-            </div>
-            <div className="w-full h-2 bg-rose-200/50 dark:bg-zinc-800 rounded-full overflow-hidden mb-2">
-              <div
-                className="h-full bg-gradient-to-r from-rose-500 to-pink-500 dark:from-zinc-200 dark:to-zinc-400 rounded-full transition-all duration-300"
-                style={{ width: `${Math.max(3, book.progress)}%` }}
-              />
-            </div>
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={handleResetProgress}
-                className="text-[11px] font-semibold text-[#881337]/70 hover:text-rose-600 dark:text-zinc-400 dark:hover:text-zinc-200 flex items-center gap-1 transition-colors cursor-pointer"
-              >
-                <RotateCcw className="w-3 h-3" /> Reiniciar progreso a página 1
-              </button>
-            </div>
-          </div>
+          {/* TAB 3: RESEÑA & COLECCIÓN */}
+          {activeTab === 'collection' && (
+            <div className="space-y-4 animate-in fade-in duration-150">
+              {/* Star Rating & Review */}
+              <div className="p-4 rounded-2xl bg-amber-500/10 dark:bg-zinc-900/60 border border-amber-500/25 dark:border-zinc-800 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6] uppercase tracking-wider flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-amber-500" />
+                    Tu Calificación & Reseña
+                  </span>
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map(s => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setRating(s)}
+                        className="cursor-pointer hover:scale-125 transition-transform p-1"
+                      >
+                        <Star
+                          className={`w-5 h-5 ${
+                            s <= rating
+                              ? 'fill-amber-400 text-amber-400 drop-shadow-xs'
+                              : 'text-slate-300 dark:text-zinc-600'
+                          }`}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <textarea
+                  rows={3}
+                  placeholder="Escribe tus reflexiones, opinión o notas personales sobre esta obra..."
+                  value={review}
+                  onChange={e => setReview(e.target.value)}
+                  className="w-full text-xs p-3 rounded-xl bg-white dark:bg-zinc-900 border border-amber-500/30 dark:border-zinc-700 text-[#4c0519] dark:text-[#f3f4f6] outline-none resize-none leading-relaxed"
+                />
+              </div>
 
-          {/* Categories Selector */}
-          <div>
-            <label className="block text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6] mb-2">
-              Categorías de la obra:
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {categories
-                .filter(c => c.id !== 'cat-all')
-                .map(cat => {
-                  const isAssigned = assignedCats.includes(cat.id);
-                  return (
-                    <button
-                      type="button"
-                      key={cat.id}
-                      onClick={() => toggleCategory(cat.id)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                        isAssigned
-                          ? 'bg-gradient-to-r from-rose-500 to-pink-500 dark:from-zinc-200 dark:to-zinc-300 dark:text-zinc-950 text-white shadow-xs'
-                          : 'bg-rose-50 dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 border border-rose-200/60 dark:border-zinc-700'
-                      }`}
-                    >
-                      <span
-                        className="w-2 h-2 rounded-full shrink-0"
-                        style={{ backgroundColor: isAssigned ? '#ffffff' : cat.color }}
-                      />
-                      <span>{cat.name}</span>
-                      {isAssigned && <Check className="w-3 h-3 stroke-[3]" />}
-                    </button>
-                  );
-                })}
+              {/* Series / Saga Grouping */}
+              <div className="p-4 rounded-2xl bg-slate-50/70 dark:bg-zinc-900/60 border border-slate-200/80 dark:border-zinc-800 space-y-2.5">
+                <div className="flex items-center gap-1.5">
+                  <Layers className="w-4 h-4 text-purple-500 dark:text-purple-400" />
+                  <h4 className="text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6] uppercase tracking-wider">
+                    Saga o Colección
+                  </h4>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <div className="sm:col-span-2">
+                    <label className="text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider block mb-1">
+                      Nombre de la Saga / Serie
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Ej: One Piece, Harry Potter, Batman..."
+                      value={series}
+                      onChange={e => setSeries(e.target.value)}
+                      className="w-full text-xs p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 text-[#4c0519] dark:text-[#f3f4f6] outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider block mb-1">
+                      Tomo / Vol. Nº
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Ej: 1"
+                      value={seriesOrder}
+                      onChange={e => setSeriesOrder(e.target.value)}
+                      className="w-full text-xs p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 text-[#4c0519] dark:text-[#f3f4f6] outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Categories Selector */}
+              <div className="p-4 rounded-2xl bg-rose-50/40 dark:bg-zinc-900/50 border border-rose-200/60 dark:border-zinc-800 space-y-2.5">
+                <label className="block text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6] uppercase tracking-wider">
+                  Categorías Asignadas:
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {categories
+                    .filter(c => c.id !== 'cat-all')
+                    .map(cat => {
+                      const isAssigned = assignedCats.includes(cat.id);
+                      return (
+                        <button
+                          type="button"
+                          key={cat.id}
+                          onClick={() => toggleCategory(cat.id)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                            isAssigned
+                              ? 'bg-gradient-to-r from-rose-500 to-pink-500 dark:from-zinc-100 dark:to-zinc-200 dark:text-zinc-950 text-white shadow-xs'
+                              : 'bg-white dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 border border-rose-200/80 dark:border-zinc-700'
+                          }`}
+                        >
+                          <span
+                            className="w-2.5 h-2.5 rounded-full shrink-0"
+                            style={{ backgroundColor: isAssigned ? '#ffffff' : cat.color }}
+                          />
+                          <span>{cat.name}</span>
+                          {isAssigned && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                        </button>
+                      );
+                    })}
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Modal Actions Footer */}
-        <div className="p-4 border-t border-rose-100 dark:border-zinc-800 flex items-center justify-between shrink-0 gap-2 bg-[#fff5f8]/70 dark:bg-zinc-900/70">
+        {/* Modal Ergonomic Footer */}
+        <div className="p-3.5 sm:p-4 border-t border-rose-100 dark:border-zinc-800 flex items-center justify-between shrink-0 gap-2 bg-[#fff5f8]/80 dark:bg-zinc-900/80">
           <button
             type="button"
             onClick={handleDelete}
-            className="flex items-center gap-1 text-rose-600 dark:text-rose-400 hover:bg-rose-100/70 dark:hover:bg-rose-950/40 px-3 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 hover:bg-rose-100/70 dark:hover:bg-rose-950/40 px-3 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+            title="Eliminar obra del almacenamiento"
           >
             <Trash2 className="w-4 h-4" />
-            <span className="hidden sm:inline">Eliminar obra</span>
+            <span className="hidden sm:inline">Eliminar</span>
           </button>
 
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={handleSaveDetails}
-              className="flex items-center gap-1 bg-white dark:bg-zinc-800 hover:bg-rose-50 dark:hover:bg-zinc-700 border border-rose-200 dark:border-zinc-700 text-[#881337] dark:text-zinc-200 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer"
+              className="flex items-center gap-1.5 bg-rose-500 hover:bg-rose-600 dark:bg-zinc-200 dark:hover:bg-white text-white dark:text-zinc-950 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
             >
-              <Save className="w-3.5 h-3.5" />
-              <span>Guardar</span>
-            </button>
-
-            {/* Primary Action Button: Read Now / Continue Reading */}
-            <button
-              type="button"
-              onClick={handleStartReading}
-              className="flex items-center gap-1.5 bg-gradient-to-r from-rose-500 via-pink-500 to-rose-400 dark:from-zinc-200 dark:via-zinc-300 dark:to-zinc-200 dark:text-zinc-950 text-white font-bold px-5 py-2 rounded-xl text-xs shadow-md shadow-rose-500/20 active:scale-95 transition-all cursor-pointer"
-            >
-              <Play className="w-3.5 h-3.5 fill-current" />
-              <span>
-                {book.progress > 0 && book.progress < 100
-                  ? `Continuar (Pág ${book.currentPage})`
-                  : 'Comenzar lectura'}
-              </span>
+              <Save className="w-4 h-4 stroke-[2.2]" />
+              <span>Guardar Cambios</span>
             </button>
           </div>
         </div>

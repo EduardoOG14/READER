@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
-import { Search, Moon, Sun, LayoutGrid, List, Plus, ArrowUpDown, X, SlidersHorizontal, BookOpen } from 'lucide-react';
+import {
+  Search,
+  Moon,
+  Sun,
+  LayoutGrid,
+  List,
+  Plus,
+  X,
+  SlidersHorizontal,
+  BookOpen,
+  Check,
+} from 'lucide-react';
 import { useApp, type SortOption } from '../context/AppContext';
 import { useBackHandler } from '../services/backButton';
 
@@ -19,19 +30,20 @@ export const Header: React.FC<HeaderProps> = ({ onOpenImport, onOpenSettings, on
     setViewMode,
     settings,
     updateSettings,
+    books,
   } = useApp();
 
   const [showSearch, setShowSearch] = useState(false);
-  const [showSortMenu, setShowSortMenu] = useState(false);
+  const [showViewOptions, setShowViewOptions] = useState(false);
 
-  // Close sort menu or search bar on back press (Priority 90)
+  // Close menus on back button press (Priority 95)
   useBackHandler(() => {
-    if (showSortMenu) {
-      setShowSortMenu(false);
+    if (showViewOptions) {
+      setShowViewOptions(false);
       return true;
     }
     return false;
-  }, 95, showSortMenu);
+  }, 95, showViewOptions);
 
   useBackHandler(() => {
     if (showSearch) {
@@ -46,137 +58,157 @@ export const Header: React.FC<HeaderProps> = ({ onOpenImport, onOpenSettings, on
     updateSettings({ theme: settings.theme === 'dark' ? 'light' : 'dark' });
   };
 
-  const sortLabels: Record<SortOption, string> = {
-    recent: 'Última lectura',
-    title: 'Título (A - Z)',
-    progress: 'Mayor progreso',
-    dateAdded: 'Fecha de añadido',
-  };
+  const sortOptions: { id: SortOption; label: string; desc: string }[] = [
+    { id: 'recent', label: 'Última lectura', desc: 'Obras que abriste recientemente' },
+    { id: 'title', label: 'Título (A - Z)', desc: 'Orden alfabético por nombre' },
+    { id: 'progress', label: 'Mayor progreso', desc: 'Obras más avanzadas primero' },
+    { id: 'dateAdded', label: 'Fecha añadido', desc: 'Últimas obras guardadas en el dispositivo' },
+  ];
 
   return (
-    <header className="sticky top-0 z-30 bg-[#fff0f5]/90 dark:bg-[#121316]/95 backdrop-blur-xl border-b border-rose-200/80 dark:border-zinc-800 px-4 py-3 transition-colors duration-250 safe-top">
-      <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
-        {/* Brand Name "READER" or Search Field */}
+    <header className="sticky top-0 z-30 bg-[#fff0f5]/90 dark:bg-[#121316]/95 backdrop-blur-xl border-b border-rose-200/80 dark:border-zinc-800 px-3 sm:px-4 py-2.5 transition-colors duration-200 safe-top">
+      <div className="max-w-6xl mx-auto flex items-center justify-between gap-2.5">
+        
+        {/* Full-Width Search Input or Brand Logo */}
         {showSearch ? (
-          <div className="flex-1 flex items-center bg-white dark:bg-zinc-900 border border-rose-200 dark:border-zinc-700/80 rounded-2xl px-3.5 py-2 shadow-xs transition-colors animate-in fade-in duration-150">
-            <Search className="w-4 h-4 text-rose-400 dark:text-zinc-400 mr-2 shrink-0" />
+          <div className="flex-1 flex items-center bg-white dark:bg-zinc-900 border border-rose-200 dark:border-zinc-700/80 rounded-2xl px-3.5 py-2 shadow-xs transition-colors animate-in fade-in zoom-in-95 duration-150">
+            <Search className="w-4 h-4 text-rose-500 dark:text-zinc-400 mr-2.5 shrink-0" />
             <input
               type="text"
               autoFocus
-              placeholder="Buscar libros o mangas por título, autor o formato..."
+              placeholder="Buscar por título, autor o formato..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full bg-transparent text-sm text-[#4c0519] dark:text-zinc-100 placeholder-rose-300 dark:placeholder-zinc-500 outline-none font-medium"
+              className="w-full bg-transparent text-xs sm:text-sm text-[#4c0519] dark:text-zinc-100 placeholder-rose-300 dark:placeholder-zinc-500 outline-none font-medium"
             />
             <button
               onClick={() => {
                 setSearchQuery('');
                 setShowSearch(false);
               }}
-              className="p-1 hover:bg-rose-100 dark:hover:bg-zinc-800 rounded-full text-rose-400 hover:text-rose-700 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors"
+              className="p-1 hover:bg-rose-100 dark:hover:bg-zinc-800 rounded-full text-rose-400 hover:text-rose-700 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors cursor-pointer"
               title="Cerrar búsqueda"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-2.5 sm:gap-3 cursor-pointer select-none" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-rose-500 to-pink-500 dark:from-zinc-700 dark:to-zinc-600 flex items-center justify-center text-white shadow-md shadow-rose-500/25 dark:shadow-black/40 shrink-0 transition-transform hover:scale-105">
+          <div
+            className="flex items-center gap-2.5 cursor-pointer select-none group"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          >
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-rose-500 to-pink-500 dark:from-zinc-700 dark:to-zinc-600 flex items-center justify-center text-white shadow-md shadow-rose-500/20 dark:shadow-black/40 shrink-0 transition-transform group-hover:scale-105 active:scale-95">
               <BookOpen className="w-5 h-5 stroke-[2.3]" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-xl sm:text-2xl font-black tracking-[0.24em] font-serif uppercase text-[#4c0519] dark:text-zinc-100">
+                <span className="text-lg sm:text-xl font-black tracking-[0.2em] font-serif uppercase text-[#4c0519] dark:text-zinc-100">
                   READER
                 </span>
                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500 dark:bg-zinc-400 animate-pulse" />
               </div>
-              <p className="text-[9px] sm:text-[10px] tracking-[0.2em] uppercase text-[#881337]/70 dark:text-zinc-400 font-mono -mt-0.5">
-                Libros & Mangas
+              <p className="text-[9px] sm:text-[10px] tracking-[0.16em] uppercase text-[#881337]/70 dark:text-zinc-400 font-mono -mt-0.5">
+                {books.length} {books.length === 1 ? 'obra' : 'obras'} en biblioteca
               </p>
             </div>
           </div>
         )}
 
-        {/* Action Controls */}
+        {/* Action Controls Bar */}
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+          {/* 1. Instant Search Trigger */}
           {!showSearch && (
             <button
               onClick={() => setShowSearch(true)}
-              className="p-2 sm:p-2.5 rounded-2xl text-[#881337] dark:text-zinc-300 hover:bg-rose-100/70 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              className="p-2 sm:p-2.5 rounded-2xl text-[#881337] dark:text-zinc-300 hover:bg-rose-100/70 dark:hover:bg-zinc-800 active:scale-95 transition-all cursor-pointer"
               title="Buscar obras"
             >
               <Search className="w-5 h-5 stroke-[2]" />
             </button>
           )}
 
-          {/* Sort Dropdown (Visible on Desktop / Tablets) */}
-          <div className="relative hidden md:block">
+          {/* 2. Visual View & Sort Options (Ergonomic Sheet on mobile, Popover on desktop) */}
+          <div className="relative">
             <button
-              onClick={() => setShowSortMenu(!showSortMenu)}
-              className="p-2.5 rounded-2xl text-[#881337] dark:text-zinc-300 hover:bg-rose-100/70 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-              title="Ordenar biblioteca"
+              onClick={() => setShowViewOptions(prev => !prev)}
+              className={`p-2 sm:p-2.5 rounded-2xl transition-all active:scale-95 cursor-pointer ${
+                showViewOptions
+                  ? 'bg-rose-200/80 text-rose-800 dark:bg-zinc-700 dark:text-zinc-100 shadow-xs'
+                  : 'text-[#881337] dark:text-zinc-300 hover:bg-rose-100/70 dark:hover:bg-zinc-800'
+              }`}
+              title="Organizar y vista"
             >
-              <ArrowUpDown className="w-5 h-5 stroke-[2]" />
+              <SlidersHorizontal className="w-5 h-5 stroke-[2]" />
             </button>
 
-            {showSortMenu && (
-              <>
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setShowSortMenu(false)}
-                />
-                <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-zinc-900 border border-rose-200 dark:border-zinc-700/80 rounded-2xl shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
-                  <div className="px-3 py-1.5 text-[10px] font-bold text-rose-400 dark:text-zinc-400 uppercase tracking-widest">
-                    Ordenar por
+            {/* Desktop Popover Menu */}
+            {showViewOptions && (
+              <div className="hidden md:block absolute right-0 mt-2 w-64 bg-white dark:bg-zinc-900 border border-rose-200 dark:border-zinc-700/80 rounded-3xl shadow-2xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+                {/* View Mode Switcher */}
+                <div className="mb-3 pb-2 border-b border-rose-100 dark:border-zinc-800">
+                  <div className="text-[10px] font-bold text-rose-400 dark:text-zinc-400 uppercase tracking-widest mb-1.5 px-1">
+                    Diseño de vista
                   </div>
-                  {(Object.keys(sortLabels) as SortOption[]).map(option => (
+                  <div className="grid grid-cols-2 gap-1.5 bg-rose-50 dark:bg-zinc-800 p-1 rounded-2xl">
                     <button
-                      key={option}
-                      onClick={() => {
-                        setSortBy(option);
-                        setShowSortMenu(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-rose-50 dark:hover:bg-zinc-800 transition-colors ${
-                        sortBy === option
-                          ? 'text-rose-600 dark:text-white font-bold bg-rose-50/60 dark:bg-zinc-800'
-                          : 'text-[#4c0519] dark:text-zinc-300 font-medium'
+                      onClick={() => setViewMode('grid')}
+                      className={`flex items-center justify-center gap-1.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                        viewMode === 'grid'
+                          ? 'bg-white dark:bg-zinc-700 text-rose-600 dark:text-white shadow-xs'
+                          : 'text-zinc-600 dark:text-zinc-400'
                       }`}
                     >
-                      {sortLabels[option]}
-                      {sortBy === option && (
-                        <div className="w-1.5 h-1.5 rounded-full bg-rose-600 dark:bg-zinc-400" />
-                      )}
+                      <LayoutGrid className="w-3.5 h-3.5" />
+                      <span>Cuadrícula</span>
                     </button>
-                  ))}
+                    <button
+                      onClick={() => setViewMode('list')}
+                      className={`flex items-center justify-center gap-1.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                        viewMode === 'list'
+                          ? 'bg-white dark:bg-zinc-700 text-rose-600 dark:text-white shadow-xs'
+                          : 'text-zinc-600 dark:text-zinc-400'
+                      }`}
+                    >
+                      <List className="w-3.5 h-3.5" />
+                      <span>Lista</span>
+                    </button>
+                  </div>
                 </div>
-              </>
+
+                {/* Sort Options */}
+                <div>
+                  <div className="text-[10px] font-bold text-rose-400 dark:text-zinc-400 uppercase tracking-widest mb-1 px-1">
+                    Ordenar por
+                  </div>
+                  <div className="space-y-1">
+                    {sortOptions.map(opt => (
+                      <button
+                        key={opt.id}
+                        onClick={() => {
+                          setSortBy(opt.id);
+                          setShowViewOptions(false);
+                        }}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                          sortBy === opt.id
+                            ? 'bg-rose-100/70 text-rose-700 dark:bg-zinc-800 dark:text-white font-bold'
+                            : 'text-[#4c0519] dark:text-zinc-300 hover:bg-rose-50 dark:hover:bg-zinc-800/60'
+                        }`}
+                      >
+                        <span>{opt.label}</span>
+                        {sortBy === opt.id && <Check className="w-4 h-4 stroke-[2.5]" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
             )}
           </div>
 
-          {/* View mode toggle */}
-          <button
-            onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-            className="p-2 sm:p-2.5 rounded-2xl text-[#881337] dark:text-zinc-300 hover:bg-rose-100/70 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-            title={viewMode === 'grid' ? 'Cambiar a lista' : 'Cambiar a cuadrícula'}
-          >
-            {viewMode === 'grid' ? <List className="w-5 h-5" /> : <LayoutGrid className="w-5 h-5" />}
-          </button>
-
-          {/* Quick Settings (Desktop only, mobile has it in dock) */}
-          <button
-            onClick={onOpenSettings}
-            className="hidden md:flex p-2.5 rounded-2xl text-[#881337] dark:text-zinc-300 hover:bg-rose-100/70 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-            title="Ajustes y descanso ocular"
-          >
-            <SlidersHorizontal className="w-5 h-5 stroke-[2]" />
-          </button>
-
-          {/* Dark / Light toggle */}
+          {/* 3. Dark / Light Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className="p-2 sm:p-2.5 rounded-2xl text-[#881337] dark:text-zinc-300 hover:bg-rose-100/70 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-            title={settings.theme === 'dark' ? 'Modo Claro (Sakura Pastel)' : 'Modo Oscuro (Gris Industrial)'}
+            className="p-2 sm:p-2.5 rounded-2xl text-[#881337] dark:text-zinc-300 hover:bg-rose-100/70 dark:hover:bg-zinc-800 active:scale-95 transition-all cursor-pointer"
+            title={settings.theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}
           >
             {settings.theme === 'dark' ? (
               <Sun className="w-5 h-5 text-zinc-300 hover:rotate-45 transition-transform" />
@@ -185,26 +217,119 @@ export const Header: React.FC<HeaderProps> = ({ onOpenImport, onOpenSettings, on
             )}
           </button>
 
-          {/* Curated Public Spanish Library button */}
+          {/* 4. Settings Button (Desktop) */}
           <button
-            onClick={onOpenExplore}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-gradient-to-r from-rose-500/10 to-pink-500/10 dark:from-zinc-800 dark:to-zinc-800/90 border border-rose-300/80 dark:border-zinc-700 text-rose-700 dark:text-zinc-200 hover:scale-102 active:scale-95 transition-all text-xs font-bold cursor-pointer"
-            title="Biblioteca de libros, mangas y cómics en español"
+            onClick={onOpenSettings}
+            className="hidden sm:flex p-2.5 rounded-2xl text-[#881337] dark:text-zinc-300 hover:bg-rose-100/70 dark:hover:bg-zinc-800 active:scale-95 transition-all cursor-pointer"
+            title="Ajustes de la aplicación"
           >
-            <BookOpen className="w-4 h-4 stroke-[2.2]" />
-            <span className="hidden sm:inline">Biblioteca Pública</span>
+            <SlidersHorizontal className="w-4 h-4 stroke-[2.2]" />
           </button>
 
-          {/* Import button (Desktop) */}
+          {/* 5. Public Catalog (Desktop button) */}
+          <button
+            onClick={onOpenExplore}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-gradient-to-r from-rose-500/10 to-pink-500/10 dark:from-zinc-800 dark:to-zinc-800/90 border border-rose-300/80 dark:border-zinc-700 text-rose-700 dark:text-zinc-200 hover:scale-102 active:scale-95 transition-all text-xs font-bold cursor-pointer"
+            title="Biblioteca de obras en español"
+          >
+            <BookOpen className="w-4 h-4 stroke-[2.2]" />
+            <span>Catálogo Público</span>
+          </button>
+
+          {/* 5. Import Button (Desktop) */}
           <button
             onClick={onOpenImport}
-            className="hidden sm:flex items-center gap-1.5 bg-gradient-to-r from-rose-500 via-pink-500 to-rose-500 hover:from-rose-600 hover:to-pink-600 dark:from-zinc-200 dark:to-zinc-300 dark:hover:from-white dark:hover:to-zinc-200 dark:text-zinc-950 text-white px-4 py-2 rounded-2xl font-bold text-xs shadow-md shadow-rose-500/25 dark:shadow-black/40 active:scale-95 transition-all cursor-pointer ml-1"
+            className="hidden sm:flex items-center gap-1.5 bg-gradient-to-r from-rose-500 via-pink-500 to-rose-500 hover:from-rose-600 hover:to-pink-600 dark:from-zinc-200 dark:to-zinc-300 dark:hover:from-white dark:hover:to-zinc-200 dark:text-zinc-950 text-white px-4 py-2 rounded-2xl font-bold text-xs shadow-md shadow-rose-500/20 dark:shadow-black/40 active:scale-95 transition-all cursor-pointer ml-1"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
             <span>Importar</span>
           </button>
         </div>
       </div>
+
+      {/* Mobile Bottom Action Sheet for View & Sort */}
+      {showViewOptions && (
+        <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+            onClick={() => setShowViewOptions(false)}
+          />
+          <div className="relative bg-white dark:bg-zinc-900 border-t border-rose-200 dark:border-zinc-700 rounded-t-3xl p-5 z-10 shadow-2xl animate-in slide-in-from-bottom duration-200 pb-[max(env(safe-area-inset-bottom,16px),16px)]">
+            <div className="w-12 h-1 bg-rose-200 dark:bg-zinc-700 rounded-full mx-auto mb-4" />
+            
+            <h4 className="text-sm font-bold text-[#4c0519] dark:text-zinc-100 mb-4 text-center">
+              Personalizar Vista de Biblioteca
+            </h4>
+
+            {/* View Mode Segmented Switch */}
+            <div className="mb-4">
+              <label className="text-[10px] font-bold text-rose-900/60 dark:text-zinc-400 uppercase tracking-wider block mb-1.5">
+                Modo de visualización
+              </label>
+              <div className="grid grid-cols-2 gap-2 bg-rose-50 dark:bg-zinc-800 p-1.5 rounded-2xl">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    viewMode === 'grid'
+                      ? 'bg-white dark:bg-zinc-700 text-rose-600 dark:text-white shadow-xs'
+                      : 'text-zinc-600 dark:text-zinc-400'
+                  }`}
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                  <span>Cuadrícula</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    viewMode === 'list'
+                      ? 'bg-white dark:bg-zinc-700 text-rose-600 dark:text-white shadow-xs'
+                      : 'text-zinc-600 dark:text-zinc-400'
+                  }`}
+                >
+                  <List className="w-4 h-4" />
+                  <span>Lista</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Sort Options */}
+            <div className="mb-4">
+              <label className="text-[10px] font-bold text-rose-900/60 dark:text-zinc-400 uppercase tracking-wider block mb-1.5">
+                Criterio de ordenación
+              </label>
+              <div className="space-y-1.5">
+                {sortOptions.map(opt => (
+                  <button
+                    key={opt.id}
+                    onClick={() => {
+                      setSortBy(opt.id);
+                      setShowViewOptions(false);
+                    }}
+                    className={`w-full flex items-center justify-between p-3 rounded-2xl text-xs font-semibold transition-all cursor-pointer ${
+                      sortBy === opt.id
+                        ? 'bg-rose-100/80 text-rose-700 dark:bg-zinc-800 dark:text-white font-bold shadow-xs'
+                        : 'text-[#881337] dark:text-zinc-300 hover:bg-rose-50 dark:hover:bg-zinc-800/60'
+                    }`}
+                  >
+                    <div className="text-left">
+                      <p className="font-bold">{opt.label}</p>
+                      <p className="text-[10px] text-[#881337]/60 dark:text-zinc-400 font-normal">{opt.desc}</p>
+                    </div>
+                    {sortBy === opt.id && <Check className="w-4 h-4 stroke-[3] text-rose-600 dark:text-white" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowViewOptions(false)}
+              className="w-full py-3 rounded-2xl bg-rose-100/70 hover:bg-rose-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-[#881337] dark:text-zinc-200 font-bold text-xs transition-colors cursor-pointer"
+            >
+              Listo
+            </button>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

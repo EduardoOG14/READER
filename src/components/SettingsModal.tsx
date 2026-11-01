@@ -16,6 +16,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useBackHandler } from '../services/backButton';
 import { CURRENT_APP_VERSION } from '../services/updater';
 import { exportBackupFile, restoreBackupFromJson } from '../services/backupRestore';
 import { UpdateModal } from './UpdateModal';
@@ -36,6 +37,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   const [isRestoring, setIsRestoring] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useBackHandler(() => {
+    if (isOpen) {
+      onClose();
+      return true;
+    }
+    return false;
+  }, 100, isOpen);
 
   if (!isOpen) return null;
 
