@@ -1,0 +1,116 @@
+import React from 'react';
+import { MoreVertical, BookOpen, Check } from 'lucide-react';
+import type { Book } from '../types';
+
+interface BookCardProps {
+  book: Book;
+  onOpenDetails: (book: Book) => void;
+}
+
+export const BookCard: React.FC<BookCardProps> = ({ book, onOpenDetails }) => {
+
+  const getFormatBadge = (format: string) => {
+    switch (format) {
+      case 'pdf':
+        return { bg: 'bg-rose-500/95 text-white', label: 'PDF' };
+      case 'cbz':
+      case 'cbr':
+      case 'zip':
+        return { bg: 'bg-purple-600/95 text-white', label: 'MANGA' };
+      case 'epub':
+        return { bg: 'bg-emerald-600/95 text-white', label: 'EPUB' };
+      case 'txt':
+      case 'md':
+        return { bg: 'bg-sky-600/95 text-white', label: 'TEXT' };
+      default:
+        return { bg: 'bg-slate-700/95 text-white', label: format.toUpperCase() };
+    }
+  };
+
+  const badge = getFormatBadge(book.format);
+  const isCompleted = book.progress >= 100 || (book.currentPage >= book.totalPages && book.totalPages > 1);
+
+  return (
+    <div className="group relative flex flex-col cursor-pointer select-none">
+      {/* Cover Card */}
+      <div
+        onClick={() => onOpenDetails(book)}
+        className="relative aspect-[3/4.2] w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-rose-100/50 dark:bg-[#07241c] shadow-xs group-hover:shadow-xl group-hover:shadow-rose-900/10 dark:group-hover:shadow-emerald-950/40 group-hover:-translate-y-1.5 transition-all duration-300 border border-rose-200/70 dark:border-emerald-800/60"
+      >
+        {book.coverUrl ? (
+          <img
+            src={book.coverUrl}
+            alt={book.title}
+            className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-300"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center bg-gradient-to-b from-rose-50 to-pink-100 dark:from-[#0a2920] dark:to-[#041712]">
+            <BookOpen className="w-8 h-8 text-rose-300 dark:text-emerald-500 mb-2" />
+            <span className="text-xs font-semibold text-[#881337] dark:text-[#a7f3d0] line-clamp-3">
+              {book.title}
+            </span>
+          </div>
+        )}
+
+        {/* Subtle overlay gradient on hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
+        {/* Format Badge */}
+        <div className="absolute top-2 left-2 z-10">
+          <span
+            className={`text-[9px] font-black px-2 py-0.5 rounded-md shadow-xs backdrop-blur-xs tracking-wider uppercase ${badge.bg}`}
+          >
+            {badge.label}
+          </span>
+        </div>
+
+        {/* Quick Menu Button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenDetails(book);
+          }}
+          className="absolute top-2 right-2 p-1.5 rounded-full bg-black/45 hover:bg-black/70 text-white backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity z-10 cursor-pointer"
+          title="Opciones de libro"
+        >
+          <MoreVertical className="w-3.5 h-3.5" />
+        </button>
+
+        {/* Progress Bar (if in progress) */}
+        {book.progress > 0 && !isCompleted && (
+          <div className="absolute bottom-0 inset-x-0 bg-black/65 backdrop-blur-xs p-1.5 z-10">
+            <div className="flex items-center justify-between text-[10px] text-white font-medium mb-0.5 px-0.5">
+              <span>Pág {book.currentPage}/{book.totalPages}</span>
+              <span className="font-bold">{book.progress}%</span>
+            </div>
+            <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-rose-500 to-pink-400 dark:from-emerald-400 dark:to-teal-300 rounded-full transition-all duration-300"
+                style={{ width: `${book.progress}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Completed Badge */}
+        {isCompleted && (
+          <div className="absolute bottom-2 right-2 bg-emerald-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm z-10">
+            <Check className="w-3 h-3 stroke-[3]" />
+            <span>Leído</span>
+          </div>
+        )}
+      </div>
+
+      {/* Book Metadata Below Cover */}
+      <div className="pt-2 px-0.5" onClick={() => onOpenDetails(book)}>
+        <h3 className="text-xs sm:text-sm font-bold text-[#4c0519] dark:text-[#ecfdf5] line-clamp-1 group-hover:text-rose-600 dark:group-hover:text-emerald-300 transition-colors">
+          {book.title}
+        </h3>
+        <p className="text-[11px] text-[#881337]/70 dark:text-[#a7f3d0]/70 line-clamp-1 mt-0.5 font-medium">
+          {book.author || `${book.totalPages} ${book.totalPages === 1 ? 'pág' : 'págs'}`}
+        </p>
+      </div>
+    </div>
+  );
+};

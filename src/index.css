@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --bg-main: #fff0f5;           /* Fondo sakura pastel */
+    --bg-card: #ffffff;           /* Tarjeta blanco puro pastel */
+    --bg-card-subtle: #ffe4ec;    /* Elementos suaves sakura */
+    --bg-glass: rgba(255, 240, 245, 0.92);
+    --border-theme: #fecdd9;      /* Borde pétalo sakura */
+    --border-subtle: #ffe4ec;
+    --text-primary: #4c0519;      /* Vino cerezo elegante */
+    --text-secondary: #881337;    /* Rosa cerezo medio */
+    --text-muted: #be123c;        /* Rosado suave */
+    --accent: #f43f6c;            /* Flor de sakura */
+    --accent-hover: #e11d4d;
+    --accent-subtle: #ffe4ec;
+  }
+
+  .dark {
+    --bg-main: #121316;           /* Gris industrial oscuro profundo */
+    --bg-card: #1c1d22;           /* Tarjeta gris grafito oscuro */
+    --bg-card-subtle: #26282f;    /* Elementos gris medio oscuro */
+    --bg-glass: rgba(18, 19, 22, 0.94);
+    --border-theme: #383a42;      /* Borde gris estructurado */
+    --border-subtle: #2b2d34;
+    --text-primary: #f3f4f6;      /* Blanco/gris claro nítido */
+    --text-secondary: #d1d5db;    /* Gris neutro suave */
+    --text-muted: #9ca3af;        /* Gris medio */
+    --accent: #71717a;            /* Gris industrial zinc */
+    --accent-hover: #52525b;
+    --accent-subtle: #27272a;
+  }
+
+  /* Mapeo universal de Gris Industrial para modo oscuro */
+  .dark [class*="dark:bg-[#041712]"] { background-color: #121316 !important; }
+  .dark [class*="dark:bg-[#07241c]"] { background-color: #1a1b1f !important; }
+  .dark [class*="dark:bg-[#0a2920]"] { background-color: #212227 !important; }
+  .dark [class*="dark:bg-[#061a12]"] { background-color: #18191d !important; }
+  .dark [class*="dark:bg-[#0f382c]"] { background-color: #2a2c33 !important; }
+  .dark [class*="dark:border-emerald-"] { border-color: rgba(113, 113, 122, 0.45) !important; }
+  .dark [class*="dark:text-emerald-"] { color: #e4e4e7 !important; }
+  .dark [class*="dark:text-[#ecfdf5]"] { color: #f4f4f5 !important; }
+  .dark [class*="dark:text-[#a7f3d0]"] { color: #a1a1aa !important; }
+  .dark [class*="dark:from-emerald-"] { --tw-gradient-from: #52525b !important; }
+  .dark [class*="dark:to-teal-"], .dark [class*="dark:to-emerald-"] { --tw-gradient-to: #3f3f46 !important; }
+
+  /* Reading Eye-Care Filters */
+  .filter-sepia {
+    filter: sepia(0.55) contrast(0.92) brightness(0.98);
+    background-color: #f6eedb !important;
+  }
+
+  .filter-warm {
+    filter: sepia(0.25) hue-rotate(-15deg) saturate(1.1) brightness(0.95);
+  }
+
+  .filter-invert {
+    filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(1.05);
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  input, textarea {
+    user-select: auto;
+  }
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Custom Minimalist Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(244, 63, 108, 0.2);
+  border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(113, 113, 122, 0.35);
+}
+
+/* Safe Area Insets for Mobile devices */
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
