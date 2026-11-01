@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   X,
   Search,
@@ -11,8 +11,8 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useBackHandler } from '../services/backButton';
-import { importBookFile } from '../services/bookImporter';
 import { SPANISH_CATALOG, type CatalogItem } from '../services/catalogData';
+import { downloadQueue, type QueueState } from '../services/downloadQueue';
 import type { Book } from '../types';
 
 interface ExploreModalProps {
@@ -29,8 +29,13 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('todos');
   const [filterQuery, setFilterQuery] = useState('');
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
-  const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [queueState, setQueueState] = useState<QueueState>(downloadQueue.getState());
+
+  useEffect(() => {
+    downloadQueue.setRefreshHandler(refreshLibrary);
+    return downloadQueue.subscribe(state => setQueueState(state));
+  }, [refreshLibrary]);
 
   // Android Back Button handler (Priority 110)
   useBackHandler(() => {
@@ -107,28 +112,10 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
     setDisplayLimit(PAGE_SIZE);
   };
 
-  // Handle "Marcar cómo propio" action
-  const handleMarkAsOwned = async (item: CatalogItem) => {
-    setDownloadingId(item.id);
-    try {
-      // 1. Generate the local file (EPUB or CBZ) with full Spanish content
-      const file = await item.createFile();
-
-      // 2. Import into user's personal library (IndexedDB + Android storage)
-      await importBookFile(file, [
-        item.category !== 'libros' ? 'cat-manga' : 'cat-books',
-      ]);
-
-      // 3. Refresh user's library context
-      await refreshLibrary();
-
-      showToast(`«${item.title}» se ha guardado en tu biblioteca.`);
-    } catch (err: any) {
-      console.error('Error al guardar obra en biblioteca:', err);
-      showToast('Error al guardar la obra localmente: ' + (err.message || String(err)));
-    } finally {
-      setDownloadingId(null);
-    }
+  // Handle "Marcar cómo propio" action via async download queue
+  const handleMarkAsOwned = (item: CatalogItem) => {
+    downloadQueue.enqueue(item);
+    showToast(`«${item.title}» se ha añadido a la cola de descargas.`);
   };
 
   // Handle "Leer ahora" for already owned book
@@ -282,7 +269,9 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
                 {visibleItems.map(item => {
                   const ownedBook = getOwnedBook(item);
-                  const isDownloading = downloadingId === item.id;
+                  const isItemActive = queueState.activeItem?.item.id === item.id;
+                  const isItemPending = queueState.pendingItems.some(q => q.item.id === item.id);
+                  const isQueued = isItemActive || isItemPending;
 
                   return (
                     <div
@@ -361,13 +350,18 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
                         ) : (
                           <button
                             onClick={() => handleMarkAsOwned(item)}
-                            disabled={isDownloading}
+                            disabled={isQueued}
                             className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 dark:from-zinc-200 dark:to-zinc-300 dark:hover:from-white dark:hover:to-zinc-200 text-white dark:text-zinc-950 font-bold text-xs shadow-xs active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                           >
-                            {isDownloading ? (
+                            {isItemActive ? (
                               <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                <span>Guardando copia local...</span>
+                                <Loader2 className="w-4 h-4 animate-spin text-white dark:text-zinc-900" />
+                                <span>Descargando ({queueState.activeItem?.progressPercent}%)...</span>
+                              </>
+                            ) : isItemPending ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin opacity-60 text-white dark:text-zinc-900" />
+                                <span>En cola de descarga...</span>
                               </>
                             ) : (
                               <>
@@ -403,6 +397,33 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
             </>
           )}
         </div>
+
+        {/* Floating Download Queue Progress Bar */}
+        {queueState.totalCount > 0 && (
+          <div className="mx-1 mb-2 p-3 rounded-2xl bg-slate-900/95 dark:bg-zinc-800 text-white border border-rose-400/40 shadow-xl flex items-center justify-between gap-3 text-xs shrink-0 animate-in fade-in slide-in-from-bottom-2">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <Loader2 className="w-4 h-4 animate-spin text-rose-400 shrink-0" />
+              <div className="min-w-0">
+                <p className="font-bold truncate">
+                  {queueState.isProcessing
+                    ? `Guardando: ${queueState.activeItem?.item.title || 'obra'}...`
+                    : 'Descargas finalizadas con éxito'}
+                </p>
+                <p className="text-[10px] text-slate-300">
+                  {queueState.completedCount} de {queueState.totalCount} obras descargadas en la biblioteca
+                </p>
+              </div>
+            </div>
+            <div className="w-24 sm:w-36 h-2 bg-slate-800 dark:bg-zinc-700 rounded-full overflow-hidden shrink-0">
+              <div
+                className="h-full bg-gradient-to-r from-rose-500 to-pink-500 transition-all duration-300"
+                style={{
+                  width: `${Math.round((queueState.completedCount / Math.max(1, queueState.totalCount)) * 100)}%`,
+                }}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="pt-3 border-t border-rose-100 dark:border-zinc-800 flex items-center justify-between text-xs text-[#881337]/70 dark:text-zinc-500 shrink-0">

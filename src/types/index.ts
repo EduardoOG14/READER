@@ -32,6 +32,11 @@ export interface Book {
   fileStorageKey: string; // Key in IndexedDB/Filesystem
   description?: string; // Synopsis or summary of the book/manga
   bookmarks?: Bookmark[]; // MoonReader bookmarks
+  rating?: number; // 1 to 5 stars
+  review?: string; // Personal thoughts/review
+  series?: string; // Saga or Collection name
+  seriesOrder?: number; // Volume or installment number in the series
+  completedDate?: number; // timestamp when book was finished
 }
 
 export type ThemeMode = 'light' | 'dark' | 'system';
@@ -55,5 +60,26 @@ export interface ReadingSettings {
   showMoonStatusBar?: boolean;
   autoScrollSeconds?: number;
   continuousReadingMode?: boolean; // Modo Lectura: continuous downward scroll vs single-page paginated
+  volumeKeyTurnPage?: boolean; // Turn page with physical Volume Up / Down keys
+  invertVolumeKeys?: boolean; // Invert Volume Up / Down action
+  orientationLock?: 'auto' | 'portrait' | 'landscape'; // Screen orientation lock
+  smartTrimMargins?: boolean; // Smart crop blank margins in manga and comics
+  immersiveMode?: boolean; // Fullscreen immersive mode hiding system status bars
+}
+
+export interface ReadingSession {
+  date: string; // YYYY-MM-DD
+  minutes: number;
+  pagesRead: number;
+}
+
+export interface ReadingStats {
+  currentStreak: number;
+  bestStreak: number;
+  lastReadDate?: string;
+  totalMinutes: number;
+  totalPagesRead: number;
+  dailyGoalMinutes: number;
+  sessions: Record<string, ReadingSession>;
 }
 

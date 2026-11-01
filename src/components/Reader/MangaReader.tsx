@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import JSZip from 'jszip';
-import { ZoomIn, ZoomOut, Lock, Unlock } from 'lucide-react';
+import { ZoomIn, ZoomOut, Lock, Unlock, Crop } from 'lucide-react';
 import { isImageFile, naturalSort } from '../../services/parsers/mangaParser';
 import { useApp } from '../../context/AppContext';
 
@@ -78,7 +78,7 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
   onToggleControls,
   showControls,
 }) => {
-  const { settings, activeBook } = useApp();
+  const { settings, activeBook, updateSettings } = useApp();
   const [zip, setZip] = useState<JSZip | null>(null);
   const [pageFilenames, setPageFilenames] = useState<string[]>([]);
   const [pageUrls, setPageUrls] = useState<Map<number, string>>(new Map());
@@ -429,6 +429,24 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
       >
         <ZoomOut className="w-4 h-4" />
       </button>
+
+      {/* Smart Trim Margins */}
+      <button
+        onClick={() => {
+          const next = !settings.smartTrimMargins;
+          updateSettings({ smartTrimMargins: next });
+          setZoomToast(next ? 'Recorte inteligente activado' : 'Recorte de bordes desactivado');
+          setTimeout(() => setZoomToast(null), 2000);
+        }}
+        className={`p-2 rounded-xl transition-colors cursor-pointer ${
+          settings.smartTrimMargins
+            ? 'bg-rose-500/40 text-rose-300 dark:bg-zinc-700 dark:text-zinc-200'
+            : 'text-slate-400 hover:text-white hover:bg-slate-800 dark:hover:bg-zinc-800'
+        }`}
+        title={settings.smartTrimMargins ? 'Recorte inteligente activo' : 'Activar recorte de bordes en blanco'}
+      >
+        <Crop className="w-4 h-4" />
+      </button>
     </div>
   );
 
@@ -508,7 +526,9 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
           <img
             src={currentUrl}
             alt={`Página ${currentPage}`}
-            className="max-w-full max-h-[92vh] object-contain select-none shadow-md pointer-events-none"
+            className={`max-w-full max-h-[92vh] object-contain select-none shadow-md pointer-events-none transition-transform duration-200 ${
+              settings.smartTrimMargins ? 'scale-[1.08]' : ''
+            }`}
           />
         </div>
       ) : (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Header } from './components/Header';
 import { CategoryBar } from './components/CategoryBar';
@@ -16,7 +16,7 @@ import { ReaderContainer } from './components/Reader/ReaderContainer';
 import { ReaderErrorBoundary } from './components/ReaderErrorBoundary';
 import { PullToRefresh } from './components/PullToRefresh';
 import type { Book } from './types';
-import { Loader2, CheckCircle2 } from 'lucide-react';
+import { Loader2, CheckCircle2, Layers, ArrowLeft } from 'lucide-react';
 import { useBackHandler, subscribeExitToast } from './services/backButton';
 
 const LibraryView: React.FC = () => {
@@ -28,12 +28,54 @@ const LibraryView: React.FC = () => {
   const [isExploreOpen, setIsExploreOpen] = useState(false);
   const [selectedBookForDetails, setSelectedBookForDetails] = useState<Book | null>(null);
   const [showExitToast, setShowExitToast] = useState(false);
+  const [groupBySeries, setGroupBySeries] = useState(false);
+  const [selectedSeriesName, setSelectedSeriesName] = useState<string | null>(null);
 
   useEffect(() => {
     return subscribeExitToast(visible => {
       setShowExitToast(visible);
     });
   }, []);
+
+  // Back Button Interceptor for Series drilldown (Priority 105)
+  useBackHandler(() => {
+    if (selectedSeriesName) {
+      setSelectedSeriesName(null);
+      return true;
+    }
+    return false;
+  }, 105, !!selectedSeriesName);
+
+  // Group books by series
+  const seriesGroups = useMemo(() => {
+    const map: Record<string, Book[]> = {};
+    const standalone: Book[] = [];
+
+    for (const b of filteredBooks) {
+      if (b.series && b.series.trim()) {
+        const sName = b.series.trim();
+        if (!map[sName]) map[sName] = [];
+        map[sName].push(b);
+      } else {
+        standalone.push(b);
+      }
+    }
+
+    Object.keys(map).forEach(sName => {
+      map[sName].sort((a, b) => (a.seriesOrder || 1) - (b.seriesOrder || 1));
+    });
+
+    return { map, standalone };
+  }, [filteredBooks]);
+
+  const hasAnySeries = Object.keys(seriesGroups.map).length > 0;
+
+  const displayBooks = useMemo(() => {
+    if (selectedSeriesName) {
+      return seriesGroups.map[selectedSeriesName] || [];
+    }
+    return filteredBooks;
+  }, [selectedSeriesName, seriesGroups, filteredBooks]);
 
   // Back Button Interceptors for Modals (Priority 110)
   useBackHandler(() => {
@@ -118,44 +160,143 @@ const LibraryView: React.FC = () => {
             {/* Spotlight Banner: Continue reading current book */}
             <SpotlightHero />
 
-            {/* Collection Section Header / Counter */}
-            <div className="flex items-center justify-between mb-4 pb-2 border-b border-rose-200/50 dark:border-zinc-800/40 text-xs text-[#881337]/75 dark:text-zinc-400/75">
+            {/* Collection Section Header / Counter & Sagas Toggle */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-2 border-b border-rose-200/50 dark:border-zinc-800/40 text-xs text-[#881337]/75 dark:text-zinc-400/75">
               <div className="flex items-center gap-2">
+                {selectedSeriesName ? (
+                  <button
+                    onClick={() => setSelectedSeriesName(null)}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-100 dark:bg-purple-950/60 font-bold text-purple-700 dark:text-purple-300 hover:bg-purple-200 transition-colors cursor-pointer"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>Todas las Sagas</span>
+                  </button>
+                ) : null}
                 <span className="font-bold text-[#4c0519] dark:text-[#f3f4f6]">
-                  {activeCategory ? activeCategory.name : 'Todas las obras'}
+                  {selectedSeriesName
+                    ? `Saga: ${selectedSeriesName}`
+                    : activeCategory
+                    ? activeCategory.name
+                    : 'Todas las obras'}
                 </span>
                 <span>•</span>
-                <span>{filteredBooks.length} {filteredBooks.length === 1 ? 'obra' : 'obras'}</span>
+                <span>
+                  {displayBooks.length} {displayBooks.length === 1 ? 'obra' : 'obras'}
+                </span>
               </div>
-              {completedCount > 0 && (
-                <div className="flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>{completedCount} {completedCount === 1 ? 'leído' : 'leídos'}</span>
-                </div>
-              )}
+
+              <div className="flex items-center gap-2.5">
+                {/* Toggle Group by Series */}
+                {hasAnySeries && !selectedSeriesName && (
+                  <button
+                    onClick={() => setGroupBySeries(prev => !prev)}
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl font-bold transition-all cursor-pointer ${
+                      groupBySeries
+                        ? 'bg-purple-600 text-white shadow-xs'
+                        : 'bg-rose-100/70 dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 hover:bg-rose-100'
+                    }`}
+                    title="Agrupar tomos por saga o colección"
+                  >
+                    <Layers className="w-3.5 h-3.5" />
+                    <span>{groupBySeries ? 'Agrupado por Sagas' : 'Ver por Sagas'}</span>
+                  </button>
+                )}
+
+                {completedCount > 0 && (
+                  <div className="flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>{completedCount} {completedCount === 1 ? 'leído' : 'leídos'}</span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Book Catalog: Grid or List */}
-            {viewMode === 'grid' ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 sm:gap-5">
-                {filteredBooks.map(book => (
-                  <BookCard
-                    key={book.id}
-                    book={book}
-                    onOpenDetails={b => setSelectedBookForDetails(b)}
-                  />
-                ))}
+            {/* Sagas View (Folder Cards) */}
+            {groupBySeries && !selectedSeriesName ? (
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-purple-800 dark:text-purple-400 mb-3 flex items-center gap-1.5">
+                    <Layers className="w-4 h-4" />
+                    <span>Colecciones y Sagas ({Object.keys(seriesGroups.map).length})</span>
+                  </h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4">
+                    {(Object.entries(seriesGroups.map) as [string, Book[]][]).map(([sName, sBooks]) => {
+                      const avgProgress = Math.round(
+                        sBooks.reduce((acc: number, b: Book) => acc + (b.progress || 0), 0) / Math.max(1, sBooks.length)
+                      );
+                      const cover = sBooks[0]?.coverUrl;
+
+                      return (
+                        <div
+                          key={sName}
+                          onClick={() => setSelectedSeriesName(sName)}
+                          className="group relative cursor-pointer p-3 rounded-2xl bg-gradient-to-br from-purple-500/10 via-rose-500/5 to-purple-500/15 dark:from-zinc-900 dark:to-zinc-800 border border-purple-300/60 dark:border-purple-500/30 hover:border-purple-500 dark:hover:border-purple-400 transition-all hover:scale-102 flex flex-col justify-between gap-2 shadow-sm"
+                        >
+                          <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-purple-900/10 flex items-center justify-center">
+                            {cover ? (
+                              <img src={cover} alt={sName} className="w-full h-full object-cover" />
+                            ) : (
+                              <Layers className="w-10 h-10 text-purple-400" />
+                            )}
+                            <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-purple-600/90 text-white font-bold text-[10px] uppercase shadow-xs">
+                              {sBooks.length} tomos
+                            </div>
+                          </div>
+                          <div>
+                            <h4 className="font-extrabold text-xs sm:text-sm line-clamp-1 text-[#4c0519] dark:text-[#f3f4f6]">
+                              {sName}
+                            </h4>
+                            <p className="text-[10px] text-purple-700 dark:text-purple-300 font-semibold">
+                              {avgProgress}% completado
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Standalone Works */}
+                {seriesGroups.standalone.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-rose-900/60 dark:text-zinc-400 mb-3">
+                      Obras Individuales ({seriesGroups.standalone.length})
+                    </h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 sm:gap-5">
+                      {seriesGroups.standalone.map((book: Book) => (
+                        <BookCard
+                          key={book.id}
+                          book={book}
+                          onOpenDetails={b => setSelectedBookForDetails(b)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
-              <div className="flex flex-col gap-2.5 max-w-4xl mx-auto">
-                {filteredBooks.map(book => (
-                  <BookListItem
-                    key={book.id}
-                    book={book}
-                    onOpenDetails={b => setSelectedBookForDetails(b)}
-                  />
-                ))}
-              </div>
+              /* Regular or Selected Series Book Catalog: Grid or List */
+              viewMode === 'grid' ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 sm:gap-5">
+                  {displayBooks.map((book: Book) => (
+                    <BookCard
+                      key={book.id}
+                      book={book}
+                      onOpenDetails={b => setSelectedBookForDetails(b)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2.5 max-w-4xl mx-auto">
+                  {displayBooks.map((book: Book) => (
+                    <BookListItem
+                      key={book.id}
+                      book={book}
+                      onOpenDetails={b => setSelectedBookForDetails(b)}
+                    />
+                  ))}
+                </div>
+              )
             )}
 
             {/* Permanent Bottom Signature: "By EduardoOG" (Only visible outside reader) */}

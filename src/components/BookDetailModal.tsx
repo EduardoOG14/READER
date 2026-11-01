@@ -11,6 +11,8 @@ import {
   Play,
   FileText,
   Edit3,
+  Star,
+  Layers,
 } from 'lucide-react';
 import type { Book } from '../types';
 import { useApp } from '../context/AppContext';
@@ -30,6 +32,10 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [description, setDescription] = useState('');
+  const [series, setSeries] = useState('');
+  const [seriesOrder, setSeriesOrder] = useState<string | number>('');
+  const [rating, setRating] = useState<number>(0);
+  const [review, setReview] = useState('');
   const [coverUrl, setCoverUrl] = useState<string | undefined>(undefined);
   const [assignedCats, setAssignedCats] = useState<string[]>([]);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
@@ -41,6 +47,10 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
       setTitle(book.title);
       setAuthor(book.author || '');
       setDescription(book.description || '');
+      setSeries(book.series || '');
+      setSeriesOrder(book.seriesOrder ?? '');
+      setRating(book.rating || 0);
+      setReview(book.review || '');
       setCoverUrl(book.coverUrl);
       setAssignedCats(book.categoryIds || []);
       setIsEditingDescription(false);
@@ -96,6 +106,10 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
       author: author.trim() || undefined,
       description: description.trim() || undefined,
       categoryIds: assignedCats,
+      series: series.trim() || undefined,
+      seriesOrder: typeof seriesOrder === 'number' && !isNaN(seriesOrder) ? seriesOrder : typeof seriesOrder === 'string' && seriesOrder.trim() ? Number(seriesOrder) : undefined,
+      rating: rating > 0 ? rating : undefined,
+      review: review.trim() || undefined,
     });
     setIsEditingDescription(false);
     showNotice('¡Cambios guardados con éxito!');
@@ -318,6 +332,76 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                 Esta obra no tiene sinopsis registrada aún. Toca en «Editar sinopsis» para añadir un resumen.
               </p>
             )}
+          </div>
+
+          {/* AGRUPACIÓN POR SAGA O COLECCIÓN */}
+          <div className="p-3.5 rounded-2xl bg-slate-50/70 dark:bg-zinc-900/60 border border-slate-200/80 dark:border-zinc-800 space-y-2">
+            <div className="flex items-center gap-1.5">
+              <Layers className="w-4 h-4 text-purple-500 dark:text-purple-400" />
+              <h4 className="text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6] uppercase tracking-wider">
+                Saga o Colección
+              </h4>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="sm:col-span-2">
+                <label className="text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider block mb-1">
+                  Nombre de la Saga / Serie
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ej: One Piece, Dune, Batman..."
+                  value={series}
+                  onChange={e => setSeries(e.target.value)}
+                  className="w-full text-xs p-2 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 text-[#4c0519] dark:text-[#f3f4f6] outline-none"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider block mb-1">
+                  Tomo / Volumen Nº
+                </label>
+                <input
+                  type="number"
+                  placeholder="Ej: 1"
+                  value={seriesOrder}
+                  onChange={e => setSeriesOrder(e.target.value)}
+                  className="w-full text-xs p-2 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 text-[#4c0519] dark:text-[#f3f4f6] outline-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* CALIFICACIÓN Y RESEÑA PERSONAL */}
+          <div className="p-3.5 rounded-2xl bg-amber-500/10 dark:bg-zinc-900/60 border border-amber-500/25 dark:border-zinc-800 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6] uppercase tracking-wider">
+                Tu Calificación & Reseña
+              </span>
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map(s => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setRating(s)}
+                    className="cursor-pointer hover:scale-110 transition-transform p-0.5"
+                  >
+                    <Star
+                      className={`w-4 h-4 ${
+                        s <= rating
+                          ? 'fill-amber-400 text-amber-400 drop-shadow-xs'
+                          : 'text-slate-300 dark:text-zinc-600'
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <textarea
+              rows={2}
+              placeholder="Escribe tus notas, reflexiones o reseña personal sobre esta obra..."
+              value={review}
+              onChange={e => setReview(e.target.value)}
+              className="w-full text-xs p-2 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 text-[#4c0519] dark:text-[#f3f4f6] outline-none resize-none leading-relaxed"
+            />
           </div>
 
           {/* Reading progress bar */}

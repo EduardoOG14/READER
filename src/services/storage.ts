@@ -101,6 +101,11 @@ export const DEFAULT_SETTINGS: ReadingSettings = {
   showMoonStatusBar: true,
   autoScrollSeconds: 10,
   continuousReadingMode: false,
+  volumeKeyTurnPage: true,
+  invertVolumeKeys: false,
+  orientationLock: 'auto',
+  smartTrimMargins: false,
+  immersiveMode: false,
 };
 
 // --- Storage API ---

@@ -13,9 +13,12 @@ import {
   List,
   Scroll,
   BookOpen,
+  Smartphone,
+  Search,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { getBookFile } from '../../services/storage';
+import { recordReadingTime } from '../../services/readingStats';
 import { PdfReader } from './PdfReader';
 import { MangaReader } from './MangaReader';
 import { EpubReader } from './EpubReader';
@@ -26,10 +29,12 @@ import { BookmarksDrawer } from './BookmarksDrawer';
 import { AutoScrollControl } from './AutoScrollControl';
 import { TtsPlayerModal } from './TtsPlayerModal';
 import { BrightnessGestureHud } from './BrightnessGestureHud';
+import { SearchInBookDrawer } from './SearchInBookDrawer';
+import { BookCompletedModal } from '../BookCompletedModal';
 import { useBackHandler } from '../../services/backButton';
 
 export const ReaderContainer: React.FC = () => {
-  const { activeBook, closeReader, updateBookProgress, settings, updateSettings, addBookmark, removeBookmark } = useApp();
+  const { activeBook, closeReader, updateBookProgress, settings, updateSettings, addBookmark, removeBookmark, editBook } = useApp();
 
   const [fileBuffer, setFileBuffer] = useState<ArrayBuffer | null>(null);
   const [loadingFile, setLoadingFile] = useState(true);
@@ -37,14 +42,46 @@ export const ReaderContainer: React.FC = () => {
   const [showSettingsSheet, setShowSettingsSheet] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Moon+ Reader feature modals & states
+  // Advanced features state
   const [showBookmarksDrawer, setShowBookmarksDrawer] = useState(false);
+  const [showSearchDrawer, setShowSearchDrawer] = useState(false);
+  const [showCompletedModal, setShowCompletedModal] = useState(false);
   const [showAutoScroll, setShowAutoScroll] = useState(false);
   const [showTtsModal, setShowTtsModal] = useState(false);
   const [showBrightnessHud, setShowBrightnessHud] = useState(false);
   const [hudBrightness, setHudBrightness] = useState<number>(settings.brightness || 100);
   const [bookmarkToast, setBookmarkToast] = useState<string | null>(null);
   const [currentPageText, setCurrentPageText] = useState<string>('');
+  const [orientationMode, setOrientationMode] = useState<'auto' | 'portrait' | 'landscape'>(
+    settings.orientationLock || 'auto'
+  );
+
+  const toggleOrientationLock = async () => {
+    const next = orientationMode === 'auto' ? 'portrait' : orientationMode === 'portrait' ? 'landscape' : 'auto';
+    setOrientationMode(next);
+    updateSettings({ orientationLock: next });
+
+    try {
+      if (typeof screen !== 'undefined' && (screen as any).orientation) {
+        if (next === 'auto') {
+          (screen as any).orientation.unlock?.();
+        } else {
+          await (screen as any).orientation.lock?.(next === 'portrait' ? 'portrait-primary' : 'landscape-primary');
+        }
+      }
+    } catch (e) {
+      console.warn('Orientation lock notice:', e);
+    }
+
+    setBookmarkToast(
+      next === 'portrait'
+        ? 'Orientación fijada: Vertical'
+        : next === 'landscape'
+        ? 'Orientación fijada: Horizontal'
+        : 'Orientación: Automática'
+    );
+    setTimeout(() => setBookmarkToast(null), 2000);
+  };
 
   // Continuous Reading Mode ("Modo Lectura" - page after page downward scroll)
   const [isContinuousReading, setIsContinuousReading] = useState<boolean>(
@@ -134,9 +171,39 @@ export const ReaderContainer: React.FC = () => {
         setTotalPages(newTotalPages);
       }
       updateBookProgress(activeBook.id, clamped, total);
+
+      // Record reading stat (page turn)
+      recordReadingTime(0, 1).catch(() => {});
+
+      // Celebration dialog if finished
+      if (clamped >= total && total > 1 && !activeBook.completedDate) {
+        setShowCompletedModal(true);
+      }
     },
-    [activeBook?.id, totalPages, updateBookProgress]
+    [activeBook, totalPages, updateBookProgress]
   );
+
+  // Active reading session tracker: records 1 minute every 60s
+  useEffect(() => {
+    if (!bookId) return;
+    const interval = setInterval(() => {
+      recordReadingTime(1, 0).catch(() => {});
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [bookId]);
+
+  // Handle saving rating & review from completion modal
+  const handleSaveRatingAndReview = async (rating: number, review: string) => {
+    if (!activeBook) return;
+    await editBook(activeBook.id, {
+      rating,
+      review,
+      completedDate: Date.now(),
+      progress: 100,
+    });
+    setBookmarkToast('¡Calificación y reseña guardadas!');
+    setTimeout(() => setBookmarkToast(null), 2000);
+  };
 
   // Safe reader close: cancels active TTS speech and saves latest progress before returning to library
   const handleClose = useCallback(() => {
@@ -162,6 +229,14 @@ export const ReaderContainer: React.FC = () => {
 
   // 2. Reader Sub-modals & Drawers (Priority 200)
   useBackHandler(() => {
+    if (showCompletedModal) {
+      setShowCompletedModal(false);
+      return true;
+    }
+    if (showSearchDrawer) {
+      setShowSearchDrawer(false);
+      return true;
+    }
     if (showBookmarksDrawer) {
       setShowBookmarksDrawer(false);
       return true;
@@ -179,7 +254,7 @@ export const ReaderContainer: React.FC = () => {
       return true;
     }
     return false;
-  }, 200, showBookmarksDrawer || showSettingsSheet || showTtsModal || showAutoScroll);
+  }, 200, showCompletedModal || showSearchDrawer || showBookmarksDrawer || showSettingsSheet || showTtsModal || showAutoScroll);
 
   // 3. Reader container itself: exits reader and returns to library (Priority 50)
   useBackHandler(() => {
@@ -187,10 +262,28 @@ export const ReaderContainer: React.FC = () => {
     return true;
   }, 50, !!activeBook);
 
-  // Keyboard navigation
+  // Keyboard navigation & Physical Volume Keys
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!activeBook) return;
+
+      // Physical Volume button navigation
+      const isVolumeEnabled = settings.volumeKeyTurnPage !== false;
+      const isVolumeUp = e.key === 'VolumeUp' || e.key === 'AudioVolumeUp' || e.code === 'VolumeUp' || (e as any).keyCode === 175;
+      const isVolumeDown = e.key === 'VolumeDown' || e.key === 'AudioVolumeDown' || e.code === 'VolumeDown' || (e as any).keyCode === 174;
+
+      if (isVolumeEnabled && (isVolumeUp || isVolumeDown)) {
+        e.preventDefault();
+        e.stopPropagation();
+        const advance = settings.invertVolumeKeys ? isVolumeUp : isVolumeDown;
+        if (advance) {
+          if (currentPage < totalPages) handlePageChange(currentPage + 1);
+        } else {
+          if (currentPage > 1) handlePageChange(currentPage - 1);
+        }
+        return;
+      }
+
       if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
         if (currentPage < totalPages) {
           handlePageChange(currentPage + 1);
@@ -204,7 +297,7 @@ export const ReaderContainer: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeBook, currentPage, totalPages, handlePageChange]);
+  }, [activeBook, currentPage, totalPages, handlePageChange, settings.volumeKeyTurnPage, settings.invertVolumeKeys]);
 
   // Cleanup speech synthesis on container unmount
   useEffect(() => {
@@ -483,6 +576,28 @@ export const ReaderContainer: React.FC = () => {
             )}
           </button>
 
+          {/* Search inside Book */}
+          <button
+            onClick={() => setShowSearchDrawer(true)}
+            className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-zinc-800 transition-colors"
+            title="Buscar texto en el libro"
+          >
+            <Search className="w-4 h-4" />
+          </button>
+
+          {/* Orientation Lock (Auto / Vertical / Horizontal) */}
+          <button
+            onClick={toggleOrientationLock}
+            className={`p-2 rounded-xl transition-colors ${
+              orientationMode !== 'auto'
+                ? 'bg-rose-500/30 text-rose-300 dark:bg-zinc-700 dark:text-zinc-200 border border-rose-400/50 dark:border-zinc-500'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-zinc-800'
+            }`}
+            title={`Bloqueo de rotación: ${orientationMode === 'portrait' ? 'Vertical' : orientationMode === 'landscape' ? 'Horizontal' : 'Auto'}`}
+          >
+            <Smartphone className={`w-4 h-4 ${orientationMode === 'landscape' ? 'rotate-90' : ''}`} />
+          </button>
+
           {/* MoonReader Reading Settings & Themes */}
           <button
             onClick={() => setShowSettingsSheet(true)}
@@ -697,6 +812,24 @@ export const ReaderContainer: React.FC = () => {
         onClose={() => setShowSettingsSheet(false)}
         isManga={isManga}
         isTextBased={isTextBased}
+      />
+
+      {/* In-Book Full Text Search Drawer */}
+      <SearchInBookDrawer
+        isOpen={showSearchDrawer}
+        onClose={() => setShowSearchDrawer(false)}
+        book={activeBook}
+        fileBuffer={fileBuffer}
+        onJumpToPage={p => handlePageChange(p)}
+        currentPageText={currentPageText}
+      />
+
+      {/* Book Completion Celebration Modal (Rating & Review) */}
+      <BookCompletedModal
+        isOpen={showCompletedModal}
+        onClose={() => setShowCompletedModal(false)}
+        book={activeBook}
+        onSaveRatingAndReview={handleSaveRatingAndReview}
       />
     </div>
   );
