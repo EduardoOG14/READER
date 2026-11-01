@@ -1,184 +1,107 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   X,
   Search,
-  Download,
   BookOpen,
-  Loader2,
-  Globe,
-  Sparkles,
-  ChevronRight,
+  CheckCircle2,
+  BookmarkCheck,
   Play,
-  ArrowLeft,
+  Filter,
+  Loader2,
 } from 'lucide-react';
-import {
-  searchOnlineBooks,
-  searchOnlineManga,
-  getMangaChapters,
-  downloadOnlineBook,
-  downloadMangaChapterToLibrary,
-  type OnlineBook,
-  type OnlineManga,
-  type MangaChapterInfo,
-} from '../services/onlineCatalog';
 import { useApp } from '../context/AppContext';
-import type { Book } from '../types';
 import { useBackHandler } from '../services/backButton';
+import { importBookFile } from '../services/bookImporter';
+import { SPANISH_CATALOG, type CatalogItem } from '../services/catalogData';
+import type { Book } from '../types';
 
 interface ExploreModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-type TabType = 'manga' | 'books';
-type MangaTypeFilter = 'all' | 'manga' | 'manhwa' | 'comic';
+type CategoryFilter = 'todos' | 'libros' | 'manga' | 'comics';
 
 export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) => {
-  const { openReader, refreshLibrary } = useApp();
+  const { books, openReader, refreshLibrary } = useApp();
 
-  const [activeTab, setActiveTab] = useState<TabType>('manga');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [mangaTypeFilter, setMangaTypeFilter] = useState<MangaTypeFilter>('all');
-  const [selectedLanguage, setSelectedLanguage] = useState<'es' | 'all'>('es');
+  const [activeCategory, setActiveCategory] = useState<CategoryFilter>('todos');
+  const [filterQuery, setFilterQuery] = useState('');
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [bookResults, setBookResults] = useState<OnlineBook[]>([]);
-  const [mangaResults, setMangaResults] = useState<OnlineManga[]>([]);
-  const [hasSearched, setHasSearched] = useState(false);
-
-  // Chapter selection for manga
-  const [selectedManga, setSelectedManga] = useState<OnlineManga | null>(null);
-  const [chapters, setChapters] = useState<MangaChapterInfo[]>([]);
-  const [isLoadingChapters, setIsLoadingChapters] = useState(false);
-
-  // Download states
-  const [downloadingId, setDownloadingId] = useState<string | number | null>(null);
-  const [downloadProgress, setDownloadProgress] = useState<number>(0);
-  const [downloadStatusText, setDownloadStatusText] = useState<string>('');
-  const [downloadedBooks, setDownloadedBooks] = useState<Record<string, Book>>({});
-  const [searchError, setSearchError] = useState<string | null>(null);
-
-  // When browsing manga chapters, pressing back returns to the search list first (Priority 125)
+  // Android Back Button handler (Priority 110)
   useBackHandler(() => {
-    if (selectedManga) {
-      setSelectedManga(null);
+    if (isOpen) {
+      onClose();
       return true;
     }
     return false;
-  }, 125, isOpen && !!selectedManga);
+  }, 110, isOpen);
+
+  // Show temporary toast feedback
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  // Check if a catalog item is already saved in the user's personal library
+  const getOwnedBook = (item: CatalogItem): Book | undefined => {
+    const cleanCatalogTitle = item.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+    return books.find(b => {
+      const cleanBookTitle = b.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+      return cleanBookTitle.includes(cleanCatalogTitle) || cleanCatalogTitle.includes(cleanBookTitle);
+    });
+  };
+
+  // Filter catalog items by category and local search query
+  const filteredCatalog = useMemo(() => {
+    return SPANISH_CATALOG.filter(item => {
+      if (activeCategory !== 'todos' && item.category !== activeCategory) {
+        return false;
+      }
+      if (!filterQuery.trim()) return true;
+      const q = filterQuery.toLowerCase().trim();
+      return (
+        item.title.toLowerCase().includes(q) ||
+        item.author.toLowerCase().includes(q) ||
+        item.genre.toLowerCase().includes(q) ||
+        item.description.toLowerCase().includes(q)
+      );
+    });
+  }, [activeCategory, filterQuery]);
+
+  // Handle "Marcar cómo propio" action
+  const handleMarkAsOwned = async (item: CatalogItem) => {
+    setDownloadingId(item.id);
+    try {
+      // 1. Generate the local file (EPUB or CBZ) with full Spanish content
+      const file = await item.createFile();
+
+      // 2. Import into user's personal library (IndexedDB + Android storage)
+      await importBookFile(file, [
+        item.category === 'manga' ? 'cat-manga' : 'cat-books',
+      ]);
+
+      // 3. Refresh user's library context
+      await refreshLibrary();
+
+      showToast(`«${item.title}» se ha guardado en tu biblioteca.`);
+    } catch (err: any) {
+      console.error('Error al guardar obra en biblioteca:', err);
+      showToast('Error al guardar la obra localmente: ' + (err.message || String(err)));
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+
+  // Handle "Leer ahora" for already owned book
+  const handleReadOwnedBook = (ownedBook: Book) => {
+    onClose();
+    openReader(ownedBook);
+  };
 
   if (!isOpen) return null;
-
-  const popularMangaQueries = [
-    'Solo Leveling',
-    'Omniscient Reader',
-    'One Piece',
-    'Berserk',
-    'Tower of God',
-    'Chainsaw Man',
-    'Eleceed',
-  ];
-
-  const popularBookQueries = [
-    'Don Quijote',
-    'Frankenstein',
-    'Sherlock Holmes',
-    'Orgullo y Prejuicio',
-    'Drácula',
-    'Alicia en el país de las maravillas',
-  ];
-
-  const handleSearch = async (queryToSearch = searchQuery) => {
-    const q = queryToSearch.trim();
-    if (!q) return;
-
-    setIsLoading(true);
-    setHasSearched(true);
-    setSelectedManga(null);
-    setSearchError(null);
-
-    try {
-      if (activeTab === 'manga') {
-        const results = await searchOnlineManga(q, mangaTypeFilter);
-        setMangaResults(results);
-      } else {
-        const results = await searchOnlineBooks(q, selectedLanguage);
-        setBookResults(results);
-      }
-    } catch (err: any) {
-      console.error('Search error:', err);
-      setSearchError('No se pudo conectar con el servidor. Comprueba tu conexión a internet.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleOpenChapters = async (manga: OnlineManga) => {
-    setSelectedManga(manga);
-    setIsLoadingChapters(true);
-    try {
-      const chaps = await getMangaChapters(manga.id, selectedLanguage);
-      setChapters(chaps);
-    } catch (err) {
-      console.error('Error fetching chapters:', err);
-    } finally {
-      setIsLoadingChapters(false);
-    }
-  };
-
-  const handleDownloadBook = async (book: OnlineBook) => {
-    setDownloadingId(book.id);
-    setDownloadProgress(0);
-    setDownloadStatusText('Iniciando descarga...');
-
-    try {
-      const importedBook = await downloadOnlineBook(book, (percent, status) => {
-        setDownloadProgress(percent);
-        setDownloadStatusText(status);
-      });
-      setDownloadedBooks(prev => ({ ...prev, [String(book.id)]: importedBook }));
-      await refreshLibrary();
-    } catch (err: any) {
-      alert(`Error al descargar: ${err?.message || 'Fallo de descarga'}`);
-    } finally {
-      setDownloadingId(null);
-    }
-  };
-
-  const handleDownloadChapter = async (chapter: MangaChapterInfo) => {
-    if (!selectedManga) return;
-
-    const downloadKey = `${selectedManga.id}_${chapter.id}`;
-    setDownloadingId(downloadKey);
-    setDownloadProgress(0);
-    setDownloadStatusText('Conectando...');
-
-    try {
-      const importedBook = await downloadMangaChapterToLibrary(selectedManga, chapter, (percent, status) => {
-        setDownloadProgress(percent);
-        setDownloadStatusText(status);
-      });
-      setDownloadedBooks(prev => ({ ...prev, [downloadKey]: importedBook }));
-      await refreshLibrary();
-    } catch (err: any) {
-      alert(`Error al descargar capítulo: ${err?.message || 'Fallo de conexión'}`);
-    } finally {
-      setDownloadingId(null);
-    }
-  };
-
-  const getMangaTypeBadge = (typeLabel: OnlineManga['typeLabel']) => {
-    switch (typeLabel) {
-      case 'Manhwa':
-        return 'bg-cyan-500/90 text-white';
-      case 'Manga':
-        return 'bg-purple-600/90 text-white';
-      case 'Manhua':
-        return 'bg-amber-600/90 text-white';
-      default:
-        return 'bg-rose-600/90 text-white';
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5">
@@ -188,484 +111,241 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
         onClick={onClose}
       />
 
-      {/* Modal Dialog */}
-      <div className="relative w-full max-w-4xl h-[90vh] bg-white dark:bg-[#0a2920] border border-rose-200 dark:border-emerald-700/80 rounded-3xl shadow-2xl flex flex-col z-10 animate-in zoom-in-95 duration-200 overflow-hidden text-[#4c0519] dark:text-[#ecfdf5]">
-        {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-rose-100 dark:border-emerald-800/60 bg-[#fff5f8]/70 dark:bg-[#07241c]/70 flex items-center justify-between shrink-0">
+      {/* Main Catalog Dialog */}
+      <div className="relative w-full max-w-4xl bg-white dark:bg-[#18191c] border border-rose-200 dark:border-zinc-700/80 rounded-3xl shadow-2xl p-4 sm:p-6 z-10 animate-in zoom-in-95 duration-200 text-[#4c0519] dark:text-[#f3f4f6] flex flex-col max-h-[92vh]">
+        
+        {/* Floating Toast notification */}
+        {toastMessage && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 dark:bg-zinc-900/95 text-white border border-rose-400/50 dark:border-emerald-500/50 rounded-2xl px-4 py-2.5 text-xs font-semibold shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-150 flex items-center gap-2 pointer-events-none">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>{toastMessage}</span>
+          </div>
+        )}
+
+        {/* Dialog Header */}
+        <div className="flex items-center justify-between pb-4 border-b border-rose-100 dark:border-zinc-800 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-500 to-pink-500 dark:from-emerald-500 dark:to-teal-400 text-white flex items-center justify-center shadow-md">
-              <Globe className="w-5 h-5 stroke-[2.2]" />
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-500 via-pink-500 to-rose-400 dark:from-zinc-700 dark:to-zinc-600 text-white flex items-center justify-center shadow-md">
+              <BookOpen className="w-5 h-5 stroke-[2.2]" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base sm:text-lg font-bold">
-                  Explorar y Descargar
+                <h3 className="text-base sm:text-lg font-bold text-[#4c0519] dark:text-[#f3f4f6]">
+                  Biblioteca Pública de Obras
                 </h3>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-rose-100 dark:bg-emerald-950 text-rose-700 dark:text-emerald-300 border border-rose-200 dark:border-emerald-800">
-                  Online
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-500 text-white dark:bg-zinc-700 dark:text-zinc-200">
+                  100% Español
                 </span>
               </div>
-              <p className="text-xs text-[#881337]/70 dark:text-[#a7f3d0]/70">
-                Descarga mangas, manhwas, cómics y libros para leer sin conexión
+              <p className="text-[11px] sm:text-xs text-[#881337]/70 dark:text-zinc-400">
+                Libros, mangas y cómics listos para guardar y leer sin conexión
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-rose-100 dark:hover:bg-[#0f382c] text-rose-400 dark:text-emerald-400 transition-colors cursor-pointer"
+            className="p-2 rounded-full hover:bg-rose-100 dark:hover:bg-zinc-800 text-rose-400 dark:text-zinc-400 transition-colors cursor-pointer"
+            title="Cerrar"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Tab & Search Controls */}
-        <div className="p-4 border-b border-rose-100 dark:border-emerald-800/60 space-y-3 shrink-0">
-          {/* Main Tabs: Manga/Manhwa vs Libros */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                setActiveTab('manga');
-                setSelectedManga(null);
-                setHasSearched(false);
-              }}
-              className={`flex-1 py-2 px-3 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                activeTab === 'manga'
-                  ? 'bg-gradient-to-r from-rose-500 to-pink-500 dark:from-emerald-500 dark:to-teal-400 text-white shadow-xs'
-                  : 'bg-rose-50/60 dark:bg-[#07241c] text-[#881337] dark:text-[#a7f3d0] border border-rose-200/60 dark:border-emerald-800/60'
-              }`}
-            >
-              <span>⛩️ Mangas, Manhwas & Cómics</span>
-            </button>
-
-            <button
-              onClick={() => {
-                setActiveTab('books');
-                setSelectedManga(null);
-                setHasSearched(false);
-              }}
-              className={`flex-1 py-2 px-3 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                activeTab === 'books'
-                  ? 'bg-gradient-to-r from-rose-500 to-pink-500 dark:from-emerald-500 dark:to-teal-400 text-white shadow-xs'
-                  : 'bg-rose-50/60 dark:bg-[#07241c] text-[#881337] dark:text-[#a7f3d0] border border-rose-200/60 dark:border-emerald-800/60'
-              }`}
-            >
-              <span>📚 Libros & Clásicos (EPUB)</span>
-            </button>
+        {/* Filters and Instant Local Search Bar */}
+        <div className="pt-3 pb-2 space-y-3 shrink-0">
+          {/* Instant Search Bar */}
+          <div className="relative">
+            <Search className="w-4 h-4 text-rose-400 dark:text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={filterQuery}
+              onChange={e => setFilterQuery(e.target.value)}
+              placeholder="Filtrar por título, autor o género..."
+              className="w-full pl-10 pr-4 py-2 text-xs bg-rose-50/50 dark:bg-zinc-900/80 border border-rose-200/80 dark:border-zinc-700 rounded-2xl outline-none text-[#4c0519] dark:text-[#f3f4f6] placeholder-rose-400/60 dark:placeholder-zinc-500 focus:ring-2 focus:ring-rose-400/30 dark:focus:ring-zinc-600 transition-all"
+            />
+            {filterQuery && (
+              <button
+                onClick={() => setFilterQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-rose-400 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-zinc-200"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
-          {/* Search Box */}
-          <form
-            onSubmit={e => {
-              e.preventDefault();
-              handleSearch();
-            }}
-            className="flex items-center gap-2"
-          >
-            <div className="flex-1 flex items-center bg-white dark:bg-[#07241c] border border-rose-200 dark:border-emerald-700/80 rounded-2xl px-3.5 py-2 shadow-2xs">
-              <Search className="w-4 h-4 text-rose-400 dark:text-emerald-400 mr-2 shrink-0" />
-              <input
-                type="text"
-                placeholder={
-                  activeTab === 'manga'
-                    ? 'Buscar manga o manhwa (ej: Solo Leveling, One Piece, Omniscient Reader)...'
-                    : 'Buscar libro por título o autor (ej: Don Quijote, Frankenstein, Sherlock)...'
-                }
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="w-full bg-transparent text-xs sm:text-sm text-[#4c0519] dark:text-[#ecfdf5] placeholder-rose-300 dark:placeholder-emerald-500/60 outline-none"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  className="p-1 text-rose-400 hover:text-rose-700 dark:text-emerald-400"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-
+          {/* Category Tabs */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
             <button
-              type="submit"
-              disabled={isLoading || !searchQuery.trim()}
-              className="bg-gradient-to-r from-rose-500 to-pink-500 dark:from-emerald-500 dark:to-teal-400 disabled:opacity-50 text-white px-4 py-2 rounded-2xl font-bold text-xs shadow-md flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+              onClick={() => setActiveCategory('todos')}
+              className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
+                activeCategory === 'todos'
+                  ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
+                  : 'bg-rose-50 dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 hover:bg-rose-100 dark:hover:bg-zinc-700'
+              }`}
             >
-              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-              <span className="hidden sm:inline">Buscar</span>
+              Todos ({SPANISH_CATALOG.length})
             </button>
-          </form>
-
-          {/* Sub-Filters for Manga or Language */}
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            {activeTab === 'manga' ? (
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[11px] font-semibold text-[#881337]/70 dark:text-[#a7f3d0]/70">Tipo:</span>
-                {[
-                  { id: 'all', label: 'Todos' },
-                  { id: 'manhwa', label: '🇰🇷 Manhwas' },
-                  { id: 'manga', label: '⛩️ Mangas' },
-                  { id: 'comic', label: '🦸 Cómics' },
-                ].map(f => (
-                  <button
-                    key={f.id}
-                    onClick={() => {
-                      setMangaTypeFilter(f.id as any);
-                      if (searchQuery.trim()) {
-                        handleSearch();
-                      }
-                    }}
-                    className={`px-2.5 py-1 rounded-xl text-[11px] font-semibold transition-all cursor-pointer ${
-                      mangaTypeFilter === f.id
-                        ? 'bg-rose-500 text-white dark:bg-emerald-400 dark:text-slate-950 font-bold shadow-2xs'
-                        : 'bg-rose-50 dark:bg-[#07241c] text-[#881337] dark:text-[#a7f3d0] border border-rose-200/50 dark:border-emerald-800/60'
-                    }`}
-                  >
-                    {f.label}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div className="flex items-center gap-1.5">
-                <span className="text-[11px] font-semibold text-[#881337]/70 dark:text-[#a7f3d0]/70">Idioma:</span>
-                <button
-                  onClick={() => setSelectedLanguage('es')}
-                  className={`px-2.5 py-1 rounded-xl text-[11px] font-semibold cursor-pointer ${
-                    selectedLanguage === 'es'
-                      ? 'bg-rose-500 text-white dark:bg-emerald-400 dark:text-slate-950 font-bold'
-                      : 'bg-rose-50 dark:bg-[#07241c] text-[#881337] dark:text-[#a7f3d0]'
-                  }`}
-                >
-                  🇪🇸 Español
-                </button>
-                <button
-                  onClick={() => setSelectedLanguage('all')}
-                  className={`px-2.5 py-1 rounded-xl text-[11px] font-semibold cursor-pointer ${
-                    selectedLanguage === 'all'
-                      ? 'bg-rose-500 text-white dark:bg-emerald-400 dark:text-slate-950 font-bold'
-                      : 'bg-rose-50 dark:bg-[#07241c] text-[#881337] dark:text-[#a7f3d0]'
-                  }`}
-                >
-                  🌐 Todos
-                </button>
-              </div>
-            )}
+            <button
+              onClick={() => setActiveCategory('libros')}
+              className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
+                activeCategory === 'libros'
+                  ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
+                  : 'bg-rose-50 dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 hover:bg-rose-100 dark:hover:bg-zinc-700'
+              }`}
+            >
+              Libros y Novelas
+            </button>
+            <button
+              onClick={() => setActiveCategory('manga')}
+              className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
+                activeCategory === 'manga'
+                  ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
+                  : 'bg-rose-50 dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 hover:bg-rose-100 dark:hover:bg-zinc-700'
+              }`}
+            >
+              Mangas
+            </button>
+            <button
+              onClick={() => setActiveCategory('comics')}
+              className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
+                activeCategory === 'comics'
+                  ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
+                  : 'bg-rose-50 dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 hover:bg-rose-100 dark:hover:bg-zinc-700'
+              }`}
+            >
+              Cómics
+            </button>
           </div>
         </div>
 
-        {/* Content Body */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5">
-          {/* Active Download Progress Bar Banner */}
-          {downloadingId && (
-            <div className="mb-4 p-3.5 rounded-2xl bg-gradient-to-r from-rose-500/10 to-pink-500/10 dark:from-emerald-500/10 dark:to-teal-400/10 border border-rose-300 dark:border-emerald-600/60 animate-in fade-in duration-150">
-              <div className="flex items-center justify-between text-xs font-bold mb-1.5 text-rose-700 dark:text-emerald-300">
-                <div className="flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin text-rose-500 dark:text-emerald-400" />
-                  <span>{downloadStatusText || 'Descargando...'}</span>
-                </div>
-                <span>{downloadProgress}%</span>
-              </div>
-              <div className="w-full h-2 bg-rose-200/50 dark:bg-[#07241c] rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-rose-500 to-pink-500 dark:from-emerald-400 dark:to-teal-300 rounded-full transition-all duration-200"
-                  style={{ width: `${downloadProgress}%` }}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* CHAPTER SELECTOR VIEW FOR MANGA */}
-          {selectedManga ? (
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <button
-                  onClick={() => setSelectedManga(null)}
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-rose-100 dark:bg-[#07241c] text-xs font-bold text-[#881337] dark:text-[#a7f3d0] hover:bg-rose-200 dark:hover:bg-[#0f382c] transition-colors cursor-pointer"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span>Volver a resultados</span>
-                </button>
-              </div>
-
-              {/* Manga Header in Chapter View */}
-              <div className="flex gap-4 p-4 rounded-3xl bg-rose-50/60 dark:bg-[#07241c]/60 border border-rose-200/60 dark:border-emerald-800/60 mb-5">
-                {selectedManga.coverUrl && (
-                  <img
-                    src={selectedManga.coverUrl}
-                    alt={selectedManga.title}
-                    className="w-20 h-28 object-cover rounded-2xl shadow-md shrink-0"
-                  />
-                )}
-                <div className="flex-1 min-w-0">
-                  <span
-                    className={`text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider ${getMangaTypeBadge(
-                      selectedManga.typeLabel
-                    )}`}
-                  >
-                    {selectedManga.typeLabel}
-                  </span>
-                  <h4 className="text-base font-bold text-[#4c0519] dark:text-[#ecfdf5] mt-1 line-clamp-1">
-                    {selectedManga.title}
-                  </h4>
-                  {selectedManga.description && (
-                    <p className="text-xs text-[#881337]/75 dark:text-[#a7f3d0]/75 line-clamp-2 mt-1">
-                      {selectedManga.description}
-                    </p>
-                  )}
-                  <p className="text-xs font-semibold text-rose-600 dark:text-emerald-400 mt-2">
-                    {chapters.length} capítulos disponibles
-                  </p>
-                </div>
-              </div>
-
-              {/* Chapters List */}
-              {isLoadingChapters ? (
-                <div className="h-48 flex flex-col items-center justify-center text-rose-400 dark:text-emerald-400 gap-2">
-                  <Loader2 className="w-7 h-7 animate-spin" />
-                  <span className="text-xs font-semibold">Cargando capítulos...</span>
-                </div>
-              ) : chapters.length === 0 ? (
-                <div className="py-12 text-center text-xs text-[#881337]/70 dark:text-[#a7f3d0]/70">
-                  No se encontraron capítulos disponibles en español para este manga.
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {chapters.map(chap => {
-                    const downloadKey = `${selectedManga.id}_${chap.id}`;
-                    const isDownloadingThis = downloadingId === downloadKey;
-                    const downloadedBook = downloadedBooks[downloadKey];
-
-                    return (
-                      <div
-                        key={chap.id}
-                        className="flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-[#07241c] border border-rose-200/70 dark:border-emerald-800/60 hover:border-rose-400 dark:hover:border-emerald-500 transition-all"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-xl bg-rose-100 dark:bg-emerald-950 flex items-center justify-center font-bold text-xs text-rose-700 dark:text-emerald-300">
-                            #{chap.chapter}
-                          </div>
-                          <div>
-                            <div className="text-xs font-bold text-[#4c0519] dark:text-[#ecfdf5]">
-                              Capítulo {chap.chapter} {chap.title ? `• ${chap.title}` : ''}
-                            </div>
-                            <div className="text-[10px] text-[#881337]/70 dark:text-[#a7f3d0]/70">
-                              {chap.pages} páginas • Idioma: {chap.language.toUpperCase()}
-                            </div>
-                          </div>
-                        </div>
-
-                        {downloadedBook ? (
-                          <button
-                            onClick={() => {
-                              openReader(downloadedBook);
-                              onClose();
-                            }}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-xs active:scale-95 transition-all cursor-pointer"
-                          >
-                            <Play className="w-3.5 h-3.5 fill-current" />
-                            <span>Leer ahora</span>
-                          </button>
-                        ) : isDownloadingThis ? (
-                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-100 dark:bg-[#0f382c] text-rose-600 dark:text-emerald-300 font-bold text-xs">
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                            <span>{downloadProgress}%</span>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => handleDownloadChapter(chap)}
-                            disabled={downloadingId !== null}
-                            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 dark:from-emerald-500 dark:to-teal-400 text-white font-bold text-xs shadow-xs hover:shadow-md active:scale-95 disabled:opacity-50 transition-all cursor-pointer"
-                          >
-                            <Download className="w-3.5 h-3.5" />
-                            <span>Descargar</span>
-                          </button>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          ) : !hasSearched ? (
-            /* POPULAR SUGGESTIONS BEFORE SEARCH */
-            <div className="py-6 text-center max-w-lg mx-auto">
-              <div className="w-14 h-14 rounded-3xl bg-rose-100/70 dark:bg-[#07241c] text-rose-500 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3 shadow-xs">
-                <Sparkles className="w-7 h-7" />
-              </div>
-              <h4 className="text-base font-bold text-[#4c0519] dark:text-[#ecfdf5] mb-1">
-                {activeTab === 'manga'
-                  ? 'Explora Mangas, Manhwas y Cómics'
-                  : 'Explora Libros Clásicos y Universales'}
-              </h4>
-              <p className="text-xs text-[#881337]/75 dark:text-[#a7f3d0]/75 mb-5">
-                Escribe en la barra de búsqueda o prueba con una de las sugerencias populares:
-              </p>
-
-              <div className="flex flex-wrap justify-center gap-2">
-                {(activeTab === 'manga' ? popularMangaQueries : popularBookQueries).map(item => (
-                  <button
-                    key={item}
-                    onClick={() => {
-                      setSearchQuery(item);
-                      handleSearch(item);
-                    }}
-                    className="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-[#07241c] hover:bg-rose-100 dark:hover:bg-[#0f382c] border border-rose-200/70 dark:border-emerald-800/60 text-xs font-semibold text-[#881337] dark:text-[#a7f3d0] transition-all cursor-pointer shadow-2xs hover:scale-103"
-                  >
-                    {item}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : isLoading ? (
-            /* LOADING SPINNER */
-            <div className="h-64 flex flex-col items-center justify-center text-rose-400 dark:text-emerald-400 gap-3">
-              <Loader2 className="w-9 h-9 animate-spin" />
-              <span className="text-xs font-bold uppercase tracking-wider">Buscando en catálogo online...</span>
-            </div>
-          ) : searchError ? (
-            /* SEARCH ERROR / OFFLINE VIEW */
-            <div className="py-14 text-center max-w-md mx-auto p-6 rounded-3xl bg-rose-50/70 dark:bg-[#07241c] border border-rose-200 dark:border-emerald-800/80 my-4">
-              <p className="text-sm font-bold text-rose-600 dark:text-emerald-400 mb-1">
-                Catálogo no disponible sin conexión
-              </p>
-              <p className="text-xs text-[#881337]/75 dark:text-[#a7f3d0]/75">
-                {searchError}
-              </p>
-              <p className="text-[11px] text-slate-400 dark:text-emerald-500/60 mt-3">
-                Todas las obras ya guardadas en tu biblioteca siguen 100% disponibles sin conexión.
+        {/* Scrollable Catalog Grid */}
+        <div className="py-2 overflow-y-auto flex-1 space-y-3.5 pr-1">
+          {filteredCatalog.length === 0 ? (
+            <div className="py-14 text-center space-y-2">
+              <Filter className="w-8 h-8 text-rose-300 dark:text-zinc-600 mx-auto" />
+              <p className="text-sm font-semibold text-[#881337] dark:text-zinc-400">
+                No se encontraron obras que coincidan con tu búsqueda.
               </p>
             </div>
-          ) : activeTab === 'manga' ? (
-            /* MANGA & MANHWA RESULTS */
-            mangaResults.length === 0 ? (
-              <div className="py-16 text-center text-xs text-[#881337]/70 dark:text-[#a7f3d0]/70">
-                No se encontraron mangas o manhwas con ese título. Intenta con otro nombre.
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                {mangaResults.map(manga => (
-                  <div
-                    key={manga.id}
-                    onClick={() => handleOpenChapters(manga)}
-                    className="group relative flex flex-col rounded-2xl sm:rounded-3xl overflow-hidden bg-rose-50/40 dark:bg-[#07241c]/60 border border-rose-200/70 dark:border-emerald-800/60 p-2 hover:border-rose-400 dark:hover:border-emerald-500 hover:shadow-lg transition-all cursor-pointer"
-                  >
-                    <div className="relative aspect-[3/4.2] w-full rounded-xl sm:rounded-2xl overflow-hidden bg-slate-200 dark:bg-slate-800 mb-2">
-                      {manga.coverUrl ? (
-                        <img
-                          src={manga.coverUrl}
-                          alt={manga.title}
-                          className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-200"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-rose-300 dark:text-emerald-500">
-                          <BookOpen className="w-8 h-8" />
-                        </div>
-                      )}
-                      <span
-                        className={`absolute top-2 left-2 text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider ${getMangaTypeBadge(
-                          manga.typeLabel
-                        )}`}
-                      >
-                        {manga.typeLabel}
-                      </span>
-                    </div>
-
-                    <h4 className="text-xs font-bold text-[#4c0519] dark:text-[#ecfdf5] line-clamp-1 group-hover:text-rose-600 dark:group-hover:text-emerald-300 transition-colors">
-                      {manga.title}
-                    </h4>
-
-                    <div className="mt-2 pt-2 border-t border-rose-200/40 dark:border-emerald-800/40 flex items-center justify-between text-[11px] font-bold text-rose-600 dark:text-emerald-400">
-                      <span>Ver Capítulos</span>
-                      <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )
           ) : (
-            /* BOOKS (EPUB) RESULTS */
-            bookResults.length === 0 ? (
-              <div className="py-16 text-center text-xs text-[#881337]/70 dark:text-[#a7f3d0]/70">
-                No se encontraron libros con ese título o autor.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                {bookResults.map(book => {
-                  const isDownloadingThis = downloadingId === book.id;
-                  const downloadedBook = downloadedBooks[String(book.id)];
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
+              {filteredCatalog.map(item => {
+                const ownedBook = getOwnedBook(item);
+                const isDownloading = downloadingId === item.id;
 
-                  return (
-                    <div
-                      key={book.id}
-                      className="flex gap-3.5 p-3 rounded-2xl bg-white dark:bg-[#07241c] border border-rose-200/70 dark:border-emerald-800/60 hover:border-rose-400 dark:hover:border-emerald-500 transition-all shadow-2xs"
-                    >
-                      <div className="w-16 h-22 rounded-xl overflow-hidden bg-rose-100 dark:bg-slate-800 shrink-0 border border-rose-200/60 dark:border-emerald-950">
-                        {book.coverUrl ? (
-                          <img
-                            src={book.coverUrl}
-                            alt={book.title}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-rose-400 dark:text-emerald-500">
-                            <BookOpen className="w-6 h-6" />
-                          </div>
-                        )}
-                      </div>
+                return (
+                  <div
+                    key={item.id}
+                    className="p-3 sm:p-3.5 rounded-2xl bg-rose-50/40 dark:bg-zinc-900/60 border border-rose-200/70 dark:border-zinc-800 hover:border-rose-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between gap-3 shadow-xs"
+                  >
+                    {/* Header info */}
+                    <div className="space-y-2">
+                      {/* Gradient preview badge */}
+                      <div
+                        className="h-24 sm:h-28 rounded-xl p-3 flex flex-col justify-between text-white shadow-xs relative overflow-hidden"
+                        style={{
+                          background: `linear-gradient(135deg, ${item.coverGradient.from}, ${item.coverGradient.to})`,
+                        }}
+                      >
+                        <div className="flex items-center justify-between text-[10px] font-bold tracking-wider uppercase">
+                          <span className="px-2 py-0.5 rounded-full bg-black/35 backdrop-blur-xs">
+                            {item.format.toUpperCase()}
+                          </span>
+                          <span
+                            className="px-2 py-0.5 rounded-full"
+                            style={{ backgroundColor: `${item.coverGradient.accent}40` }}
+                          >
+                            {item.badgeText}
+                          </span>
+                        </div>
 
-                      <div className="flex-1 min-w-0 flex flex-col justify-between">
-                        <div>
-                          <div className="flex items-center gap-1.5 mb-1">
-                            <span className="text-[9px] font-black px-1.5 py-0.2 rounded uppercase bg-emerald-600 text-white">
-                              {book.format.toUpperCase()}
-                            </span>
-                            <span className="text-[10px] text-[#881337]/70 dark:text-[#a7f3d0]/70">
-                              {book.languages.join(', ').toUpperCase()}
-                            </span>
-                          </div>
-                          <h4 className="text-xs sm:text-sm font-bold text-[#4c0519] dark:text-[#ecfdf5] line-clamp-1">
-                            {book.title}
+                        <div className="z-10">
+                          <h4 className="font-extrabold text-sm sm:text-base leading-tight drop-shadow-sm line-clamp-2">
+                            {item.title}
                           </h4>
-                          <p className="text-[11px] text-[#881337]/70 dark:text-[#a7f3d0]/70 line-clamp-1">
-                            {book.authors.join(', ') || 'Autor desconocido'}
+                          <p className="text-[11px] opacity-90 truncate drop-shadow-xs">
+                            {item.author} {item.year ? `(${item.year})` : ''}
                           </p>
                         </div>
 
-                        <div className="mt-2">
-                          {downloadedBook ? (
-                            <button
-                              onClick={() => {
-                                openReader(downloadedBook);
-                                onClose();
-                              }}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-xs active:scale-95 transition-all cursor-pointer"
-                            >
-                              <Play className="w-3.5 h-3.5 fill-current" />
-                              <span>Leer ahora</span>
-                            </button>
-                          ) : isDownloadingThis ? (
-                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-100 dark:bg-[#0f382c] text-rose-600 dark:text-emerald-300 font-bold text-xs">
-                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                              <span>{downloadProgress}%</span>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => handleDownloadBook(book)}
-                              disabled={downloadingId !== null}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 dark:from-emerald-500 dark:to-teal-400 text-white font-bold text-xs shadow-xs hover:shadow-md active:scale-95 disabled:opacity-50 transition-all cursor-pointer"
-                            >
-                              <Download className="w-3.5 h-3.5" />
-                              <span>Descargar EPUB</span>
-                            </button>
-                          )}
-                        </div>
+                        {/* Subtle decorative circle */}
+                        <div
+                          className="absolute -right-4 -bottom-4 w-20 h-20 rounded-full opacity-20 pointer-events-none"
+                          style={{ backgroundColor: item.coverGradient.accent }}
+                        />
                       </div>
+
+                      {/* Genre & Meta */}
+                      <div className="flex items-center justify-between text-[11px] text-[#881337]/75 dark:text-zinc-400 font-mono">
+                        <span className="font-sans font-semibold text-rose-700 dark:text-zinc-300 truncate max-w-[160px]">
+                          {item.genre}
+                        </span>
+                        <span>{item.totalPages} págs. aprox</span>
+                      </div>
+
+                      {/* Synopsis */}
+                      <p className="text-xs text-[#4c0519]/80 dark:text-zinc-300 line-clamp-3 leading-relaxed">
+                        {item.description}
+                      </p>
                     </div>
-                  );
-                })}
-              </div>
-            )
+
+                    {/* Action buttons */}
+                    <div className="pt-2 border-t border-rose-100 dark:border-zinc-800">
+                      {ownedBook ? (
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] border border-emerald-500/30">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                            <span>En tu biblioteca</span>
+                          </div>
+
+                          <button
+                            onClick={() => handleReadOwnedBook(ownedBook)}
+                            className="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer shrink-0"
+                            title="Abrir y leer ahora"
+                          >
+                            <Play className="w-3.5 h-3.5 fill-white" />
+                            <span>Leer</span>
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => handleMarkAsOwned(item)}
+                          disabled={isDownloading}
+                          className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 dark:from-zinc-200 dark:to-zinc-300 dark:hover:from-white dark:hover:to-zinc-200 text-white dark:text-zinc-950 font-bold text-xs shadow-xs active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                        >
+                          {isDownloading ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <span>Guardando copia local...</span>
+                            </>
+                          ) : (
+                            <>
+                              <BookmarkCheck className="w-4 h-4 stroke-[2.2]" />
+                              <span>Marca cómo propio</span>
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           )}
+        </div>
+
+        {/* Footer */}
+        <div className="pt-3 border-t border-rose-100 dark:border-zinc-800 flex items-center justify-between text-xs text-[#881337]/70 dark:text-zinc-500 shrink-0">
+          <span>
+            {filteredCatalog.length} {filteredCatalog.length === 1 ? 'obra disponible' : 'obras disponibles'} en español
+          </span>
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-xl bg-rose-100/70 hover:bg-rose-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-[#881337] dark:text-zinc-200 font-bold transition-colors cursor-pointer"
+          >
+            Cerrar
+          </button>
         </div>
       </div>
     </div>
