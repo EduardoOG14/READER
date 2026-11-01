@@ -1,9 +1,38 @@
+import { registerPlugin, Capacitor, type PluginListenerHandle } from '@capacitor/core';
+
 /**
  * GitHub Release Update Checker for READER
  */
 
 export const CURRENT_APP_VERSION = '1.0.0';
 export const DEFAULT_GITHUB_REPO = 'EduardoOG14/READER';
+
+export interface DownloadProgress {
+  percent: number;
+  bytesDownloaded: number;
+  totalBytes: number;
+}
+
+export interface AppUpdaterPluginInterface {
+  canRequestPackageInstalls(): Promise<{ value: boolean }>;
+  openInstallPermissionSettings(): Promise<void>;
+  downloadAndInstall(options: { url: string; fileName?: string }): Promise<{ success: boolean; path: string }>;
+  installApk(options: { path: string }): Promise<{ success: boolean }>;
+  addListener(
+    eventName: 'downloadProgress',
+    listenerFunc: (progress: DownloadProgress) => void
+  ): Promise<PluginListenerHandle>;
+  addListener(
+    eventName: 'downloadComplete',
+    listenerFunc: (progress: DownloadProgress) => void
+  ): Promise<PluginListenerHandle>;
+  addListener(
+    eventName: 'downloadError',
+    listenerFunc: (error: { error: string }) => void
+  ): Promise<PluginListenerHandle>;
+}
+
+export const NativeAppUpdater = registerPlugin<AppUpdaterPluginInterface>('AppUpdater');
 
 export interface UpdateAsset {
   name: string;
@@ -115,3 +144,84 @@ export async function checkForUpdates(repo: string = DEFAULT_GITHUB_REPO): Promi
     apkAsset,
   };
 }
+
+/**
+ * Checks whether the app has permission to request package installation on Android 8+
+ */
+export async function canInstallUnknownApps(): Promise<boolean> {
+  if (!Capacitor.isNativePlatform()) return true;
+  try {
+    const res = await NativeAppUpdater.canRequestPackageInstalls();
+    return res.value;
+  } catch (e) {
+    console.warn('[Updater] Could not check install permissions:', e);
+    return true;
+  }
+}
+
+/**
+ * Opens system settings for unknown app installation permissions on Android
+ */
+export async function openInstallSettings(): Promise<void> {
+  if (!Capacitor.isNativePlatform()) return;
+  try {
+    await NativeAppUpdater.openInstallPermissionSettings();
+  } catch (e) {
+    console.warn('[Updater] Could not open install permission settings:', e);
+  }
+}
+
+/**
+ * Downloads and triggers in-app installation of the APK file directly on the device
+ */
+export async function downloadAndInstallUpdate(
+  apkUrl: string,
+  fileName?: string,
+  onProgress?: (progress: DownloadProgress) => void
+): Promise<{ success: boolean; path?: string }> {
+  if (!Capacitor.isNativePlatform()) {
+    // Web / Desktop Fallback: trigger browser download
+    const a = document.createElement('a');
+    a.href = apkUrl;
+    a.download = fileName || 'READER.apk';
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    return { success: true };
+  }
+
+  let progressHandle: PluginListenerHandle | null = null;
+  if (onProgress) {
+    progressHandle = await NativeAppUpdater.addListener('downloadProgress', p => {
+      onProgress(p);
+    });
+  }
+
+  try {
+    const result = await NativeAppUpdater.downloadAndInstall({
+      url: apkUrl,
+      fileName,
+    });
+    return result;
+  } finally {
+    if (progressHandle) {
+      await progressHandle.remove();
+    }
+  }
+}
+
+/**
+ * Re-triggers native installation intent for an already downloaded APK
+ */
+export async function installDownloadedApk(path: string): Promise<boolean> {
+  if (!Capacitor.isNativePlatform()) return false;
+  try {
+    const res = await NativeAppUpdater.installApk({ path });
+    return res.success;
+  } catch (err) {
+    console.error('[Updater] Failed to launch installer:', err);
+    throw err;
+  }
+}
+
