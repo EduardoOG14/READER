@@ -26,8 +26,8 @@ export const TextReader: React.FC<TextReaderProps> = ({
     try {
       const decoded = new TextDecoder('utf-8').decode(buffer);
       setFullText(decoded);
-    } catch (e) {
-      console.error('Error decoding text buffer:', e);
+    } catch {
+      console.error('Error decoding text buffer');
     }
   }, [buffer]);
 

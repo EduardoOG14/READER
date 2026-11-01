@@ -96,7 +96,7 @@ export async function checkForUpdates(repo: string = DEFAULT_GITHUB_REPO): Promi
       },
       cache: 'no-store',
     });
-  } catch (err: any) {
+  } catch {
     throw new Error('No se pudo conectar a GitHub. Verifica tu conexión a internet.');
   }
 

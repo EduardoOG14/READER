@@ -38,10 +38,10 @@ export const BookListItem: React.FC<BookListItemProps> = ({ book, onOpenDetails 
   return (
     <div
       onClick={() => onOpenDetails(book)}
-      className="flex items-center gap-3.5 p-3 rounded-2xl bg-white/80 dark:bg-[#0a2920]/80 backdrop-blur-xs border border-rose-200/80 dark:border-emerald-800/70 hover:border-rose-400 dark:hover:border-emerald-500/60 transition-all cursor-pointer group shadow-2xs hover:shadow-md"
+      className="flex items-center gap-3.5 p-3 rounded-2xl bg-white/80 dark:bg-[#18191c]/90 backdrop-blur-xs border border-rose-200/80 dark:border-zinc-800 hover:border-rose-400 dark:hover:border-zinc-700 transition-all cursor-pointer group shadow-2xs hover:shadow-md"
     >
       {/* Thumbnail */}
-      <div className="relative w-13 h-17 sm:w-14 sm:h-18 rounded-xl overflow-hidden bg-rose-50 dark:bg-[#06241c] shrink-0 border border-rose-200/60 dark:border-emerald-900/80">
+      <div className="relative w-13 h-17 sm:w-14 sm:h-18 rounded-xl overflow-hidden bg-rose-50 dark:bg-zinc-800 shrink-0 border border-rose-200/60 dark:border-zinc-700">
         {book.coverUrl ? (
           <img
             src={book.coverUrl}
@@ -50,7 +50,7 @@ export const BookListItem: React.FC<BookListItemProps> = ({ book, onOpenDetails 
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <BookOpen className="w-6 h-6 text-rose-300 dark:text-emerald-600" />
+            <BookOpen className="w-6 h-6 text-rose-300 dark:text-zinc-500" />
           </div>
         )}
       </div>
@@ -65,27 +65,27 @@ export const BookListItem: React.FC<BookListItemProps> = ({ book, onOpenDetails 
           >
             {book.format}
           </span>
-          <h4 className="text-xs sm:text-sm font-bold text-[#4c0519] dark:text-[#ecfdf5] truncate group-hover:text-rose-600 dark:group-hover:text-emerald-300 transition-colors">
+          <h4 className="text-xs sm:text-sm font-bold text-[#4c0519] dark:text-[#f3f4f6] truncate group-hover:text-rose-600 dark:group-hover:text-zinc-100 transition-colors">
             {book.title}
           </h4>
         </div>
 
-        <p className="text-[11px] text-[#881337]/75 dark:text-[#a7f3d0]/75 truncate mt-0.5 font-medium">
+        <p className="text-[11px] text-[#881337]/75 dark:text-zinc-400 truncate mt-0.5 font-medium">
           {book.author ? `${book.author} • ` : ''}
           {book.totalPages} páginas • {formatFileSize(book.fileSize)}
         </p>
 
         {/* Progress bar */}
         <div className="flex items-center gap-2 mt-2">
-          <div className="flex-1 h-1.5 bg-rose-100 dark:bg-[#06241c] rounded-full overflow-hidden max-w-48">
+          <div className="flex-1 h-1.5 bg-rose-100 dark:bg-zinc-800 rounded-full overflow-hidden max-w-48">
             <div
               className={`h-full rounded-full transition-all ${
-                isCompleted ? 'bg-emerald-500' : 'bg-gradient-to-r from-rose-500 to-pink-500 dark:from-emerald-400 dark:to-teal-300'
+                isCompleted ? 'bg-emerald-500' : 'bg-gradient-to-r from-rose-500 to-pink-500 dark:from-zinc-300 dark:to-zinc-100'
               }`}
               style={{ width: `${book.progress}%` }}
             />
           </div>
-          <span className="text-[10px] sm:text-[11px] font-semibold text-[#881337]/80 dark:text-[#a7f3d0]/80">
+          <span className="text-[10px] sm:text-[11px] font-semibold text-[#881337]/80 dark:text-zinc-400">
             {isCompleted ? (
               <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold">
                 <Check className="w-3 h-3 stroke-[3]" /> Leído
@@ -103,7 +103,7 @@ export const BookListItem: React.FC<BookListItemProps> = ({ book, onOpenDetails 
           e.stopPropagation();
           onOpenDetails(book);
         }}
-        className="p-2 rounded-xl text-rose-400 dark:text-emerald-400 hover:text-rose-700 dark:hover:text-emerald-200 hover:bg-rose-100/70 dark:hover:bg-[#0f382c] transition-colors cursor-pointer"
+        className="p-2 rounded-xl text-rose-400 dark:text-zinc-400 hover:text-rose-700 dark:hover:text-zinc-200 hover:bg-rose-100/70 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
         title="Opciones de libro"
       >
         <MoreVertical className="w-5 h-5" />

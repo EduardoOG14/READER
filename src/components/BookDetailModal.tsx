@@ -80,7 +80,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
         await editBook(book.id, { coverUrl: optimizedThumbnail });
         showNotice('¡Portada actualizada y guardada localmente!');
       }
-    } catch (err) {
+    } catch {
       alert('No se pudo procesar la imagen seleccionada.');
     } finally {
       setIsProcessingCover(false);
@@ -148,7 +148,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
       <div
-        className="relative w-full max-w-xl bg-white dark:bg-[#0a2920] border border-rose-200 dark:border-emerald-700/80 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 max-h-[92vh] flex flex-col text-[#4c0519] dark:text-[#ecfdf5]"
+        className="relative w-full max-w-xl bg-white dark:bg-[#18191c] border border-rose-200 dark:border-zinc-700/80 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 max-h-[92vh] flex flex-col text-[#4c0519] dark:text-[#f3f4f6]"
         onClick={e => e.stopPropagation()}
       >
         {/* Hidden File Input for changing cover */}
@@ -161,7 +161,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
         />
 
         {/* Modal Header */}
-        <div className="p-4 sm:p-5 border-b border-rose-100 dark:border-emerald-800/60 flex items-center justify-between shrink-0 bg-[#fff5f8]/70 dark:bg-[#07241c]/70">
+        <div className="p-4 sm:p-5 border-b border-rose-100 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-[#fff5f8]/70 dark:bg-zinc-900/70">
           <div className="flex items-center gap-2">
             <span
               className={`text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider ${getFormatBadge(
@@ -170,13 +170,13 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
             >
               {book.format.toUpperCase()}
             </span>
-            <h3 className="text-sm sm:text-base font-bold text-[#4c0519] dark:text-[#ecfdf5] truncate max-w-[280px] sm:max-w-md">
+            <h3 className="text-sm sm:text-base font-bold text-[#4c0519] dark:text-[#f3f4f6] truncate max-w-[280px] sm:max-w-md">
               {book.title}
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full text-rose-400 dark:text-emerald-400 hover:bg-rose-100 dark:hover:bg-[#0f382c] transition-colors cursor-pointer"
+            className="p-1.5 rounded-full text-rose-400 dark:text-zinc-400 hover:bg-rose-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -194,7 +194,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
           {/* Top Section: Cover with Change Cover Button + Info */}
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 items-center sm:items-start">
             {/* Book Cover with Hover / Tap to change */}
-            <div className="relative group w-32 aspect-[3/4.2] rounded-2xl overflow-hidden bg-rose-100 dark:bg-[#07241c] shrink-0 shadow-md border border-rose-200/80 dark:border-emerald-800/80">
+            <div className="relative group w-32 aspect-[3/4.2] rounded-2xl overflow-hidden bg-rose-100 dark:bg-zinc-800 shrink-0 shadow-md border border-rose-200/80 dark:border-zinc-700">
               {coverUrl ? (
                 <img
                   src={coverUrl}
@@ -202,7 +202,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                   className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-200"
                 />
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center text-rose-300 dark:text-emerald-500">
+                <div className="w-full h-full flex flex-col items-center justify-center text-rose-300 dark:text-zinc-500">
                   <BookOpen className="w-10 h-10 mb-1" />
                   <span className="text-[10px] font-semibold opacity-70">Sin Portada</span>
                 </div>
@@ -235,19 +235,19 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
             {/* Editable Title, Author & Metadata */}
             <div className="flex-1 w-full space-y-2.5">
               <div>
-                <label className="text-[10px] font-bold text-rose-900/60 dark:text-emerald-300/70 uppercase tracking-wider block mb-1">
+                <label className="text-[10px] font-bold text-rose-900/60 dark:text-zinc-400 uppercase tracking-wider block mb-1">
                   Título de la Obra
                 </label>
                 <input
                   type="text"
                   value={title}
                   onChange={e => setTitle(e.target.value)}
-                  className="w-full text-sm font-bold bg-rose-50/50 dark:bg-[#07241c] border border-rose-200 dark:border-emerald-800 rounded-xl px-3 py-1.5 text-[#4c0519] dark:text-[#ecfdf5] outline-none focus:ring-1 focus:ring-rose-400 dark:focus:ring-emerald-400"
+                  className="w-full text-sm font-bold bg-rose-50/50 dark:bg-zinc-900/80 border border-rose-200 dark:border-zinc-700 rounded-xl px-3 py-1.5 text-[#4c0519] dark:text-[#f3f4f6] outline-none focus:ring-1 focus:ring-rose-400 dark:focus:ring-zinc-500"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] font-bold text-rose-900/60 dark:text-emerald-300/70 uppercase tracking-wider block mb-1">
+                <label className="text-[10px] font-bold text-rose-900/60 dark:text-zinc-400 uppercase tracking-wider block mb-1">
                   Autor / Creador
                 </label>
                 <input
@@ -255,17 +255,17 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                   placeholder="Autor desconocido"
                   value={author}
                   onChange={e => setAuthor(e.target.value)}
-                  className="w-full text-xs bg-rose-50/50 dark:bg-[#07241c] border border-rose-200 dark:border-emerald-800 rounded-xl px-3 py-1.5 text-[#881337] dark:text-[#a7f3d0] outline-none focus:ring-1 focus:ring-rose-400 dark:focus:ring-emerald-400"
+                  className="w-full text-xs bg-rose-50/50 dark:bg-zinc-900/80 border border-rose-200 dark:border-zinc-700 rounded-xl px-3 py-1.5 text-[#881337] dark:text-zinc-300 outline-none focus:ring-1 focus:ring-rose-400 dark:focus:ring-zinc-500"
                 />
               </div>
 
               {/* Quick specs */}
-              <div className="flex flex-wrap items-center gap-2 text-xs text-[#881337]/75 dark:text-[#a7f3d0]/75 pt-1">
-                <span>Páginas: <strong className="text-[#4c0519] dark:text-[#ecfdf5]">{book.totalPages}</strong></span>
+              <div className="flex flex-wrap items-center gap-2 text-xs text-[#881337]/75 dark:text-zinc-400 pt-1">
+                <span>Páginas: <strong className="text-[#4c0519] dark:text-[#f3f4f6]">{book.totalPages}</strong></span>
                 <span>•</span>
-                <span>Tamaño: <strong className="text-[#4c0519] dark:text-[#ecfdf5]">{formatFileSize(book.fileSize)}</strong></span>
+                <span>Tamaño: <strong className="text-[#4c0519] dark:text-[#f3f4f6]">{formatFileSize(book.fileSize)}</strong></span>
                 <span>•</span>
-                <span>Añadido: <strong className="text-[#4c0519] dark:text-[#ecfdf5]">{formatDate(book.dateAdded)}</strong></span>
+                <span>Añadido: <strong className="text-[#4c0519] dark:text-[#f3f4f6]">{formatDate(book.dateAdded)}</strong></span>
               </div>
 
               {/* Button to manually change cover on desktop */}
@@ -273,7 +273,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-[#07241c] hover:bg-rose-100 dark:hover:bg-[#0f382c] border border-rose-200/80 dark:border-emerald-800 text-[11px] font-bold text-rose-700 dark:text-emerald-300 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-zinc-800 hover:bg-rose-100 dark:hover:bg-zinc-700 border border-rose-200/80 dark:border-zinc-700 text-[11px] font-bold text-rose-700 dark:text-zinc-200 transition-colors cursor-pointer"
                 >
                   <Upload className="w-3.5 h-3.5" />
                   <span>Subir nueva imagen de portada</span>
@@ -283,18 +283,18 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
           </div>
 
           {/* SINOPSIS / RESUMEN DE LA OBRA */}
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-rose-50/60 to-pink-50/30 dark:from-[#07241c]/80 dark:to-[#041712]/60 border border-rose-200/80 dark:border-emerald-800/70">
+          <div className="p-4 rounded-2xl bg-gradient-to-br from-rose-50/60 to-pink-50/30 dark:from-zinc-900/80 dark:to-zinc-950/60 border border-rose-200/80 dark:border-zinc-800">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-1.5">
-                <FileText className="w-4 h-4 text-rose-500 dark:text-emerald-400" />
-                <h4 className="text-xs font-bold text-[#4c0519] dark:text-[#ecfdf5] uppercase tracking-wider">
+                <FileText className="w-4 h-4 text-rose-500 dark:text-zinc-400" />
+                <h4 className="text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6] uppercase tracking-wider">
                   Sinopsis / Resumen
                 </h4>
               </div>
               <button
                 type="button"
                 onClick={() => setIsEditingDescription(!isEditingDescription)}
-                className="text-[11px] font-semibold text-rose-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
+                className="text-[11px] font-semibold text-rose-600 dark:text-zinc-300 hover:underline flex items-center gap-1 cursor-pointer"
               >
                 <Edit3 className="w-3 h-3" />
                 <span>{isEditingDescription ? 'Listo' : 'Editar sinopsis'}</span>
@@ -307,30 +307,30 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                 value={description}
                 onChange={e => setDescription(e.target.value)}
                 placeholder="Escribe o pega una breve sinopsis o resumen de esta obra..."
-                className="w-full text-xs p-2.5 rounded-xl bg-white dark:bg-[#0a2920] border border-rose-200 dark:border-emerald-700 text-[#4c0519] dark:text-[#ecfdf5] outline-none"
+                className="w-full text-xs p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-rose-200 dark:border-zinc-700 text-[#4c0519] dark:text-[#f3f4f6] outline-none"
               />
             ) : description ? (
-              <p className="text-xs text-[#881337]/90 dark:text-[#a7f3d0]/90 leading-relaxed max-h-36 overflow-y-auto whitespace-pre-line pr-1">
+              <p className="text-xs text-[#881337]/90 dark:text-zinc-300 leading-relaxed max-h-36 overflow-y-auto whitespace-pre-line pr-1">
                 {description}
               </p>
             ) : (
-              <p className="text-xs text-[#881337]/60 dark:text-[#a7f3d0]/60 italic">
+              <p className="text-xs text-[#881337]/60 dark:text-zinc-400 italic">
                 Esta obra no tiene sinopsis registrada aún. Toca en «Editar sinopsis» para añadir un resumen.
               </p>
             )}
           </div>
 
           {/* Reading progress bar */}
-          <div className="p-3.5 bg-rose-50/40 dark:bg-[#07241c]/50 rounded-2xl border border-rose-200/60 dark:border-emerald-800/60">
-            <div className="flex justify-between items-center text-xs font-bold text-[#4c0519] dark:text-[#ecfdf5] mb-2">
+          <div className="p-3.5 bg-rose-50/40 dark:bg-zinc-900/50 rounded-2xl border border-rose-200/60 dark:border-zinc-800">
+            <div className="flex justify-between items-center text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6] mb-2">
               <span>Progreso de lectura</span>
-              <span className="text-rose-600 dark:text-emerald-400 font-extrabold">
+              <span className="text-rose-600 dark:text-zinc-200 font-extrabold">
                 {book.progress}% (Página {book.currentPage} de {book.totalPages})
               </span>
             </div>
-            <div className="w-full h-2 bg-rose-200/50 dark:bg-[#041712] rounded-full overflow-hidden mb-2">
+            <div className="w-full h-2 bg-rose-200/50 dark:bg-zinc-800 rounded-full overflow-hidden mb-2">
               <div
-                className="h-full bg-gradient-to-r from-rose-500 to-pink-500 dark:from-emerald-400 dark:to-teal-300 rounded-full transition-all duration-300"
+                className="h-full bg-gradient-to-r from-rose-500 to-pink-500 dark:from-zinc-200 dark:to-zinc-400 rounded-full transition-all duration-300"
                 style={{ width: `${Math.max(3, book.progress)}%` }}
               />
             </div>
@@ -338,7 +338,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
               <button
                 type="button"
                 onClick={handleResetProgress}
-                className="text-[11px] font-semibold text-[#881337]/70 hover:text-rose-600 dark:text-[#a7f3d0]/70 dark:hover:text-emerald-300 flex items-center gap-1 transition-colors cursor-pointer"
+                className="text-[11px] font-semibold text-[#881337]/70 hover:text-rose-600 dark:text-zinc-400 dark:hover:text-zinc-200 flex items-center gap-1 transition-colors cursor-pointer"
               >
                 <RotateCcw className="w-3 h-3" /> Reiniciar progreso a página 1
               </button>
@@ -347,7 +347,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
 
           {/* Categories Selector */}
           <div>
-            <label className="block text-xs font-bold text-[#4c0519] dark:text-[#ecfdf5] mb-2">
+            <label className="block text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6] mb-2">
               Categorías de la obra:
             </label>
             <div className="flex flex-wrap gap-2">
@@ -362,8 +362,8 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                       onClick={() => toggleCategory(cat.id)}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                         isAssigned
-                          ? 'bg-gradient-to-r from-rose-500 to-pink-500 dark:from-emerald-500 dark:to-teal-400 text-white shadow-xs'
-                          : 'bg-rose-50 dark:bg-[#07241c] text-[#881337] dark:text-[#a7f3d0] border border-rose-200/60 dark:border-emerald-800'
+                          ? 'bg-gradient-to-r from-rose-500 to-pink-500 dark:from-zinc-200 dark:to-zinc-300 dark:text-zinc-950 text-white shadow-xs'
+                          : 'bg-rose-50 dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 border border-rose-200/60 dark:border-zinc-700'
                       }`}
                     >
                       <span
@@ -380,7 +380,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
         </div>
 
         {/* Modal Actions Footer */}
-        <div className="p-4 border-t border-rose-100 dark:border-emerald-800/60 flex items-center justify-between shrink-0 gap-2 bg-[#fff5f8]/70 dark:bg-[#07241c]/70">
+        <div className="p-4 border-t border-rose-100 dark:border-zinc-800 flex items-center justify-between shrink-0 gap-2 bg-[#fff5f8]/70 dark:bg-zinc-900/70">
           <button
             type="button"
             onClick={handleDelete}
@@ -394,7 +394,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
             <button
               type="button"
               onClick={handleSaveDetails}
-              className="flex items-center gap-1 bg-white dark:bg-[#0a2920] hover:bg-rose-50 dark:hover:bg-[#0f382c] border border-rose-200 dark:border-emerald-800 text-[#881337] dark:text-[#a7f3d0] px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer"
+              className="flex items-center gap-1 bg-white dark:bg-zinc-800 hover:bg-rose-50 dark:hover:bg-zinc-700 border border-rose-200 dark:border-zinc-700 text-[#881337] dark:text-zinc-200 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer"
             >
               <Save className="w-3.5 h-3.5" />
               <span>Guardar</span>
@@ -404,7 +404,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
             <button
               type="button"
               onClick={handleStartReading}
-              className="flex items-center gap-1.5 bg-gradient-to-r from-rose-500 via-pink-500 to-rose-400 dark:from-emerald-500 dark:via-teal-400 dark:to-emerald-400 text-white font-bold px-5 py-2 rounded-xl text-xs shadow-md shadow-rose-500/20 dark:shadow-emerald-500/20 active:scale-95 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 bg-gradient-to-r from-rose-500 via-pink-500 to-rose-400 dark:from-zinc-200 dark:via-zinc-300 dark:to-zinc-200 dark:text-zinc-950 text-white font-bold px-5 py-2 rounded-xl text-xs shadow-md shadow-rose-500/20 active:scale-95 transition-all cursor-pointer"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
               <span>

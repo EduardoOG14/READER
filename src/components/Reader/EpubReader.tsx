@@ -38,7 +38,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
           try {
             const bodyText = iframe.contentDocument?.body?.innerText;
             if (bodyText) extracted += (extracted ? '\n\n' : '') + bodyText;
-          } catch (e) {}
+          } catch {}
         });
       }
 

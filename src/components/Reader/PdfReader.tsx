@@ -366,7 +366,7 @@ export const PdfReader: React.FC<PdfReaderProps> = ({
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [isContinuousMode, pdfDoc?.numPages, totalPages, endPage]);
+  }, [isContinuousMode, pdfDoc, totalPages, endPage]);
 
   // Prepend previous pages smoothly as user scrolls up and reaches the top sentinel
   useEffect(() => {
@@ -398,7 +398,7 @@ export const PdfReader: React.FC<PdfReaderProps> = ({
     if (currentPage + 5 > endPage && endPage < total) {
       setEndPage(Math.min(total, currentPage + 10));
     }
-  }, [currentPage, isContinuousMode, endPage, pdfDoc?.numPages, totalPages]);
+  }, [currentPage, isContinuousMode, endPage, pdfDoc, totalPages]);
 
   // Compensate scrollTop after prepending previous pages so user position never jumps
   React.useLayoutEffect(() => {
@@ -443,7 +443,7 @@ export const PdfReader: React.FC<PdfReaderProps> = ({
     if (continuousScrollRef.current) {
       continuousScrollRef.current.scrollTop = 0;
     }
-  }, [currentPage, isContinuousMode, startPage, endPage, isZoomLocked, pdfDoc?.numPages, totalPages]);
+  }, [currentPage, isContinuousMode, startPage, endPage, isZoomLocked, pdfDoc, totalPages]);
 
   // Render single page safely in Paginated Mode (fit to screen)
   const renderPaginatedPage = useCallback(
@@ -656,7 +656,7 @@ export const PdfReader: React.FC<PdfReaderProps> = ({
       pages.push(p);
     }
     return pages;
-  }, [startPage, endPage, pdfDoc?.numPages, totalPages]);
+  }, [startPage, endPage, pdfDoc, totalPages]);
 
   // Theme preset container colors
   const preset = settings.readingThemePreset || (settings.theme === 'dark' ? 'emerald' : 'day');

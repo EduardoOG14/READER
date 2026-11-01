@@ -95,7 +95,7 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+            <div className="p-2 rounded-xl bg-rose-500/10 text-rose-600 dark:bg-zinc-800 dark:text-zinc-300">
               <Sliders className="w-5 h-5" />
             </div>
             <div>
@@ -135,9 +135,9 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
                         theme: t.id === 'day' || t.id === 'sakura' ? 'light' : 'dark',
                       });
                     }}
-                    className={`flex flex-col items-start p-2.5 rounded-2xl border text-left transition-all ${
+                    className={`flex flex-col items-start p-2.5 rounded-2xl border text-left transition-all cursor-pointer ${
                       isSelected
-                        ? 'ring-2 ring-emerald-500 shadow-sm'
+                        ? 'ring-2 ring-rose-500 dark:ring-zinc-400 shadow-sm'
                         : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
                     } ${t.bgClass}`}
                   >
@@ -154,14 +154,14 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
           </div>
 
           {/* 2. MoonReader Status Bar Toggle */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-800">
+          <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200/70 dark:border-zinc-800">
             <div className="flex items-center gap-2.5">
-              <Battery className="w-4 h-4 text-emerald-500" />
+              <Battery className="w-4 h-4 text-rose-500 dark:text-zinc-400" />
               <div>
-                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">
+                <span className="text-xs font-bold text-slate-800 dark:text-zinc-200 block">
                   Barra de Estado MoonReader
                 </span>
-                <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                <span className="text-[11px] text-slate-500 dark:text-zinc-400">
                   Muestra reloj en tiempo real, batería y porcentaje
                 </span>
               </div>
@@ -169,12 +169,12 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
             <button
               type="button"
               onClick={() => updateSettings({ showMoonStatusBar: !settings.showMoonStatusBar })}
-              className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors ${
-                settings.showMoonStatusBar !== false ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'
+              className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors cursor-pointer ${
+                settings.showMoonStatusBar !== false ? 'bg-rose-500 dark:bg-zinc-300' : 'bg-slate-300 dark:bg-zinc-700'
               }`}
             >
               <div
-                className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${
+                className={`bg-white dark:bg-zinc-950 w-4 h-4 rounded-full shadow-md transform transition-transform ${
                   settings.showMoonStatusBar !== false ? 'translate-x-5' : 'translate-x-0'
                 }`}
               />
@@ -183,7 +183,7 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
 
           {/* 3. Hardware Brightness Dimmer */}
           <div>
-            <div className="flex justify-between items-center text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            <div className="flex justify-between items-center text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1.5">
               <span className="flex items-center gap-1.5">
                 <Sun className="w-3.5 h-3.5 text-amber-500" />
                 Atenuador de Brillo (Dimmer nocturno)
@@ -196,16 +196,16 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
               max="100"
               value={settings.brightness}
               onChange={e => updateSettings({ brightness: Number(e.target.value) })}
-              className="w-full accent-emerald-500"
+              className="w-full accent-rose-500 dark:accent-zinc-400"
             />
-            <p className="text-[10px] text-slate-400 mt-1">
+            <p className="text-[10px] text-slate-400 dark:text-zinc-500 mt-1">
               Tip: Desliza el dedo verticalmente por el borde izquierdo de la pantalla para ajustar el brillo al instante.
             </p>
           </div>
 
           {/* 4. Eye Filters */}
           <div>
-            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">
+            <label className="text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider block mb-2">
               Filtro de Descanso Visual
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -216,19 +216,19 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
                     key={f.id}
                     type="button"
                     onClick={() => updateSettings({ eyeFilter: f.id })}
-                    className={`flex flex-col items-start p-3 rounded-2xl border text-left transition-all ${
+                    className={`flex flex-col items-start p-3 rounded-2xl border text-left transition-all cursor-pointer ${
                       isSelected
-                        ? 'border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/30 ring-1 ring-emerald-600'
-                        : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                        ? 'border-rose-500 bg-rose-50/50 dark:border-zinc-400 dark:bg-zinc-800 ring-1 ring-rose-500 dark:ring-zinc-400'
+                        : 'border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700'
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-0.5">
                       <span className={`w-3.5 h-3.5 rounded-full ${f.iconBg}`} />
-                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                      <span className="text-xs font-bold text-slate-800 dark:text-zinc-200">
                         {f.name}
                       </span>
                     </div>
-                    <span className="text-[10.5px] text-slate-500 dark:text-slate-400">
+                    <span className="text-[10.5px] text-slate-500 dark:text-zinc-400">
                       {f.desc}
                     </span>
                   </button>
@@ -277,10 +277,10 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
                     key={f.id}
                     type="button"
                     onClick={() => updateSettings({ fontFamily: f.id as any })}
-                    className={`py-2 px-1 rounded-xl border text-center transition-all ${
+                    className={`py-2 px-1 rounded-xl border text-center transition-all cursor-pointer ${
                       (settings.fontFamily || 'sans') === f.id
-                        ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-bold'
-                        : 'border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
+                        ? 'border-rose-500 bg-rose-50 dark:border-zinc-400 dark:bg-zinc-800 text-rose-600 dark:text-zinc-100 font-bold'
+                        : 'border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-300'
                     } ${f.font}`}
                   >
                     {f.label}
@@ -290,7 +290,7 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
 
               {/* Font size */}
               <div>
-                <div className="flex justify-between items-center text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                <div className="flex justify-between items-center text-xs font-semibold text-slate-600 dark:text-zinc-300 mb-1">
                   <span>Tamaño de letra</span>
                   <span className="font-mono">{settings.fontSize} px</span>
                 </div>
@@ -300,13 +300,13 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
                   max="32"
                   value={settings.fontSize}
                   onChange={e => updateSettings({ fontSize: Number(e.target.value) })}
-                  className="w-full accent-emerald-500"
+                  className="w-full accent-rose-500 dark:accent-zinc-400"
                 />
               </div>
 
               {/* Line height */}
               <div>
-                <div className="flex justify-between items-center text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                <div className="flex justify-between items-center text-xs font-semibold text-slate-600 dark:text-zinc-300 mb-1">
                   <span>Interlineado</span>
                   <span className="font-mono">{(settings.lineHeight || 1.6).toFixed(1)}x</span>
                 </div>
@@ -317,7 +317,7 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
                   step="0.1"
                   value={settings.lineHeight || 1.6}
                   onChange={e => updateSettings({ lineHeight: Number(e.target.value) })}
-                  className="w-full accent-emerald-500"
+                  className="w-full accent-rose-500 dark:accent-zinc-400"
                 />
               </div>
 
@@ -326,10 +326,10 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
                 <button
                   type="button"
                   onClick={() => updateSettings({ textAlign: 'left' })}
-                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border text-xs font-semibold ${
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border text-xs font-semibold cursor-pointer ${
                     (settings.textAlign || 'left') === 'left'
-                      ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
-                      : 'border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
+                      ? 'border-rose-500 bg-rose-50 dark:border-zinc-400 dark:bg-zinc-800 text-rose-600 dark:text-zinc-100 font-bold'
+                      : 'border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-300'
                   }`}
                 >
                   <AlignLeft className="w-3.5 h-3.5" />
@@ -338,10 +338,10 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
                 <button
                   type="button"
                   onClick={() => updateSettings({ textAlign: 'justify' })}
-                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border text-xs font-semibold ${
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl border text-xs font-semibold cursor-pointer ${
                     settings.textAlign === 'justify'
-                      ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
-                      : 'border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
+                      ? 'border-rose-500 bg-rose-50 dark:border-zinc-400 dark:bg-zinc-800 text-rose-600 dark:text-zinc-100 font-bold'
+                      : 'border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-300'
                   }`}
                 >
                   <AlignJustify className="w-3.5 h-3.5" />

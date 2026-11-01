@@ -981,4 +981,353 @@ export const SPANISH_CATALOG: CatalogItem[] = [
         { number: 3, chapter: 'Capítulo 1: El Salto Temporal', scene: 'Laboratorio de la Mansión X', panelText: 'La mente adulta de Kitty Pryde despierta en su cuerpo adolescente en la época dorada de los X-Men.', dialogue: '¡Profesor Xavier! ¡Deben escucharme! ¡El senador Kelly va a ser asesinado esta misma tarde!' },
       ]),
   },
+  // ==========================================
+  // EXPANDED SPANISH MANGAS & SEINEN
+  // ==========================================
+  {
+    id: 'cat-tokyo-ghoul',
+    title: 'Tokyo Ghoul',
+    author: 'Sui Ishida',
+    category: 'manga',
+    format: 'cbz',
+    genre: 'Manga / Fantasía Oscura / Seinen',
+    totalPages: 10,
+    year: 2011,
+    description: 'En Tokio acechan los ghouls, seres que subsisten a base de carne humana. Ken Kaneki, un tímido estudiante universitario, sufre un trasplante tras un ataque que lo transforma en el primer ghoul de un solo ojo.',
+    coverGradient: { from: '#090a0f', to: '#881337', accent: '#e11d48' },
+    badgeText: 'MANGA EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('Tokyo Ghoul', 'Sui Ishida', [
+        { number: 1, chapter: 'Capítulo 1: Tragedia', scene: 'Cafetería Anteiku', panelText: 'Una taza de café humeante refleja los ojos asustados de Ken Kaneki tras despertar en el hospital.', dialogue: 'Mi mundo se desmoronó aquel día. Dejé de ser un humano... y ahora el olor de la comida me repugna.' },
+        { number: 2, chapter: 'Capítulo 1: El Ojo Carmesí', scene: 'Callejón del Distrito 20', panelText: 'Frente al espejo roto, el ojo izquierdo de Kaneki arde con un iris rojo escarlata y esclerótica negra.', dialogue: 'No puedo comer humanos... ¡pero si no como nada voy a perder el juicio!' },
+        { number: 3, chapter: 'Capítulo 1: El Café y la Salvación', scene: 'Puertas de Anteiku', panelText: 'Touka Kirishima lo mira con desdén y compasión a la vez, arrojándole un trozo de comida adecuada.', dialogue: 'Bienvenido al purgatorio de los monstruos. Aquí aprendemos a vivir entre ustedes.' },
+      ]),
+  },
+  {
+    id: 'cat-fullmetal',
+    title: 'Fullmetal Alchemist',
+    author: 'Hiromu Arakawa',
+    category: 'manga',
+    format: 'cbz',
+    genre: 'Manga / Shonen / Aventura & Alquimia',
+    totalPages: 10,
+    year: 2001,
+    description: 'La regla del Intercambio Equivalente dicta que para obtener algo de igual valor debe perderse. Tras violar el mayor tabú alquímico intentando resucitar a su madre, los hermanos Edward y Alphonse Elric inician la búsqueda de la legendaria Piedra Filosofal.',
+    coverGradient: { from: '#b45309', to: '#18181b', accent: '#f59e0b' },
+    badgeText: 'MANGA EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('Fullmetal Alchemist', 'Hiromu Arakawa', [
+        { number: 1, chapter: 'Capítulo 1: Los Dos Alquimistas', scene: 'Templo de Liore', panelText: 'La prótesis metálica automail de Edward brilla bajo los relámpagos del círculo alquímico.', dialogue: '¡Levántate y camina hacia adelante! Tienes dos piernas sanas, no dependas de falsos milagros.' },
+        { number: 2, chapter: 'Capítulo 1: El Alma en la Armadura', scene: 'Taller de Resembool', panelText: 'Alphonse, una armadura de acero hueca con ojos incandescentes, contiene a su hermano menor.', dialogue: 'Prometimos recuperar nuestros cuerpos originales, Ed. No nos rendiremos jamás.' },
+        { number: 3, chapter: 'Capítulo 1: La Verdad Oculta', scene: 'Puerta de la Verdad', panelText: 'Una silueta blanca sin rostro contempla el sacrificio del alquimista estatal de acero.', dialogue: 'Para obtener algo, debes dar algo a cambio. Esa es la ley de la naturaleza.' },
+      ]),
+  },
+  {
+    id: 'cat-vagabond',
+    title: 'Vagabond',
+    author: 'Takehiko Inoue',
+    category: 'manga',
+    format: 'cbz',
+    genre: 'Manga / Histórico / Samurái & Filosofía',
+    totalPages: 10,
+    year: 1998,
+    description: 'Basado en la legendaria vida de Miyamoto Musashi. Tras sobrevivir a la sangrienta batalla de Sekigahara, Shinmen Takezo renace como Musashi y emprende un viaje espiritual y mortal para convertirse en el guerrero invencible bajo el cielo.',
+    coverGradient: { from: '#1c1917', to: '#44403c', accent: '#a8a29e' },
+    badgeText: 'MANGA EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('Vagabond', 'Takehiko Inoue', [
+        { number: 1, chapter: 'Capítulo 1: El Camino de la Espada', scene: 'Bosque de Miyamoto', panelText: 'Una katana desenvainada corta las gotas de rocío al amanecer con precisión silenciosa.', dialogue: 'Ser invencible bajo el cielo... ¿qué significa realmente cuando tu alma sigue sedienta?' },
+        { number: 2, chapter: 'Capítulo 1: Frente a Inshun', scene: 'Templo Hozoin', panelText: 'La lanza de Inshun silba en el aire; Musashi frena el ataque con los ojos cerrados, sintiendo el viento.', dialogue: 'Mi espada no busca matar por odio. Busca cortar la ilusión de mi propia debilidad.' },
+        { number: 3, chapter: 'Capítulo 1: Bajo la Luna de Kioto', scene: 'Paso de Montaña', panelText: 'La silueta solitaria de Musashi contempla las nubes que cruzan la luna llena.', dialogue: 'Un vagabundo no tiene hogar, pero toda la tierra bajo el cielo es su santuario.' },
+      ]),
+  },
+  {
+    id: 'cat-vinland',
+    title: 'Vinland Saga',
+    author: 'Makoto Yukimura',
+    category: 'manga',
+    format: 'cbz',
+    genre: 'Manga / Histórico / Vikingos & Drama',
+    totalPages: 10,
+    year: 2005,
+    description: 'Thorfinn, hijo del guerrero más temido de Islandia, crece en el campo de batalla jurando venganza contra Askeladd, el mercenario que asesinó a su padre. Un relato épico sobre el odio, el honor y la búsqueda de una tierra libre de guerras.',
+    coverGradient: { from: '#1e3a8a', to: '#0f172a', accent: '#60a5fa' },
+    badgeText: 'MANGA EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('Vinland Saga', 'Makoto Yukimura', [
+        { number: 1, chapter: 'Capítulo 1: El Mar del Norte', scene: 'Drakkar Vikingo', panelText: 'Olas gélidas golpean la proa mientras Thorfinn empuña las dos dagas con miradas de fuego.', dialogue: '¡Askeladd! ¡Concédeme mi duelo! ¡Juré por el alma de mi padre que te arrancaré la cabeza!' },
+        { number: 2, chapter: 'Capítulo 1: Las Palabras de Thors', scene: 'Recuerdo en Islandia', panelText: 'El gigante Thors arroja su espada a la nieve ante los ojos atónitos de su pequeño hijo.', dialogue: 'Escucha bien, Thorfinn: No tienes enemigos. Nadie en este mundo merece tu odio.' },
+        { number: 3, chapter: 'Capítulo 1: Hacia la Tierra Lejana', scene: 'Costa de Inglaterra', panelText: 'En el horizonte occidental, más allá de los mares tempestuosos, brilla la promesa de Vinland.', dialogue: 'Un lugar cálido y fértil... donde ningún esclavo tenga cadenas y la espada sea olvidada.' },
+      ]),
+  },
+  {
+    id: 'cat-spy-family',
+    title: 'Spy x Family',
+    author: 'Tatsuya Endo',
+    category: 'manga',
+    format: 'cbz',
+    genre: 'Manga / Comedia / Espías & Acción',
+    totalPages: 10,
+    year: 2019,
+    description: 'Para mantener la paz entre dos naciones enemigas, el maestro espía Twilight debe crear una familia ficticia. Adopta a una niña telépata llamada Anya y se casa con Yor, una hábil asesina a sueldo, manteniendo todos sus identidades en secreto.',
+    coverGradient: { from: '#065f46', to: '#042f2e', accent: '#34d399' },
+    badgeText: 'MANGA EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('Spy x Family', 'Tatsuya Endo', [
+        { number: 1, chapter: 'Capítulo 1: Misión Strix', scene: 'Orfanato de Berlint', panelText: 'El agente Twilight, bajo la identidad de Loid Forger, busca adoptar a una niña para infiltrarse en la Academia Eden.', dialogue: 'Esto es sólo un trabajo temporal por la paz mundial. Los sentimientos familiares no forman parte de la misión.' },
+        { number: 2, chapter: 'Capítulo 1: La Sonrisa de Anya', scene: 'Salón del Apartamento Forger', panelText: 'Anya lee la mente de su padre adoptivo con ojos brillantes y una sonrisa pícara.', dialogue: '¡Waku waku! ¡Papá es un espía secreto y mamá es una asesina mortal! ¡La aventura es emocionante!' },
+        { number: 3, chapter: 'Capítulo 1: La Cena Familiar', scene: 'Restaurante Céntrico', panelText: 'Los tres fingen una cena refinada mientras desactivan una bomba bajo la mesa con sonrisas impecables.', dialogue: 'Por el futuro de Ostania y Westalis... brindemos por esta familia normal y corriente.' },
+      ]),
+  },
+  // ==========================================
+  // EXPANDED MANHWAS & WEBTOONS
+  // ==========================================
+  {
+    id: 'cat-the-boxer',
+    title: 'The Boxer',
+    author: 'JH',
+    category: 'manhwa',
+    format: 'cbz',
+    genre: 'Manhwa / Deportes / Psicológico & Acción',
+    totalPages: 10,
+    year: 2020,
+    description: 'K, el legendario entrenador de boxeo que ha formado a campeones mundiales, encuentra a Yu, un joven apático con ojos vacíos pero dotado de reflejos y talento sobrehumanos. El camino hacia la cima del boxeo mundial comienza.',
+    coverGradient: { from: '#18181b', to: '#450a0a', accent: '#ef4444' },
+    badgeText: 'MANHWA EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('The Boxer', 'JH', [
+        { number: 1, chapter: 'Capítulo 1: El Monstruo Dormido', scene: 'Callejón de la Escuela', panelText: 'Tres abusadores lanzan golpes a máxima velocidad, pero Yu ni siquiera parpadea; el tiempo parece congelarse.', dialogue: 'Todo se mueve tan despacio... ¿Es esto lo que llaman golpear?' },
+        { number: 2, chapter: 'Capítulo 1: La Mirada de K', scene: 'Gimnasio de Boxeo', panelText: 'El veterano entrenador K observa la postura perfecta e instintiva del joven novato con asombro puro.', dialogue: 'He buscado este monstruo toda mi vida. Este chico nació para gobernar el cuadrilátero.' },
+        { number: 3, chapter: 'Capítulo 1: El Primer Jab', scene: 'El Ring Profesional', panelText: 'Un solo puñetazo rompe la barrera del sonido y apaga las luces del oponente en un instante.', dialogue: 'No siento gloria ni orgullo. Sólo sigo las instrucciones de golpear y derribar.' },
+      ]),
+  },
+  {
+    id: 'cat-lore-olympus',
+    title: 'Lore Olympus (Cuentos del Olimpo)',
+    author: 'Rachel Smythe',
+    category: 'manhwa',
+    format: 'cbz',
+    genre: 'Webtoon / Mitología Griega / Romance Moderno',
+    totalPages: 10,
+    year: 2018,
+    description: 'El célebre mito del rapto de Perséfone reimaginado en un vibrante mundo contemporáneo con teléfonos móviles, intrigas de la alta sociedad divina en el Olimpo y el romance con Hades, señor del Inframundo.',
+    coverGradient: { from: '#1e1b4b', to: '#4a044e', accent: '#f472b6' },
+    badgeText: 'WEBTOON EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('Lore Olympus', 'Rachel Smythe', [
+        { number: 1, chapter: 'Capítulo 1: La Fiesta de Zeus', scene: 'Palacio del Olimpo', panelText: 'Perséfone, vestida con un vestido blanco y flores primaverales, cautiva sin querer a los dioses de la sala.', dialogue: 'Es mi primera vez fuera del reino de mi madre. El Olimpo es mucho más abrumador de lo que imaginé.' },
+        { number: 2, chapter: 'Capítulo 1: Encuentro en las Sombras', scene: 'Limusina de Hades', panelText: 'Hades, azul y elegante, le ofrece abrigo con modales caballerescos en la fría noche celestial.', dialogue: 'No temas, diosa de la primavera. El Inframundo es tranquilo para quienes aprecian la paz.' },
+        { number: 3, chapter: 'Capítulo 1: Rosas en la Oscuridad', scene: 'Jardines de Asfódelos', panelText: 'Bajo los dedos de Perséfone, flores resplandecientes brotan en el suelo de piedra negra del tártaro.', dialogue: 'Incluso en el reino de las sombras, la vida florece cuando hay ternura.' },
+      ]),
+  },
+  {
+    id: 'cat-bastard',
+    title: 'Bastard',
+    author: 'Carnby Kim & Youngchan Hwang',
+    category: 'manhwa',
+    format: 'cbz',
+    genre: 'Manhwa / Thriller / Suspenso Psicológico',
+    totalPages: 10,
+    year: 2014,
+    description: 'Jin Seon vive bajo el terror de su padre, un respetado hombre de negocios que en secreto es un metódico asesino en serie. Cuando su padre elige como próxima víctima a Kyun Yoon, la chica que le gusta a Jin, el joven decide rebelarse.',
+    coverGradient: { from: '#020617', to: '#1c1917', accent: '#dc2626' },
+    badgeText: 'MANHWA EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('Bastard', 'Carnby Kim', [
+        { number: 1, chapter: 'Capítulo 1: Mi Padre, el Asesino', scene: 'Sótano de la Residencia', panelText: 'Las herramientas quirúrgicas perfectamente ordenadas proyectan reflejos metálicos en la oscuridad.', dialogue: 'Todos en la ciudad admiran a mi padre. Nadie sabe los gritos que esconde este sótano.' },
+        { number: 2, chapter: 'Capítulo 1: El Ojo de Cristal', scene: 'Pasillo de la Escuela', panelText: 'Kyun Yoon le sonríe con calidez a Jin sin juzgar sus cicatrices ni su ojo postizo.', dialogue: 'Por primera vez en mi vida, conocí a alguien que me hizo desear tener un mañana normal.' },
+        { number: 3, chapter: 'Capítulo 1: La Decisión del Hijo', scene: 'Comedor Familiar', panelText: 'El padre coloca una fotografía de Kyun sobre la mesa. Jin aprieta los puños bajo el mantel con ferocidad.', dialogue: 'Esta vez no te ayudaré, papá. Protegeré a Kyun... aunque tenga que enfrentarte hasta la muerte.' },
+      ]),
+  },
+  // ==========================================
+  // EXPANDED CÓMICS & NOVELAS GRÁFICAS
+  // ==========================================
+  {
+    id: 'cat-invincible',
+    title: 'Invincible',
+    author: 'Robert Kirkman & Cory Walker',
+    category: 'comics',
+    format: 'cbz',
+    genre: 'Cómic / Superhéroes / Acción & Drama',
+    totalPages: 10,
+    year: 2003,
+    description: 'Mark Grayson es un adolescente corriente cuyo padre es Omni-Man, el protector extraterrestre más poderoso de la Tierra. Al cumplir 17 años despiertan sus superpoderes, pero pronto descubre un oscuro secreto sobre el legado de su linaje.',
+    coverGradient: { from: '#0284c7', to: '#eab308', accent: '#38bdf8' },
+    badgeText: 'CÓMIC EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('Invincible', 'Robert Kirkman', [
+        { number: 1, chapter: 'Capítulo 1: El Despertar de Mark', scene: 'Tejado de la Casa Grayson', panelText: 'Mark lanza una bolsa de basura que sale disparada hacia la estratosfera a toda velocidad.', dialogue: '¡Papá! ¡Mamá! ¡Mis poderes finalmente despertaron! ¡Puedo volar de verdad!' },
+        { number: 2, chapter: 'Capítulo 1: Entrenamiento en el Cielo', scene: 'Atmósfera Terrestre', panelText: 'Omni-Man y su hijo contemplan el amanecer sobre las nubes doradas del planeta Tierra.', dialogue: 'Llevar este manto no es un juego, Mark. El mundo confía en nosotros para sobrevivir.' },
+        { number: 3, chapter: 'Capítulo 1: La Verdad de Viltrum', scene: 'Montañas Rocosas', panelText: 'La devastación en el suelo revela la aterradora misión imperial de los conquistadores extraterrestres.', dialogue: '¡Aún te tengo a ti, papá! ¡No dejaré que destruyas este hogar!' },
+      ]),
+  },
+  {
+    id: 'cat-spiderman-kraven',
+    title: 'Spider-Man: La Última Cacería de Kraven',
+    author: 'J.M. DeMatteis & Mike Zeck',
+    category: 'comics',
+    format: 'cbz',
+    genre: 'Cómic / Marvel / Clásico Psicológico',
+    totalPages: 10,
+    year: 1987,
+    description: 'Considerada la cumbre de las historias de Spider-Man. Sintiendo su fin próximo, Kraven el Cazador seda y entierra vivo a Peter Parker, vistiéndose con el traje negro del Hombre Araña para demostrar que es superior a su presa.',
+    coverGradient: { from: '#18181b', to: '#7f1d1d', accent: '#f87171' },
+    badgeText: 'CÓMIC EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('La Última Cacería de Kraven', 'J.M. DeMatteis', [
+        { number: 1, chapter: 'Capítulo 1: Bajo la Lápida', scene: 'Cementerio de Nueva York', panelText: 'La lluvia incesante empapa una tumba abierta con la máscara rasgada del arácnido.', dialogue: 'El cazador no sólo mató a la araña. La enterró en las entrañas de la tierra para renacer como ella.' },
+        { number: 2, chapter: 'Capítulo 1: El Nuevo Rostro', scene: 'Gárgola del Empire State', panelText: 'Kraven enfundado en el traje negro salta entre los rascacielos con ferocidad animal implacable.', dialogue: 'Soy la bestia y el hombre. He derrotado al demonio de ocho patas en su propio juego.' },
+        { number: 3, chapter: 'Capítulo 1: Resurgir del Barro', scene: 'El Féretro Bajo Tierra', panelText: 'Una mano enguantada en rojo y azul rompe la tierra con pura fuerza de voluntad y amor.', dialogue: 'No puedo morir aquí... ¡Mary Jane me está esperando! ¡No me rendiré ante la muerte!' },
+      ]),
+  },
+  {
+    id: 'cat-batman-halloween',
+    title: 'Batman: El Largo Halloween',
+    author: 'Jeph Loeb & Tim Sale',
+    category: 'comics',
+    format: 'cbz',
+    genre: 'Cómic / DC / Detective Noir',
+    totalPages: 10,
+    year: 1996,
+    description: 'Un misterioso asesino conocido como "Festivo" elimina a capos de la mafia de Gotham en cada fecha conmemorativa. Batman forja una alianza con Jim Gordon y el fiscal Harvey Dent, un pacto que cambiará a Gotham para siempre.',
+    coverGradient: { from: '#3f3f46', to: '#09090b', accent: '#ea580c' },
+    badgeText: 'CÓMIC EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('El Largo Halloween', 'Jeph Loeb', [
+        { number: 1, chapter: 'Capítulo 1: El Pacto en la Azotea', scene: 'Terraza de la Jefatura de Policía', panelText: 'Tres sombras bajo la batiseñal: el murciélago, el detective honesto y el fiscal incorruptible.', dialogue: 'Creo en Harvey Dent. Creo en Gotham City. Juntos pondremos fin al reinado de Carmine Falcone.' },
+        { number: 2, chapter: 'Capítulo 1: La Calabaza Sangrienta', scene: 'Mansión Falcone', panelText: 'Un revólver calibre 22 con un silenciador de tetina y una calabaza pequeña sobre el charco de sangre.', dialogue: 'El asesino sólo ataca en los días festivos. Y hoy... es la noche de brujas.' },
+        { number: 3, chapter: 'Capítulo 1: La Caída del Fiscal', scene: 'Tribunal de Gotham', panelText: 'El ácido sulfúrico vuela por el aire mientras la moneda de plata rueda por el estrado manchada.', dialogue: 'A veces el mundo no es justo, Bruce. Sólo hay dos caras en cada moneda.' },
+      ]),
+  },
+  {
+    id: 'cat-civil-war',
+    title: 'Civil War (Guerra Civil)',
+    author: 'Mark Millar & Steve McNiven',
+    category: 'comics',
+    format: 'cbz',
+    genre: 'Cómic / Marvel / Evento Épico',
+    totalPages: 10,
+    year: 2006,
+    description: 'Tras una tragedia provocada por superhéroes novatos, el Congreso de EE. UU. aprueba el Acta de Registro Sobrehumano. La comunidad heroica se fractura: Iron Man apoya el control del gobierno mientras el Capitán América lidera la resistencia.',
+    coverGradient: { from: '#991b1b', to: '#1e3a8a', accent: '#fbbf24' },
+    badgeText: 'CÓMIC EN ESPAÑOL',
+    createFile: () =>
+      generateMangaCbz('Civil War', 'Mark Millar', [
+        { number: 1, chapter: 'Capítulo 1: La Tragedia de Stamford', scene: 'Ruinas de la Escuela Primaria', panelText: 'El humo se eleva sobre los restos del desastre provocado por la imprudencia de los New Warriors.', dialogue: 'Seiscientas personas inocentes murieron hoy. Los héroes ya no pueden actuar sin rendir cuentas a la ley.' },
+        { number: 2, chapter: 'Capítulo 1: La Grieta entre Hermanos', scene: 'Helitransporte de S.H.I.E.L.D.', panelText: 'El Capitán América rechaza arrestar a sus aliados y escapa saltando por la borda a cielo abierto.', dialogue: 'Cuando la multitud y la prensa te pidan que te muevas... tu deber es plantarte como un árbol y decir: No, muévete tú.' },
+        { number: 3, chapter: 'Capítulo 1: ¿De Qué Lado Estás?', scene: 'Calles de Nueva York', panelText: 'El escudo circular del Capitán choca con los rayos repulsores de la armadura dorada de Tony Stark.', dialogue: 'No quería llegar a esto, Steve... pero la seguridad del mundo entero está en juego.' },
+      ]),
+  },
+  // ==========================================
+  // EXPANDED LIBROS & NOVELAS DISTÓPICAS
+  // ==========================================
+  {
+    id: 'cat-1984',
+    title: '1984',
+    author: 'George Orwell',
+    category: 'libros',
+    format: 'epub',
+    genre: 'Novela / Distopía / Obra Clásica Universal',
+    totalPages: 326,
+    year: 1949,
+    description: 'En el estado totalitario de Oceanía, el Partido y su omnipresente Gran Hermano controlan cada pensamiento a través de la telepantalla y la Policía del Pensamiento. Winston Smith decide cometer el peor delito: mantener un diario y amar en secreto.',
+    coverGradient: { from: '#18181b', to: '#3f3f46', accent: '#ef4444' },
+    badgeText: 'LIBRO EN ESPAÑOL',
+    createFile: () =>
+      generateBookFile('1984', 'George Orwell', [
+        {
+          title: 'Parte I — El Gran Hermano Te Vigila',
+          content: `Era un día frío y luminoso de abril y los relojes daban las trece. Winston Smith, con la barbilla clavada en el pecho en un esfuerzo por escapar del viento desagradable, se deslizó rápidamente a través de las puertas de cristal de las Casas de la Victoria, aunque no con la suficiente rapidez para evitar que un remolino de polvo arenoso entrara con él.
+
+El vestíbulo olía a col hervida y a esteras viejas. Al fondo, un cartel en color, demasiado grande para estar dentro de una casa, estaba pegado a la pared. Representaba simplemente una cara enorme, de más de un metro de ancho: la cara de un hombre de unos cuarenta y cinco años, con un espeso bigote negro y rasgos atractivos pero duros. Winston se dirigió a las escaleras. No valía la pena intentar usar el ascensor. Incluso en las mejores épocas rara vez funcionaba, y ahora la corriente eléctrica se cortaba durante las horas del día.
+
+En cada rellano, frente al hueco del ascensor, el cartel con el rostro enorme miraba desde la pared. Era una de esas imágenes tan ingeniosamente ideadas que los ojos te siguen cuando te mueves. «EL GRAN HERMANO TE VIGILA», rezaba el texto al pie.
+
+Dentro del apartamento, una voz melodiosa leía en voz alta una lista de cifras que tenían que ver con la producción de lingotes de hierro. La voz procedía de una placa oblonga de metal, parecida a un espejo opaco, que formaba parte de la superficie de la pared derecha. Winston giró un interruptor y la voz disminuyó algo, aunque las palabras aún eran distinguibles. El instrumento (se llamaba telepantalla) podía ser atenuado, pero no había manera de apagarlo por completo.`
+        },
+        {
+          title: 'Parte II — Libertad es el Derecho a Decir que Dos más Dos son Cuatro',
+          content: `En cualquier momento en que estuviera despierto o dormido, trabajando o comiendo, en el interior o al aire libre, en el baño o en la cama, no había escape. Nada era tuyo excepto los pocos centímetros cúbicos dentro de tu cráneo.
+
+El sol se había desplazado y las miríadas de ventanas del Ministerio de la Verdad, en las que ya no caía la luz, parecían agujeros en una enorme fortaleza de hormigón blanco. El corazón de Winston se hundió ante la inmensidad del edificio. Recordó una frase que había leído en un libro de texto infantil: «La libertad es la libertad de decir que dos más dos son cuatro. Si eso se concede, todo lo demás viene por sí solo».
+
+La chica de pelo negro caminaba delante de él por el pasillo del archivo. Al tropezar, dejó caer una carpeta con papeles. Winston se inclinó para ayudarla a recogerlos, y en aquel instante fugaz sintió la presión suave de sus dedos dejando un pequeño trozo de papel doblado en la palma de su mano.
+
+Cinco minutos más tarde, a solas en el baño de hombres, desdobló el papel con manos temblorosas. En él no había una consigna política, ni una orden de ejecución. Sólo tres palabras escritas en una caligrafía limpia y decidida: «Te quiero».`
+        },
+      ]),
+  },
+  {
+    id: 'cat-un-mundo-feliz',
+    title: 'Un Mundo Feliz',
+    author: 'Aldous Huxley',
+    category: 'libros',
+    format: 'epub',
+    genre: 'Novela / Ciencia Ficción / Distopía Filosófica',
+    totalPages: 280,
+    year: 1932,
+    description: 'En una sociedad futurista donde el dolor y la tristeza han sido erradicados mediante el condicionamiento genético, el consumo masivo y la droga soma, la estabilidad social reina a costa de la libertad, el arte y los sentimientos humanos genuinos.',
+    coverGradient: { from: '#0284c7', to: '#1e1b4b', accent: '#38bdf8' },
+    badgeText: 'LIBRO EN ESPAÑOL',
+    createFile: () =>
+      generateBookFile('Un Mundo Feliz', 'Aldous Huxley', [
+        {
+          title: 'Capítulo I — Comunidad, Identidad, Estabilidad',
+          content: `Un edificio gris y rechoncho de solo treinta y cuatro plantas. Sobre la entrada principal se leían las palabras: «CENTRO DE INCUBACIÓN Y CONDICIONAMIENTO DE LA CENTRAL DE LONDRES», y, en un escudo, el lema del Estado Mundial: «COMUNIDAD, IDENTIDAD, ESTABILIDAD».
+
+La enorme sala de la planta baja miraba hacia el norte. Fría a pesar del verano en el exterior, a pesar del calor tropical de la habitación, una dura y delgada luz brillaba a través de las ventanas, buscando con avidez alguna figura vestida, alguna pálida silueta de muñeco de cera, pero encontrando solo el cristal, el níquel y la porcelana esterilizada de un laboratorio.
+
+El Director de Incubación y Condicionamiento abrió la puerta. Le seguían una veintena de estudiantes jóvenes y ansiosos de aprender, todos ellos provistos de cuadernos en los que garabateaban con presteza las explicaciones del maestro.
+
+—Operación Bokanovsky —comenzó el Director con tono doctoral—. Uno de los principales instrumentos de la estabilidad social. Un óvulo fertilizado se divide, prolifera, se multiplica en decenas de gemelos idénticos. Ya no dependemos del caos biológico de la naturaleza. Cada ciudadano es fabricado con precisión para desempeñar su función exacta en la jerarquía.`
+        },
+        {
+          title: 'Capítulo II — El Remedio contra el Dolor: El Soma',
+          content: `—El secreto de la felicidad y de la virtud —dijo el Director con voz persuasiva— consiste en amar aquello que se tiene que hacer. Todo condicionamiento tiende a eso: a lograr que la gente ame su inevitable destino social.
+
+En los jardines exteriores, los niños Alfa jugaban con pelotas sonoras mientras las nodrizas repartían los frascos plateados de soma.
+
+—Un centigramo de soma cura diez sentimientos sombríos —repetía la voz suave del hipnopedia durante las horas de sueño—. Dos centigramos te llevan de vacaciones al paraíso de la tranquilidad; tres centigramos para una alegre eternidad en el sueño de la luna.
+
+Bernard Marx contemplaba el cielo con el ceño fruncido. Se sentía irremediablemente solo en medio de una multitud sonriente y satisfecha. ¿Era él el único ser sobre la tierra que prefería ser desgraciado a cambio de ser libre?`
+        },
+      ]),
+  },
+  {
+    id: 'cat-el-gran-gatsby',
+    title: 'El Gran Gatsby',
+    author: 'F. Scott Fitzgerald',
+    category: 'libros',
+    format: 'epub',
+    genre: 'Novela / Clásico Americano / Romance & Drama',
+    totalPages: 210,
+    year: 1925,
+    description: 'En los dorados y desenfrenados años veinte en Long Island, el misterioso millonario Jay Gatsby organiza fiestas fastuosas con la única esperanza de reconquistar a Daisy Buchanan, el amor inalcanzable de su juventud.',
+    coverGradient: { from: '#78350f', to: '#1c1917', accent: '#fbbf24' },
+    badgeText: 'LIBRO EN ESPAÑOL',
+    createFile: () =>
+      generateBookFile('El Gran Gatsby', 'F. Scott Fitzgerald', [
+        {
+          title: 'Capítulo I — La Luz Verde al Final del Muelle',
+          content: `En mis años más jóvenes y vulnerables mi padre me dio un consejo que desde entonces no ha dejado de dar vueltas en mi cabeza.
+
+«Cuando sientas deseos de criticar a alguien —me dijo—, recuerda que no todo el mundo ha tenido las ventajas que tuviste tú».
+
+Al llegar a Nueva York aquel verano de 1922, alquilé una modesta casa en West Egg, Long Island, aprisionada entre dos enormes mansiones que se alquilaban por doce o quince mil dólares la temporada. La de mi derecha era un colosal castillo gótico con una torre de mármol y cuarenta acres de césped frente a la bahía. Pertenecía al señor Gatsby, un hombre a quien aún no conocía pero cuyo nombre estaba en labios de toda la alta sociedad de Manhattan.
+
+Una noche de junio, al regresar a mi casa, vi una silueta en el muelle de Gatsby. Estaba de pie con las manos en los bolsillos contemplando las aguas plateadas. Extendió los brazos hacia el mar oscuro en un gesto involuntario y conmovedor, y juraría que estaba temblando. Miré hacia donde apuntaban sus manos y no vi nada más que una pequeña luz verde, diminuta y lejana, que brillaba al final de un embarcadero en la otra orilla de la bahía.`
+        },
+        {
+          title: 'Capítulo II — La Música y los Sueños Imposibles',
+          content: `En las noches de verano la música flotaba desde la casa de mi vecino. En sus jardines azules hombres y mujeres iban y venían como polillas entre los susurros, el champán y las estrellas. Los viernes llegaban cinco cajas de naranjas y limones desde una frutería de Nueva York; los lunes salían por la puerta trasera como pirámides pulposas sin jugo.
+
+—Dicen que mató a un hombre una vez —susurró una muchacha con vestido de seda dorada junto al buffet.
+—Dicen que fue espía del emperador alemán durante la guerra —añadió otro invitado con una copa en la mano.
+
+Cuando por fin hablé con Gatsby, me encontré con un hombre cuya sonrisa poseía una rara virtud de tranquilidad tranquilizadora. Era una de esas sonrisas que solo encuentras cuatro o cinco veces en la vida, que parece entenderte y creer en ti tal como a ti te gustaría que creyeran en ti.
+
+—Y así vamos adelante —pensé al mirarlo—, botes contra la corriente, empujados sin descanso hacia el pasado.`
+        },
+      ]),
+  },
 ];

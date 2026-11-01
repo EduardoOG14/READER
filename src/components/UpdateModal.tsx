@@ -101,7 +101,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
       setDownloadStatus('idle');
       setDownloadError(null);
     }
-  }, [isOpen]);
+  }, [isOpen, autoCheckOnOpen]);
 
   const handleStartInAppUpdate = async () => {
     if (!updateInfo?.apkAsset) return;

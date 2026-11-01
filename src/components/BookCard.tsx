@@ -35,7 +35,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onOpenDetails }) => {
       {/* Cover Card */}
       <div
         onClick={() => onOpenDetails(book)}
-        className="relative aspect-[3/4.2] w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-rose-100/50 dark:bg-[#07241c] shadow-xs group-hover:shadow-xl group-hover:shadow-rose-900/10 dark:group-hover:shadow-emerald-950/40 group-hover:-translate-y-1.5 transition-all duration-300 border border-rose-200/70 dark:border-emerald-800/60"
+        className="relative aspect-[3/4.2] w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-rose-100/50 dark:bg-zinc-850 shadow-xs group-hover:shadow-xl group-hover:shadow-rose-900/10 dark:group-hover:shadow-black/60 group-hover:-translate-y-1.5 transition-all duration-300 border border-rose-200/70 dark:border-zinc-700/60"
       >
         {book.coverUrl ? (
           <img
@@ -45,9 +45,9 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onOpenDetails }) => {
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center bg-gradient-to-b from-rose-50 to-pink-100 dark:from-[#0a2920] dark:to-[#041712]">
-            <BookOpen className="w-8 h-8 text-rose-300 dark:text-emerald-500 mb-2" />
-            <span className="text-xs font-semibold text-[#881337] dark:text-[#a7f3d0] line-clamp-3">
+          <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center bg-gradient-to-b from-rose-50 to-pink-100 dark:from-zinc-800 dark:to-zinc-900">
+            <BookOpen className="w-8 h-8 text-rose-300 dark:text-zinc-500 mb-2" />
+            <span className="text-xs font-semibold text-[#881337] dark:text-zinc-300 line-clamp-3">
               {book.title}
             </span>
           </div>
@@ -86,7 +86,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onOpenDetails }) => {
             </div>
             <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-rose-500 to-pink-400 dark:from-emerald-400 dark:to-teal-300 rounded-full transition-all duration-300"
+                className="h-full bg-gradient-to-r from-rose-500 to-pink-400 dark:from-zinc-300 dark:to-zinc-100 rounded-full transition-all duration-300"
                 style={{ width: `${book.progress}%` }}
               />
             </div>
@@ -104,10 +104,10 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onOpenDetails }) => {
 
       {/* Book Metadata Below Cover */}
       <div className="pt-2 px-0.5" onClick={() => onOpenDetails(book)}>
-        <h3 className="text-xs sm:text-sm font-bold text-[#4c0519] dark:text-[#ecfdf5] line-clamp-1 group-hover:text-rose-600 dark:group-hover:text-emerald-300 transition-colors">
+        <h3 className="text-xs sm:text-sm font-bold text-[#4c0519] dark:text-[#f3f4f6] line-clamp-1 group-hover:text-rose-600 dark:group-hover:text-zinc-100 transition-colors">
           {book.title}
         </h3>
-        <p className="text-[11px] text-[#881337]/70 dark:text-[#a7f3d0]/70 line-clamp-1 mt-0.5 font-medium">
+        <p className="text-[11px] text-[#881337]/70 dark:text-zinc-400 line-clamp-1 mt-0.5 font-medium">
           {book.author || `${book.totalPages} ${book.totalPages === 1 ? 'pág' : 'págs'}`}
         </p>
       </div>

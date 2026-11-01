@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react';
 import {
   Play,
   Pause,
@@ -42,12 +42,14 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const keepAliveTimerRef = useRef<any>(null);
   const isPlayingRef = useRef<boolean>(false);
-  isPlayingRef.current = isPlaying;
-
   const onNextPageRef = useRef(onNextPage);
-  onNextPageRef.current = onNextPage;
   const onPrevPageRef = useRef(onPrevPage);
-  onPrevPageRef.current = onPrevPage;
+
+  useLayoutEffect(() => {
+    isPlayingRef.current = isPlaying;
+    onNextPageRef.current = onNextPage;
+    onPrevPageRef.current = onPrevPage;
+  });
 
   // Stop speech when modal is closed
   useEffect(() => {
@@ -315,11 +317,11 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
   const progressPercent = sentences.length > 0 ? Math.round(((sentenceIndex + 1) / sentences.length) * 100) : 0;
 
   return (
-    <div className="fixed bottom-14 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-lg bg-slate-900/95 dark:bg-[#061a12]/95 text-white backdrop-blur-md border border-slate-700/80 dark:border-emerald-800/80 rounded-3xl shadow-2xl p-4 animate-in slide-in-from-bottom duration-150">
+    <div className="fixed bottom-14 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-lg bg-slate-900/95 dark:bg-[#18191c]/95 text-white backdrop-blur-md border border-slate-700/80 dark:border-zinc-700/80 rounded-3xl shadow-2xl p-4 animate-in slide-in-from-bottom duration-150">
       {/* Top Header */}
-      <div className="flex items-center justify-between pb-2 border-b border-slate-800 dark:border-emerald-900/60">
+      <div className="flex items-center justify-between pb-2 border-b border-slate-800 dark:border-zinc-800/80">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-xl bg-emerald-500/20 text-emerald-400">
+          <div className="p-1.5 rounded-xl bg-rose-500/20 text-rose-400 dark:bg-zinc-700 dark:text-zinc-200">
             <Volume2 className="w-4 h-4" />
           </div>
           <div>
@@ -327,13 +329,13 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
               <span>Lectura en Voz Alta (TTS)</span>
               {isPlaying && (
                 <span className="flex gap-0.5 items-end h-3">
-                  <span className="w-0.5 h-3 bg-emerald-400 animate-pulse" />
-                  <span className="w-0.5 h-2 bg-emerald-400 animate-ping" />
-                  <span className="w-0.5 h-3.5 bg-emerald-400 animate-pulse" />
+                  <span className="w-0.5 h-3 bg-rose-400 dark:bg-zinc-400 animate-pulse" />
+                  <span className="w-0.5 h-2 bg-rose-400 dark:bg-zinc-400 animate-ping" />
+                  <span className="w-0.5 h-3.5 bg-rose-400 dark:bg-zinc-400 animate-pulse" />
                 </span>
               )}
             </h4>
-            <p className="text-[10px] text-slate-400 dark:text-emerald-400/70">
+            <p className="text-[10px] text-slate-400 dark:text-zinc-400">
               Página {currentPage} de {totalPages} • Frase {sentenceIndex + 1} de {sentences.length} ({progressPercent}%)
             </p>
           </div>
@@ -351,13 +353,13 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
       </div>
 
       {/* Spoken Text Preview Card */}
-      <div className="my-2.5 p-3 rounded-2xl bg-black/40 border border-slate-800/80 dark:border-emerald-950/60 max-h-24 overflow-y-auto">
-        <p className="text-xs text-slate-200 dark:text-emerald-100 font-sans leading-relaxed">
+      <div className="my-2.5 p-3 rounded-2xl bg-black/40 border border-slate-800/80 dark:border-zinc-800/60 max-h-24 overflow-y-auto">
+        <p className="text-xs text-slate-200 dark:text-zinc-200 font-sans leading-relaxed">
           {activeSentence ? (
             <span>
-              <span className="text-emerald-400 font-bold mr-1">“</span>
+              <span className="text-rose-400 dark:text-zinc-400 font-bold mr-1">“</span>
               {activeSentence}
-              <span className="text-emerald-400 font-bold ml-1">”</span>
+              <span className="text-rose-400 dark:text-zinc-400 font-bold ml-1">”</span>
             </span>
           ) : (
             <span className="text-slate-500 italic">Cargando texto de la página...</span>
@@ -368,7 +370,7 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
       {/* Progress Bar of Current Page Sentences */}
       <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden mb-2">
         <div
-          className="h-full bg-emerald-500 transition-all duration-300"
+          className="h-full bg-rose-500 dark:bg-zinc-400 transition-all duration-300"
           style={{ width: `${progressPercent}%` }}
         />
       </div>
@@ -376,7 +378,7 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
       {/* Playback Controls */}
       <div className="flex items-center justify-between pt-1">
         {/* Speed toggle */}
-        <div className="flex items-center gap-1 bg-slate-800/80 dark:bg-emerald-950/80 px-2 py-1 rounded-xl">
+        <div className="flex items-center gap-1 bg-slate-800/80 dark:bg-zinc-800/80 px-2 py-1 rounded-xl">
           <FastForward className="w-3.5 h-3.5 text-slate-400" />
           <select
             value={speed}
@@ -403,7 +405,7 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
 
           <button
             onClick={isPlaying ? handlePause : handlePlay}
-            className="p-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg transition-transform active:scale-95"
+            className="p-3 rounded-2xl bg-rose-500 hover:bg-rose-600 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-white shadow-lg transition-transform active:scale-95"
             title={isPlaying ? 'Pausar voz' : 'Iniciar lectura'}
           >
             {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 fill-white" />}
@@ -429,7 +431,7 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
 
         {/* Voice selector */}
         {voices.length > 0 && (
-          <div className="flex items-center gap-1 bg-slate-800/80 dark:bg-emerald-950/80 px-2 py-1 rounded-xl max-w-[110px]">
+          <div className="flex items-center gap-1 bg-slate-800/80 dark:bg-zinc-800/80 px-2 py-1 rounded-xl max-w-[110px]">
             <Languages className="w-3.5 h-3.5 shrink-0 text-slate-400" />
             <select
               value={selectedVoice?.name || ''}

@@ -18,7 +18,7 @@ export const CategoryBar: React.FC<CategoryBarProps> = ({ onOpenCategoryManager 
   };
 
   return (
-    <div className="py-2.5 px-4 overflow-x-auto no-scrollbar flex items-center gap-2 border-b border-[#fecdd9]/70 dark:border-[#165b48]/70 bg-[#fff5f8]/60 dark:bg-[#072119]/60 transition-colors">
+    <div className="py-2.5 px-4 overflow-x-auto no-scrollbar flex items-center gap-2 border-b border-[#fecdd9]/70 dark:border-zinc-800 bg-[#fff5f8]/60 dark:bg-[#121316] transition-colors">
       <div className="flex items-center gap-2 min-w-max">
         {categories.map(category => {
           const isSelected = selectedCategoryId === category.id;
@@ -30,8 +30,8 @@ export const CategoryBar: React.FC<CategoryBarProps> = ({ onOpenCategoryManager 
               onClick={() => setSelectedCategoryId(category.id)}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all select-none cursor-pointer ${
                 isSelected
-                  ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-xs dark:from-emerald-400 dark:to-teal-300 dark:text-slate-950 scale-102 font-bold'
-                  : 'bg-white hover:bg-[#ffe4ec] text-[#881337] border border-[#fecdd9]/70 dark:bg-[#0a2920] dark:hover:bg-[#0f382c] dark:text-[#a7f3d0] dark:border-[#165b48]'
+                  ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-xs dark:from-zinc-200 dark:to-zinc-300 dark:text-zinc-950 scale-102 font-bold'
+                  : 'bg-white hover:bg-[#ffe4ec] text-[#881337] border border-[#fecdd9]/70 dark:bg-zinc-850 dark:hover:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700'
               }`}
             >
               <span
@@ -42,8 +42,8 @@ export const CategoryBar: React.FC<CategoryBarProps> = ({ onOpenCategoryManager 
               <span
                 className={`text-[10px] px-1.5 py-0.2 rounded-full ${
                   isSelected
-                    ? 'bg-white/20 text-white dark:bg-black/20 dark:text-slate-900'
-                    : 'bg-[#ffe4ec] text-[#9f1239] dark:bg-[#06241c] dark:text-[#6ee7b7]'
+                    ? 'bg-white/20 text-white dark:bg-black/20 dark:text-zinc-950 font-bold'
+                    : 'bg-[#ffe4ec] text-[#9f1239] dark:bg-zinc-800 dark:text-zinc-400'
                 }`}
               >
                 {count}
@@ -55,7 +55,7 @@ export const CategoryBar: React.FC<CategoryBarProps> = ({ onOpenCategoryManager 
         {/* Manage Categories / Add button */}
         <button
           onClick={onOpenCategoryManager}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold text-[#9f1239] hover:text-[#4c0519] dark:text-[#6ee7b7] dark:hover:text-[#ecfdf5] hover:bg-[#ffe4ec] dark:hover:bg-[#0f382c] border border-dashed border-[#fda4bb] dark:border-[#1a634e] transition-colors cursor-pointer"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold text-[#9f1239] hover:text-[#4c0519] dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-[#ffe4ec] dark:hover:bg-zinc-800 border border-dashed border-[#fda4bb] dark:border-zinc-700 transition-colors cursor-pointer"
           title="Administrar categorías manuales"
         >
           <Plus className="w-3.5 h-3.5" />

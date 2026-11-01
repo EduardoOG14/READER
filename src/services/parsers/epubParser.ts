@@ -49,7 +49,7 @@ export async function parseEpubFile(buffer: ArrayBuffer): Promise<EpubMetadata> 
       if (spine && spine.items && spine.items.length > 0) {
         totalPages = spine.items.length;
       }
-    } catch (e) {
+    } catch {
       // fallback
     }
 
