@@ -160,7 +160,7 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
                   100% Español
                 </span>
               </div>
-              <p className="text-[11px] sm:text-xs text-[#881337]/70 dark:text-zinc-400">
+              <p className="text-[11px] sm:text-xs text-slate-700 dark:text-zinc-300 font-medium">
                 Libros, mangas y cómics listos para guardar y leer sin conexión
               </p>
             </div>
@@ -207,7 +207,7 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
               className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
                 activeCategory === 'todos'
                   ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
-                  : 'bg-rose-50 dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 hover:bg-rose-100 dark:hover:bg-zinc-700'
+                  : 'bg-rose-50 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 hover:bg-rose-100 dark:hover:bg-zinc-700'
               }`}
             >
               Todos ({categoryCounts.todos})
@@ -217,7 +217,7 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
               className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
                 activeCategory === 'libros'
                   ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
-                  : 'bg-rose-50 dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 hover:bg-rose-100 dark:hover:bg-zinc-700'
+                  : 'bg-rose-50 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 hover:bg-rose-100 dark:hover:bg-zinc-700'
               }`}
             >
               Libros y Novelas ({categoryCounts.libros})
@@ -227,7 +227,7 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
               className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
                 activeCategory === 'manga'
                   ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
-                  : 'bg-rose-50 dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 hover:bg-rose-100 dark:hover:bg-zinc-700'
+                  : 'bg-rose-50 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 hover:bg-rose-100 dark:hover:bg-zinc-700'
               }`}
             >
               Mangas ({categoryCounts.manga})
@@ -237,7 +237,7 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
               className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
                 activeCategory === 'manhwa'
                   ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
-                  : 'bg-rose-50 dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 hover:bg-rose-100 dark:hover:bg-zinc-700'
+                  : 'bg-rose-50 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 hover:bg-rose-100 dark:hover:bg-zinc-700'
               }`}
             >
               Manhwas y Webtoons ({categoryCounts.manhwa})
@@ -247,7 +247,7 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
               className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
                 activeCategory === 'comics'
                   ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
-                  : 'bg-rose-50 dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 hover:bg-rose-100 dark:hover:bg-zinc-700'
+                  : 'bg-rose-50 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 hover:bg-rose-100 dark:hover:bg-zinc-700'
               }`}
             >
               Cómics ({categoryCounts.comics})
@@ -316,15 +316,15 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
                         </div>
 
                         {/* Genre & Meta */}
-                        <div className="flex items-center justify-between text-[11px] text-[#881337]/75 dark:text-zinc-400 font-mono">
-                          <span className="font-sans font-semibold text-rose-700 dark:text-zinc-300 truncate max-w-[160px]">
+                        <div className="flex items-center justify-between text-[11px] text-slate-700 dark:text-zinc-300 font-mono">
+                          <span className="font-sans font-semibold text-rose-700 dark:text-zinc-200 truncate max-w-[160px]">
                             {item.genre}
                           </span>
                           <span>{item.totalPages} págs. aprox</span>
                         </div>
 
                         {/* Synopsis */}
-                        <p className="text-xs text-[#4c0519]/80 dark:text-zinc-300 line-clamp-3 leading-relaxed">
+                        <p className="text-xs text-slate-800 dark:text-zinc-200 line-clamp-3 leading-relaxed">
                           {item.description}
                         </p>
                       </div>
@@ -426,7 +426,7 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
         )}
 
         {/* Footer */}
-        <div className="pt-3 border-t border-rose-100 dark:border-zinc-800 flex items-center justify-between text-xs text-[#881337]/70 dark:text-zinc-500 shrink-0">
+        <div className="pt-3 border-t border-rose-100 dark:border-zinc-800 flex items-center justify-between text-xs text-[#881337]/90 dark:text-zinc-300 shrink-0 font-medium">
           <span>
             Mostrando {Math.min(visibleItems.length, filteredCatalog.length)} de {filteredCatalog.length} {filteredCatalog.length === 1 ? 'obra' : 'obras'} en español
           </span>

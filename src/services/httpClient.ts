@@ -33,10 +33,14 @@ export async function httpGetJson<T = any>(url: string, options: HttpFetchOption
     }
 
     if (typeof res.data === 'string') {
+      const trimmed = res.data.trim();
+      if (trimmed.startsWith('<') || trimmed.toLowerCase().startsWith('<!doctype')) {
+        throw new Error('El servidor remoto solicitó verificación antibot o devolvió una página HTML temporal. Reintenta en unos segundos.');
+      }
       try {
         return JSON.parse(res.data) as T;
       } catch {
-        throw new Error(`El servidor respondió con contenido no válido (${res.status}): ${res.data.slice(0, 100)}`);
+        throw new Error(`El servidor respondió con contenido no reconocido (${res.status}): ${res.data.slice(0, 80)}`);
       }
     }
     return res.data as T;
@@ -51,6 +55,10 @@ export async function httpGetJson<T = any>(url: string, options: HttpFetchOption
       throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     }
     const text = await res.text();
+    const trimmed = text.trim();
+    if (trimmed.startsWith('<') || trimmed.toLowerCase().startsWith('<!doctype')) {
+      throw new Error('El servidor remoto solicitó verificación antibot o devolvió una página HTML temporal. Reintenta en unos segundos.');
+    }
     try {
       return JSON.parse(text) as T;
     } catch {

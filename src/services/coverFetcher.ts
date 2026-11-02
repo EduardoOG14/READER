@@ -62,13 +62,13 @@ export async function fetchOfficialCoverUrl(
   // 1. For Manga & Manhwa: Primary search via MangaDex
   if (isMangaLike) {
     try {
-      const mdUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=5&includes[]=cover_art`;
+      const mdUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=5&order[relevance]=desc&includes[]=cover_art`;
       const data = await httpGetJson(mdUrl, { timeoutMs: 12000 });
       const mangaList = data?.data || [];
       for (const manga of mangaList) {
         const coverRel = manga.relationships?.find((r: any) => r.type === 'cover_art');
         if (coverRel?.attributes?.fileName) {
-          const coverUrl = `https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}.1024.jpg`;
+          const coverUrl = `https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}`;
           coverCache.set(cacheKey, coverUrl);
           return coverUrl;
         }
@@ -124,12 +124,12 @@ export async function fetchOfficialCoverUrl(
   // 4. If MangaDex wasn't tried earlier (e.g. category was comics or manhwa), try MangaDex now
   if (!isMangaLike) {
     try {
-      const mdUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=3&includes[]=cover_art`;
+      const mdUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=3&order[relevance]=desc&includes[]=cover_art`;
       const data = await httpGetJson(mdUrl, { timeoutMs: 10000 });
       const manga = data?.data?.[0];
       const coverRel = manga?.relationships?.find((r: any) => r.type === 'cover_art');
       if (coverRel?.attributes?.fileName) {
-        const coverUrl = `https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}.1024.jpg`;
+        const coverUrl = `https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}`;
         coverCache.set(cacheKey, coverUrl);
         return coverUrl;
       }

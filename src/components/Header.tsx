@@ -146,7 +146,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenImport, onOpenSettings, on
               <div className="hidden md:block absolute right-0 mt-2 w-64 bg-white dark:bg-zinc-900 border border-rose-200 dark:border-zinc-700/80 rounded-3xl shadow-2xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
                 {/* View Mode Switcher */}
                 <div className="mb-3 pb-2 border-b border-rose-100 dark:border-zinc-800">
-                  <div className="text-[10px] font-bold text-rose-400 dark:text-zinc-400 uppercase tracking-widest mb-1.5 px-1">
+                  <div className="text-[10px] font-bold text-rose-900/80 dark:text-zinc-300 uppercase tracking-widest mb-1.5 px-1">
                     Diseño de vista
                   </div>
                   <div className="grid grid-cols-2 gap-1.5 bg-rose-50 dark:bg-zinc-800 p-1 rounded-2xl">
@@ -155,7 +155,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenImport, onOpenSettings, on
                       className={`flex items-center justify-center gap-1.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                         viewMode === 'grid'
                           ? 'bg-white dark:bg-zinc-700 text-rose-600 dark:text-white shadow-xs'
-                          : 'text-zinc-600 dark:text-zinc-400'
+                          : 'text-slate-700 dark:text-zinc-200'
                       }`}
                     >
                       <LayoutGrid className="w-3.5 h-3.5" />
@@ -166,7 +166,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenImport, onOpenSettings, on
                       className={`flex items-center justify-center gap-1.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                         viewMode === 'list'
                           ? 'bg-white dark:bg-zinc-700 text-rose-600 dark:text-white shadow-xs'
-                          : 'text-zinc-600 dark:text-zinc-400'
+                          : 'text-slate-700 dark:text-zinc-200'
                       }`}
                     >
                       <List className="w-3.5 h-3.5" />
@@ -177,7 +177,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenImport, onOpenSettings, on
 
                 {/* Sort Options */}
                 <div>
-                  <div className="text-[10px] font-bold text-rose-400 dark:text-zinc-400 uppercase tracking-widest mb-1 px-1">
+                  <div className="text-[10px] font-bold text-rose-900/80 dark:text-zinc-300 uppercase tracking-widest mb-1 px-1">
                     Ordenar por
                   </div>
                   <div className="space-y-1">
@@ -263,7 +263,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenImport, onOpenSettings, on
 
             {/* View Mode Segmented Switch */}
             <div className="mb-4">
-              <label className="text-[10px] font-bold text-rose-900/60 dark:text-zinc-400 uppercase tracking-wider block mb-1.5">
+              <label className="text-[10px] font-bold text-rose-900/80 dark:text-zinc-300 uppercase tracking-wider block mb-1.5">
                 Modo de visualización
               </label>
               <div className="grid grid-cols-2 gap-2 bg-rose-50 dark:bg-zinc-800 p-1.5 rounded-2xl">
@@ -272,7 +272,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenImport, onOpenSettings, on
                   className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     viewMode === 'grid'
                       ? 'bg-white dark:bg-zinc-700 text-rose-600 dark:text-white shadow-xs'
-                      : 'text-zinc-600 dark:text-zinc-400'
+                      : 'text-slate-700 dark:text-zinc-200'
                   }`}
                 >
                   <LayoutGrid className="w-4 h-4" />
@@ -283,7 +283,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenImport, onOpenSettings, on
                   className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     viewMode === 'list'
                       ? 'bg-white dark:bg-zinc-700 text-rose-600 dark:text-white shadow-xs'
-                      : 'text-zinc-600 dark:text-zinc-400'
+                      : 'text-slate-700 dark:text-zinc-200'
                   }`}
                 >
                   <List className="w-4 h-4" />
@@ -294,7 +294,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenImport, onOpenSettings, on
 
             {/* Sort Options */}
             <div className="mb-4">
-              <label className="text-[10px] font-bold text-rose-900/60 dark:text-zinc-400 uppercase tracking-wider block mb-1.5">
+              <label className="text-[10px] font-bold text-rose-900/80 dark:text-zinc-300 uppercase tracking-wider block mb-1.5">
                 Criterio de ordenación
               </label>
               <div className="space-y-1.5">

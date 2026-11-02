@@ -340,7 +340,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
             >
               {book.format.toUpperCase()}
             </span>
-            <span className="text-xs font-bold text-rose-900/60 dark:text-zinc-400 truncate">
+            <span className="text-xs font-bold text-rose-900/80 dark:text-zinc-200 truncate">
               Detalles de la Obra
             </span>
           </div>
@@ -413,11 +413,11 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                 <h3 className="text-base sm:text-lg font-black text-[#4c0519] dark:text-[#f3f4f6] line-clamp-2 leading-tight">
                   {book.title}
                 </h3>
-                <p className="text-xs text-[#881337]/75 dark:text-zinc-400 font-medium truncate mt-0.5">
+                <p className="text-xs text-slate-700 dark:text-zinc-300 font-medium truncate mt-0.5">
                   {book.author || 'Autor desconocido'}
                 </p>
-                <div className="flex flex-wrap items-center gap-2 text-[11px] text-[#881337]/70 dark:text-zinc-400 font-medium mt-1.5">
-                  <span className="font-bold text-[#4c0519] dark:text-zinc-200">{book.totalPages} págs</span>
+                <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-700 dark:text-zinc-300 font-semibold mt-1.5">
+                  <span className="font-bold text-[#4c0519] dark:text-zinc-100">{book.totalPages} págs</span>
                   <span>•</span>
                   <span>{formatFileSize(book.fileSize)}</span>
                   <span>•</span>
@@ -450,7 +450,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
             className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
               activeTab === 'episodes'
                 ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
-                : 'text-[#881337]/70 dark:text-zinc-400 hover:bg-rose-100/60 dark:hover:bg-zinc-800'
+                : 'text-slate-700 dark:text-zinc-200 hover:bg-rose-100/80 dark:hover:bg-zinc-800'
             }`}
           >
             {isManga ? 'Episodios & Lectura' : 'Lectura & Progreso'}
@@ -461,7 +461,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
             className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
               activeTab === 'synopsis'
                 ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
-                : 'text-[#881337]/70 dark:text-zinc-400 hover:bg-rose-100/60 dark:hover:bg-zinc-800'
+                : 'text-slate-700 dark:text-zinc-200 hover:bg-rose-100/80 dark:hover:bg-zinc-800'
             }`}
           >
             Sinopsis & Ficha
@@ -472,7 +472,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
             className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
               activeTab === 'collection'
                 ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
-                : 'text-[#881337]/70 dark:text-zinc-400 hover:bg-rose-100/60 dark:hover:bg-zinc-800'
+                : 'text-slate-700 dark:text-zinc-200 hover:bg-rose-100/80 dark:hover:bg-zinc-800'
             }`}
           >
             Reseña & Colección
@@ -496,7 +496,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                         <h4 className="text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6]">
                           Episodios y Capítulos Online
                         </h4>
-                        <p className="text-[10.5px] text-[#881337]/70 dark:text-zinc-400">
+                        <p className="text-[10.5px] text-slate-700 dark:text-zinc-300 font-medium">
                           Sincroniza y descarga automáticamente desde la fuente original
                         </p>
                       </div>
@@ -583,7 +583,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                         <h4 className="text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6]">
                           Edición Completa & Portada Oficial
                         </h4>
-                        <p className="text-[10.5px] text-[#881337]/70 dark:text-zinc-400">
+                        <p className="text-[10.5px] text-slate-700 dark:text-zinc-300 font-medium">
                           Descarga el texto completo íntegro (100+ capítulos) y la portada oficial
                         </p>
                       </div>
@@ -637,12 +637,12 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                   />
                 </div>
 
-                <div className="flex items-center justify-between text-[11px] text-[#881337]/75 dark:text-zinc-400 pt-0.5">
+                <div className="flex items-center justify-between text-[11px] text-slate-700 dark:text-zinc-300 font-semibold pt-0.5">
                   <span>Página {book.currentPage} de {book.totalPages}</span>
                   <button
                     type="button"
                     onClick={handleResetProgress}
-                    className="font-bold text-[#881337]/80 hover:text-rose-600 dark:text-zinc-300 dark:hover:text-white flex items-center gap-1 transition-colors cursor-pointer"
+                    className="font-bold text-slate-700 hover:text-rose-600 dark:text-zinc-200 dark:hover:text-white flex items-center gap-1 transition-colors cursor-pointer"
                   >
                     <RotateCcw className="w-3 h-3" /> Reiniciar a pág. 1
                   </button>
@@ -686,7 +686,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                     {description}
                   </p>
                 ) : (
-                  <p className="text-xs text-[#881337]/60 dark:text-zinc-400 italic py-2">
+                  <p className="text-xs text-slate-600 dark:text-zinc-300 italic py-2">
                     Esta obra no tiene sinopsis registrada aún. Toca en «Editar sinopsis» para añadir un resumen.
                   </p>
                 )}
@@ -701,19 +701,19 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
 
                 <div className="grid grid-cols-2 gap-2.5 text-xs">
                   <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-800/80 border border-slate-200/60 dark:border-zinc-700/60">
-                    <span className="text-[10px] text-slate-500 dark:text-zinc-400 block font-bold uppercase">Formato</span>
+                    <span className="text-[10px] text-slate-600 dark:text-zinc-300 block font-bold uppercase">Formato</span>
                     <span className="font-mono font-bold uppercase text-[#4c0519] dark:text-zinc-200">{book.format}</span>
                   </div>
                   <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-800/80 border border-slate-200/60 dark:border-zinc-700/60">
-                    <span className="text-[10px] text-slate-500 dark:text-zinc-400 block font-bold uppercase">Páginas Totales</span>
+                    <span className="text-[10px] text-slate-600 dark:text-zinc-300 block font-bold uppercase">Páginas Totales</span>
                     <span className="font-mono font-bold text-[#4c0519] dark:text-zinc-200">{book.totalPages}</span>
                   </div>
                   <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-800/80 border border-slate-200/60 dark:border-zinc-700/60">
-                    <span className="text-[10px] text-slate-500 dark:text-zinc-400 block font-bold uppercase">Tamaño Local</span>
+                    <span className="text-[10px] text-slate-600 dark:text-zinc-300 block font-bold uppercase">Tamaño Local</span>
                     <span className="font-mono font-bold text-[#4c0519] dark:text-zinc-200">{formatFileSize(book.fileSize)}</span>
                   </div>
                   <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-800/80 border border-slate-200/60 dark:border-zinc-700/60">
-                    <span className="text-[10px] text-slate-500 dark:text-zinc-400 block font-bold uppercase">Fecha de Agregado</span>
+                    <span className="text-[10px] text-slate-600 dark:text-zinc-300 block font-bold uppercase">Fecha de Agregado</span>
                     <span className="font-bold text-[#4c0519] dark:text-zinc-200">{formatDate(book.dateAdded)}</span>
                   </div>
                 </div>
@@ -780,7 +780,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   <div className="sm:col-span-2">
-                    <label className="text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider block mb-1">
+                    <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider block mb-1">
                       Nombre de la Saga / Serie
                     </label>
                     <input
@@ -792,7 +792,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider block mb-1">
+                    <label className="text-[10px] font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider block mb-1">
                       Tomo / Vol. Nº
                     </label>
                     <input
@@ -824,7 +824,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                             isAssigned
                               ? 'bg-gradient-to-r from-rose-500 to-pink-500 dark:from-zinc-100 dark:to-zinc-200 dark:text-zinc-950 text-white shadow-xs'
-                              : 'bg-white dark:bg-zinc-800 text-[#881337] dark:text-zinc-300 border border-rose-200/80 dark:border-zinc-700'
+                              : 'bg-white dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 border border-rose-200/80 dark:border-zinc-700'
                           }`}
                         >
                           <span

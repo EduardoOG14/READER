@@ -238,7 +238,7 @@ export async function fetchMangaDexOnlineData(
     // 2. Query MangaDex for hosted scanlation chapters
     let pages: { name: string; blob: Blob }[] = [];
     try {
-      const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=1&includes[]=cover_art`;
+      const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=1&order[relevance]=desc&includes[]=cover_art`;
       const searchData = await httpGetJson(searchUrl, { timeoutMs: 12000 });
       const manga = searchData?.data?.[0];
 
@@ -247,7 +247,7 @@ export async function fetchMangaDexOnlineData(
         if (!coverBlob) {
           const coverRel = manga.relationships?.find((r: any) => r.type === 'cover_art');
           if (coverRel?.attributes?.fileName) {
-            const cUrl = `https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}.1024.jpg`;
+            const cUrl = `https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}`;
             coverUrl = cUrl;
             const cBlob = await fetchCoverBlob(cUrl);
             if (cBlob) coverBlob = cBlob;

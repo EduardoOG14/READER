@@ -317,16 +317,16 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
                       onClose();
                       onOpenTts();
                     }}
-                    className="flex items-center gap-2.5 p-3 rounded-2xl bg-white dark:bg-zinc-850 hover:bg-slate-50 dark:hover:bg-zinc-800 border border-slate-200 dark:border-zinc-700/80 transition-all active:scale-95 text-left cursor-pointer shadow-2xs"
+                    className="flex items-center gap-2.5 p-3 rounded-2xl bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 border border-slate-200 dark:border-zinc-700/80 transition-all active:scale-95 text-left cursor-pointer shadow-2xs"
                   >
                     <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                       <Volume2 className="w-4 h-4" />
                     </div>
                     <div>
-                      <span className="text-xs font-bold block text-slate-800 dark:text-zinc-200">
+                      <span className="text-xs font-bold block text-slate-800 dark:text-zinc-100">
                         Voz Alta (TTS)
                       </span>
-                      <span className="text-[10px] text-slate-500 dark:text-zinc-400">
+                      <span className="text-[10px] text-slate-600 dark:text-zinc-300 font-medium">
                         Lectura de audio
                       </span>
                     </div>
@@ -341,17 +341,17 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
                     className={`flex items-center gap-2.5 p-3 rounded-2xl border transition-all active:scale-95 text-left cursor-pointer shadow-2xs ${
                       isAutoScrollActive
                         ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-700 dark:text-emerald-300'
-                        : 'bg-white dark:bg-zinc-850 hover:bg-slate-50 dark:hover:bg-zinc-800 border-slate-200 dark:border-zinc-700/80'
+                        : 'bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 border-slate-200 dark:border-zinc-700/80'
                     }`}
                   >
                     <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                       <Zap className="w-4 h-4" />
                     </div>
                     <div>
-                      <span className="text-xs font-bold block text-slate-800 dark:text-zinc-200">
+                      <span className="text-xs font-bold block text-slate-800 dark:text-zinc-100">
                         Auto-Avance
                       </span>
-                      <span className="text-[10px] text-slate-500 dark:text-zinc-400">
+                      <span className="text-[10px] text-slate-600 dark:text-zinc-300 font-medium">
                         {isAutoScrollActive ? 'Activo' : 'Manos libres'}
                       </span>
                     </div>
@@ -364,7 +364,7 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
                       onClose();
                       onOpenBookmarks();
                     }}
-                    className="flex items-center gap-2.5 p-3 rounded-2xl bg-white dark:bg-zinc-850 hover:bg-slate-50 dark:hover:bg-zinc-800 border border-slate-200 dark:border-zinc-700/80 transition-all active:scale-95 text-left cursor-pointer shadow-2xs"
+                    className="flex items-center gap-2.5 p-3 rounded-2xl bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 border border-slate-200 dark:border-zinc-700/80 transition-all active:scale-95 text-left cursor-pointer shadow-2xs"
                   >
                     <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 relative">
                       <BookmarkIcon className="w-4 h-4" />
@@ -375,10 +375,10 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
                       )}
                     </div>
                     <div>
-                      <span className="text-xs font-bold block text-slate-800 dark:text-zinc-200">
+                      <span className="text-xs font-bold block text-slate-800 dark:text-zinc-100">
                         Marcadores
                       </span>
-                      <span className="text-[10px] text-slate-500 dark:text-zinc-400">
+                      <span className="text-[10px] text-slate-600 dark:text-zinc-300 font-medium">
                         {bookmarksCount} guardados
                       </span>
                     </div>
@@ -391,16 +391,16 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
                       onClose();
                       onOpenSearch();
                     }}
-                    className="flex items-center gap-2.5 p-3 rounded-2xl bg-white dark:bg-zinc-850 hover:bg-slate-50 dark:hover:bg-zinc-800 border border-slate-200 dark:border-zinc-700/80 transition-all active:scale-95 text-left cursor-pointer shadow-2xs"
+                    className="flex items-center gap-2.5 p-3 rounded-2xl bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 border border-slate-200 dark:border-zinc-700/80 transition-all active:scale-95 text-left cursor-pointer shadow-2xs"
                   >
                     <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
                       <Search className="w-4 h-4" />
                     </div>
                     <div>
-                      <span className="text-xs font-bold block text-slate-800 dark:text-zinc-200">
+                      <span className="text-xs font-bold block text-slate-800 dark:text-zinc-100">
                         Buscar Texto
                       </span>
-                      <span className="text-[10px] text-slate-500 dark:text-zinc-400">
+                      <span className="text-[10px] text-slate-600 dark:text-zinc-300 font-medium">
                         En el libro
                       </span>
                     </div>
@@ -410,16 +410,16 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
                   <button
                     type="button"
                     onClick={onToggleFullscreen}
-                    className="flex items-center gap-2.5 p-3 rounded-2xl bg-white dark:bg-zinc-850 hover:bg-slate-50 dark:hover:bg-zinc-800 border border-slate-200 dark:border-zinc-700/80 transition-all active:scale-95 text-left cursor-pointer shadow-2xs"
+                    className="flex items-center gap-2.5 p-3 rounded-2xl bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 border border-slate-200 dark:border-zinc-700/80 transition-all active:scale-95 text-left cursor-pointer shadow-2xs"
                   >
                     <div className="w-9 h-9 rounded-xl bg-slate-500/10 text-slate-600 dark:text-zinc-300 flex items-center justify-center shrink-0">
                       {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
                     </div>
                     <div>
-                      <span className="text-xs font-bold block text-slate-800 dark:text-zinc-200">
+                      <span className="text-xs font-bold block text-slate-800 dark:text-zinc-100">
                         Pantalla Completa
                       </span>
-                      <span className="text-[10px] text-slate-500 dark:text-zinc-400">
+                      <span className="text-[10px] text-slate-600 dark:text-zinc-300 font-medium">
                         {isFullscreen ? 'Salir' : 'Inmersivo'}
                       </span>
                     </div>
@@ -433,7 +433,7 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
                       className={`flex items-center gap-2.5 p-3 rounded-2xl border transition-all active:scale-95 text-left cursor-pointer shadow-2xs ${
                         smartTrimMargins
                           ? 'bg-rose-500/15 border-rose-500/40 text-rose-700 dark:text-rose-300'
-                          : 'bg-white dark:bg-zinc-850 hover:bg-slate-50 dark:hover:bg-zinc-800 border-slate-200 dark:border-zinc-700/80'
+                          : 'bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 border border-slate-200 dark:border-zinc-700/80'
                       }`}
                     >
                       <div className="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">

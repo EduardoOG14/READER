@@ -498,7 +498,7 @@ export const ReaderContainer: React.FC = () => {
             <h2 className="text-sm font-semibold truncate text-white">
               {activeBook.title}
             </h2>
-            <p className="text-[11px] text-slate-400 dark:text-zinc-400 truncate">
+            <p className="text-[11px] text-slate-300 dark:text-zinc-300 font-medium truncate">
               {activeBook.author || activeBook.format.toUpperCase()} • Pág {currentPage} de {totalPages}
             </p>
           </div>
@@ -607,8 +607,8 @@ export const ReaderContainer: React.FC = () => {
               <BookOpen className="w-8 h-8 text-rose-400" />
             </div>
             <div className="space-y-2">
-              <p className="text-base font-bold text-white">Archivo no encontrado</p>
-              <p className="text-sm text-slate-400 max-w-xs leading-relaxed">
+              <p className="text-base font-bold text-slate-900 dark:text-white">Archivo no encontrado</p>
+              <p className="text-sm text-slate-600 dark:text-zinc-300 max-w-xs leading-relaxed font-medium">
                 No se pudo acceder al archivo de «{activeBook.title}». Es posible que haya sido eliminado o no se importó correctamente.
               </p>
             </div>
@@ -649,9 +649,9 @@ export const ReaderContainer: React.FC = () => {
               onChange={e => handlePageChange(Number(e.target.value))}
               className="w-full accent-zinc-400 dark:accent-zinc-300 cursor-pointer"
             />
-            <div className="flex justify-between items-center text-[11px] text-slate-400 dark:text-zinc-400 px-1 font-mono">
+            <div className="flex justify-between items-center text-[11px] text-slate-300 dark:text-zinc-300 px-1 font-mono font-medium">
               <span>Pág {currentPage}</span>
-              <span className="font-bold text-white dark:text-zinc-200">{progressPercent}%</span>
+              <span className="font-bold text-white dark:text-zinc-100">{progressPercent}%</span>
               <span>Total: {totalPages}</span>
             </div>
           </div>

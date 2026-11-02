@@ -63,7 +63,7 @@ export async function checkForNewEpisodes(book: Book): Promise<MangaUpdateCheckR
   const cleanTitle = normalizeSearchTitle(book.title);
 
   try {
-    const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=1`;
+    const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=1&order[relevance]=desc`;
     const searchData = await httpGetJson(searchUrl, { timeoutMs: 12000 });
     const manga = searchData?.data?.[0];
     if (!manga) {
@@ -379,7 +379,7 @@ export async function downloadAllAvailableEpisodes(
     message: 'Buscando obra oficial en MangaDex...',
   });
 
-  const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=1`;
+  const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=1&order[relevance]=desc`;
   const searchData = await httpGetJson(searchUrl, { timeoutMs: 12000 });
   const manga = searchData?.data?.[0];
   if (!manga) throw new Error(`«${cleanTitle}» no se encontró en MangaDex.`);

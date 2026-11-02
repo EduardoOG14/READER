@@ -69,20 +69,20 @@ export const MoonStatusBar: React.FC<MoonStatusBarProps> = ({
   const displayBattery = batteryLevel !== null ? batteryLevel : 85;
 
   return (
-    <div className="w-full pointer-events-none select-none text-[10px] sm:text-[11px] font-mono tracking-tight px-3 py-1 flex items-center justify-between border-t border-black/5 dark:border-white/5 opacity-80 transition-colors">
+    <div className="w-full pointer-events-none select-none text-[10px] sm:text-[11px] font-mono tracking-tight px-3 py-1 flex items-center justify-between border-t border-black/10 dark:border-white/10 text-slate-700 dark:text-zinc-300 font-medium transition-colors">
       {/* Left: Battery & Clock */}
-      <div className="flex items-center gap-1.5 shrink-0 opacity-80">
+      <div className="flex items-center gap-1.5 shrink-0">
         <span>&#123;{displayBattery}&#125;</span>
         <span>{currentTime}</span>
       </div>
 
       {/* Center: Book title & Page fraction */}
-      <div className="flex-1 text-center truncate px-2 font-sans font-semibold tracking-wide uppercase text-[9.5px] sm:text-[10.5px] opacity-75">
+      <div className="flex-1 text-center truncate px-2 font-sans font-semibold tracking-wide uppercase text-[9.5px] sm:text-[10.5px]">
         {bookTitle} ({currentPage}/{totalPages})
       </div>
 
       {/* Right: Progress percentage */}
-      <div className="shrink-0 font-semibold opacity-80 text-[10px] sm:text-[11px]">
+      <div className="shrink-0 font-bold text-[10px] sm:text-[11px]">
         {progressPercent}%
       </div>
     </div>

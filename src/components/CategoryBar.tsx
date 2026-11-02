@@ -31,7 +31,7 @@ export const CategoryBar: React.FC<CategoryBarProps> = ({ onOpenCategoryManager 
               className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold transition-all select-none active:scale-95 cursor-pointer ${
                 isSelected
                   ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-md shadow-rose-500/20 dark:from-zinc-100 dark:to-zinc-200 dark:text-zinc-950 font-black'
-                  : 'bg-white hover:bg-[#ffe4ec] text-[#881337] border border-[#fecdd9]/80 dark:bg-zinc-850 dark:hover:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700/80 shadow-2xs'
+                  : 'bg-white hover:bg-[#ffe4ec] text-[#881337] border border-[#fecdd9]/80 dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-700/80 shadow-2xs'
               }`}
             >
               <span
@@ -43,7 +43,7 @@ export const CategoryBar: React.FC<CategoryBarProps> = ({ onOpenCategoryManager 
                 className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
                   isSelected
                     ? 'bg-white/25 text-white dark:bg-black/20 dark:text-zinc-950'
-                    : 'bg-[#ffe4ec] text-[#9f1239] dark:bg-zinc-800 dark:text-zinc-400'
+                    : 'bg-[#ffe4ec] text-[#9f1239] dark:bg-zinc-800 dark:text-zinc-300'
                 }`}
               >
                 {count}
@@ -55,7 +55,7 @@ export const CategoryBar: React.FC<CategoryBarProps> = ({ onOpenCategoryManager 
         {/* Manage Categories / Add button */}
         <button
           onClick={onOpenCategoryManager}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-bold text-[#9f1239] hover:text-[#4c0519] dark:text-zinc-300 dark:hover:text-zinc-100 hover:bg-[#ffe4ec] dark:hover:bg-zinc-800 border border-dashed border-[#fda4bb] dark:border-zinc-700 transition-all active:scale-95 cursor-pointer shadow-2xs"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-bold text-[#9f1239] hover:text-[#4c0519] dark:text-zinc-200 dark:hover:text-white hover:bg-[#ffe4ec] dark:hover:bg-zinc-800 border border-dashed border-[#fda4bb] dark:border-zinc-700 transition-all active:scale-95 cursor-pointer shadow-2xs"
           title="Administrar categorías manuales"
         >
           <Plus className="w-3.5 h-3.5 stroke-[2.5]" />

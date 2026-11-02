@@ -307,7 +307,7 @@ const LibraryView: React.FC = () => {
 
             {/* Permanent Bottom Signature: "By EduardoOG" (Only visible outside reader) */}
             <footer className="w-full py-8 text-center select-none pb-28 md:pb-8">
-              <p className="text-[11px] font-mono tracking-[0.25em] text-[#881337] dark:text-[#a7f3d0] opacity-35 hover:opacity-85 transition-opacity uppercase">
+              <p className="text-[11px] font-mono tracking-[0.25em] text-[#881337]/80 dark:text-zinc-400 opacity-60 hover:opacity-95 transition-opacity uppercase font-medium">
                 By EduardoOG
               </p>
             </footer>

@@ -35,7 +35,7 @@ export const MobileDock: React.FC<MobileDockProps> = ({
           className={`flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all active:scale-90 cursor-pointer ${
             selectedCategoryId === 'cat-all'
               ? 'text-rose-600 dark:text-white font-bold bg-rose-50/80 dark:bg-zinc-800/80'
-              : 'text-[#881337]/70 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-zinc-200'
+              : 'text-[#881337]/90 dark:text-zinc-300 hover:text-rose-600 dark:hover:text-white'
           }`}
         >
           <BookOpen className="w-5 h-5 stroke-[2.2]" />
@@ -45,7 +45,7 @@ export const MobileDock: React.FC<MobileDockProps> = ({
         {/* 2. Catálogo Público */}
         <button
           onClick={onOpenExplore}
-          className="flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl text-[#881337]/70 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-zinc-200 transition-all active:scale-90 cursor-pointer"
+          className="flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl text-[#881337]/90 dark:text-zinc-300 hover:text-rose-600 dark:hover:text-white transition-all active:scale-90 cursor-pointer"
           title="Biblioteca de obras en español"
         >
           <Compass className="w-5 h-5 stroke-[2.2]" />
@@ -66,7 +66,7 @@ export const MobileDock: React.FC<MobileDockProps> = ({
         {/* 4. Categorías & Colecciones */}
         <button
           onClick={onOpenCategoryManager}
-          className="flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl text-[#881337]/70 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-zinc-200 transition-all active:scale-90 cursor-pointer"
+          className="flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl text-[#881337]/90 dark:text-zinc-300 hover:text-rose-600 dark:hover:text-white transition-all active:scale-90 cursor-pointer"
           title="Administrar categorías"
         >
           <FolderTree className="w-5 h-5 stroke-[2.2]" />
@@ -76,7 +76,7 @@ export const MobileDock: React.FC<MobileDockProps> = ({
         {/* 5. Ajustes y Sistema */}
         <button
           onClick={onOpenSettings}
-          className="flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl text-[#881337]/70 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-zinc-200 transition-all active:scale-90 cursor-pointer"
+          className="flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl text-[#881337]/90 dark:text-zinc-300 hover:text-rose-600 dark:hover:text-white transition-all active:scale-90 cursor-pointer"
           title="Ajustes de la aplicación"
         >
           <SlidersHorizontal className="w-5 h-5 stroke-[2.2]" />

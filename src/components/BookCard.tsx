@@ -35,7 +35,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onOpenDetails }) => {
       {/* Cover Card */}
       <div
         onClick={() => onOpenDetails(book)}
-        className="relative aspect-[3/4.2] w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-rose-100/50 dark:bg-zinc-850 shadow-xs group-hover:shadow-xl group-hover:shadow-rose-900/10 dark:group-hover:shadow-black/60 group-hover:-translate-y-1.5 transition-all duration-300 border border-rose-200/70 dark:border-zinc-700/60"
+        className="relative aspect-[3/4.2] w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-rose-100/50 dark:bg-zinc-900 shadow-xs group-hover:shadow-xl group-hover:shadow-rose-900/10 dark:group-hover:shadow-black/60 group-hover:-translate-y-1.5 transition-all duration-300 border border-rose-200/70 dark:border-zinc-700/60"
       >
         {book.coverUrl ? (
           <img
@@ -107,7 +107,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onOpenDetails }) => {
         <h3 className="text-xs sm:text-sm font-bold text-[#4c0519] dark:text-[#f3f4f6] line-clamp-1 group-hover:text-rose-600 dark:group-hover:text-zinc-100 transition-colors">
           {book.title}
         </h3>
-        <p className="text-[11px] text-[#881337]/70 dark:text-zinc-400 line-clamp-1 mt-0.5 font-medium">
+        <p className="text-[11px] text-[#881337]/80 dark:text-zinc-300 line-clamp-1 mt-0.5 font-medium">
           {book.author || `${book.totalPages} ${book.totalPages === 1 ? 'pág' : 'págs'}`}
         </p>
       </div>

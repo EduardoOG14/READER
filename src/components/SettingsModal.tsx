@@ -122,7 +122,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               <h3 className="text-base font-bold text-[#4c0519] dark:text-[#f3f4f6]">
                 Preferencias de READER
               </h3>
-              <p className="text-[11px] text-[#881337]/70 dark:text-zinc-400">
+              <p className="text-[11px] text-slate-700 dark:text-zinc-300 font-medium">
                 Ajustes visuales, confort y herramientas
               </p>
             </div>
@@ -150,7 +150,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               <span className="text-xs font-bold text-amber-700 dark:text-amber-300 mt-1">
                 Hábitos y Racha
               </span>
-              <span className="text-[10px] text-slate-500 dark:text-zinc-400">
+              <span className="text-[10px] text-slate-600 dark:text-zinc-300 font-medium">
                 Ver tiempo y estadísticas
               </span>
             </button>
@@ -165,7 +165,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               <span className="text-xs font-bold text-cyan-700 dark:text-cyan-300 mt-1">
                 Almacenamiento
               </span>
-              <span className="text-[10px] text-slate-500 dark:text-zinc-400">
+              <span className="text-[10px] text-slate-600 dark:text-zinc-300 font-medium">
                 Gestión de espacio y caché
               </span>
             </button>
@@ -266,7 +266,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 <Volume2 className="w-4 h-4 text-rose-500 dark:text-zinc-400" />
                 <div>
                   <p className="font-bold">Botones de volumen físico</p>
-                  <p className="text-[10px] text-slate-500 dark:text-zinc-400">
+                  <p className="text-[10px] text-slate-600 dark:text-zinc-300 font-medium">
                     Pasar de página con las teclas de volumen
                   </p>
                 </div>
@@ -282,7 +282,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             {/* Invert Volume Keys */}
             {settings.volumeKeyTurnPage !== false && (
               <div className="flex items-center justify-between text-xs pl-6">
-                <span className="text-[11px] text-slate-600 dark:text-zinc-300">
+                <span className="text-[11px] text-slate-700 dark:text-zinc-200 font-medium">
                   Invertir teclas (Vol+ avanza / Vol- retrocede)
                 </span>
                 <input
@@ -300,7 +300,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 <Crop className="w-4 h-4 text-purple-500 dark:text-purple-400" />
                 <div>
                   <p className="font-bold">Recorte inteligente de bordes</p>
-                  <p className="text-[10px] text-slate-500 dark:text-zinc-400">
+                  <p className="text-[10px] text-slate-600 dark:text-zinc-300 font-medium">
                     Ajusta viñetas de manga y cómic al arte útil
                   </p>
                 </div>
@@ -319,7 +319,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             <h4 className="text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6] uppercase tracking-wider">
               Copia de Seguridad y Restauración
             </h4>
-            <p className="text-[11px] text-slate-500 dark:text-zinc-400 leading-relaxed">
+            <p className="text-[11px] text-slate-700 dark:text-zinc-300 font-medium leading-relaxed">
               Exporta tu biblioteca, marcadores, reseñas y ajustes para transferirlos a otro dispositivo.
             </p>
             <div className="grid grid-cols-2 gap-2 pt-1">
@@ -351,7 +351,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 <span className="text-xs font-bold block text-[#4c0519] dark:text-[#f3f4f6]">
                   Buscar Actualizaciones
                 </span>
-                <span className="text-[10px] text-[#881337]/70 dark:text-zinc-400 font-mono">
+                <span className="text-[10px] text-slate-700 dark:text-zinc-300 font-mono font-medium">
                   Versión instalada: v{CURRENT_APP_VERSION}
                 </span>
               </div>
@@ -367,7 +367,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           </div>
 
           {/* Info */}
-          <div className="pt-2 border-t border-rose-100 dark:border-zinc-800 flex items-center justify-between text-xs text-[#881337]/70 dark:text-zinc-400">
+          <div className="pt-2 border-t border-rose-100 dark:border-zinc-800 flex items-center justify-between text-xs text-[#881337]/90 dark:text-zinc-300 font-medium">
             <div className="flex items-center gap-1.5">
               <BookOpen className="w-3.5 h-3.5" />
               <span>{books.length} obras en biblioteca</span>
