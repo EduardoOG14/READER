@@ -238,7 +238,7 @@ export async function fetchMangaDexOnlineData(
     let pages: { name: string; blob: Blob }[] = [];
     try {
       const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=1`;
-      const searchRes = await fetch(searchUrl, { signal: AbortSignal.timeout(5000) });
+      const searchRes = await fetch(searchUrl, { signal: AbortSignal.timeout(12000) });
       if (searchRes.ok) {
         const searchData = await searchRes.json();
         const manga = searchData?.data?.[0];
@@ -269,10 +269,10 @@ export async function fetchMangaDexOnlineData(
             let totalToFetch = 1;
             const collected: any[] = [];
 
-            while (offset < totalToFetch && offset < 500) {
+            while (offset < totalToFetch && offset < 10000) {
               const langParams = langs ? langs.map(l => `translatedLanguage[]=${l}`).join('&') : '';
               const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?${langParams}&order[chapter]=asc&limit=100&offset=${offset}`;
-              const feedRes = await fetch(feedUrl, { signal: AbortSignal.timeout(6000) });
+              const feedRes = await fetch(feedUrl, { signal: AbortSignal.timeout(15000) });
               if (!feedRes.ok) break;
 
               const feedData = await feedRes.json();
@@ -311,7 +311,7 @@ export async function fetchMangaDexOnlineData(
             }
 
             const sortedChapters = Array.from(uniqueChapters.values()).sort((a, b) => a.chapter - b.chapter);
-            const totalChapters = Math.min(sortedChapters.length, 50); // Download up to 50 chapters
+            const totalChapters = sortedChapters.length; // Download ALL available chapters
 
             for (let chIdx = 0; chIdx < totalChapters; chIdx++) {
               const ch = sortedChapters[chIdx];
@@ -326,7 +326,7 @@ export async function fetchMangaDexOnlineData(
 
               try {
                 const atHomeRes = await fetch(`https://api.mangadex.org/at-home/server/${ch.id}`, {
-                  signal: AbortSignal.timeout(6000),
+                  signal: AbortSignal.timeout(12000),
                 });
                 if (atHomeRes.ok) {
                   const atHomeData = await atHomeRes.json();
@@ -334,7 +334,7 @@ export async function fetchMangaDexOnlineData(
                   for (let pIdx = 0; pIdx < pageFiles.length; pIdx++) {
                     const file = pageFiles[pIdx];
                     const pUrl = `${atHomeData.baseUrl}/data-saver/${atHomeData.chapter.hash}/${file}`;
-                    const pRes = await fetch(pUrl, { signal: AbortSignal.timeout(5000) });
+                    const pRes = await fetch(pUrl, { signal: AbortSignal.timeout(15000) });
                     if (pRes.ok) {
                       const blob = await pRes.blob();
                       const ext = file.split('.').pop() || 'jpg';
@@ -344,6 +344,10 @@ export async function fetchMangaDexOnlineData(
                         name: `ch_${paddedCh}_p${paddedPage}.${ext}`,
                         blob,
                       });
+                    }
+                    // Small delay to avoid rate limiting
+                    if (pIdx < pageFiles.length - 1) {
+                      await new Promise(r => setTimeout(r, 150));
                     }
                   }
                 }

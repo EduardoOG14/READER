@@ -63,7 +63,7 @@ export async function checkForNewEpisodes(book: Book): Promise<MangaUpdateCheckR
 
   try {
     const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=1`;
-    const searchRes = await fetch(searchUrl, { signal: AbortSignal.timeout(5000) });
+    const searchRes = await fetch(searchUrl, { signal: AbortSignal.timeout(12000) });
     if (!searchRes.ok) {
       return {
         hasUpdates: false,
@@ -96,10 +96,10 @@ export async function checkForNewEpisodes(book: Book): Promise<MangaUpdateCheckR
       let totalToFetch = 1;
       const collected: any[] = [];
 
-      while (offset < totalToFetch && offset < 500) {
+      while (offset < totalToFetch && offset < 10000) {
         const langParams = langs ? langs.map(l => `translatedLanguage[]=${l}`).join('&') : '';
         const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?${langParams}&order[chapter]=asc&limit=100&offset=${offset}`;
-        const feedRes = await fetch(feedUrl, { signal: AbortSignal.timeout(6000) });
+        const feedRes = await fetch(feedUrl, { signal: AbortSignal.timeout(15000) });
         if (!feedRes.ok) break;
 
         const feedData = await feedRes.json();
@@ -230,7 +230,7 @@ export async function downloadAndMergeNewEpisodes(
 
     try {
       const atHomeRes = await fetch(`https://api.mangadex.org/at-home/server/${ch.id}`, {
-        signal: AbortSignal.timeout(6000),
+        signal: AbortSignal.timeout(12000),
       });
       if (!atHomeRes.ok) continue;
 
@@ -241,7 +241,7 @@ export async function downloadAndMergeNewEpisodes(
         const file = pageFiles[pIdx];
         const pageUrl = `${atHomeData.baseUrl}/data-saver/${atHomeData.chapter.hash}/${file}`;
 
-        const pageRes = await fetch(pageUrl, { signal: AbortSignal.timeout(5000) });
+        const pageRes = await fetch(pageUrl, { signal: AbortSignal.timeout(15000) });
         if (pageRes.ok) {
           const blob = await pageRes.blob();
           const ext = file.split('.').pop() || 'jpg';
@@ -267,6 +267,11 @@ export async function downloadAndMergeNewEpisodes(
           percent: overallPercent,
           message: `Descargando episodio ${chNum}: pág. ${pIdx + 1} de ${pageFiles.length} (${overallPercent}%)...`,
         });
+
+        // Small delay to avoid rate limiting
+        if (pIdx < pageFiles.length - 1) {
+          await new Promise(r => setTimeout(r, 150));
+        }
       }
     } catch (e) {
       console.warn(`[MangaUpdate] Error downloading chapter ${chNum}:`, e);
@@ -388,7 +393,7 @@ export async function downloadAllAvailableEpisodes(
   });
 
   const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=1`;
-  const searchRes = await fetch(searchUrl, { signal: AbortSignal.timeout(5000) });
+  const searchRes = await fetch(searchUrl, { signal: AbortSignal.timeout(12000) });
   if (!searchRes.ok) throw new Error('No se pudo conectar con MangaDex.');
 
   const searchData = await searchRes.json();
@@ -403,10 +408,10 @@ export async function downloadAllAvailableEpisodes(
     let totalToFetch = 1;
     const collected: any[] = [];
 
-    while (offset < totalToFetch && offset < 500) {
+    while (offset < totalToFetch && offset < 10000) {
       const langParams = langs ? langs.map(l => `translatedLanguage[]=${l}`).join('&') : '';
       const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?${langParams}&order[chapter]=asc&limit=100&offset=${offset}`;
-      const feedRes = await fetch(feedUrl, { signal: AbortSignal.timeout(6000) });
+      const feedRes = await fetch(feedUrl, { signal: AbortSignal.timeout(15000) });
       if (!feedRes.ok) break;
 
       const feedData = await feedRes.json();

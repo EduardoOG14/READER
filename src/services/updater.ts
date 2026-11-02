@@ -4,7 +4,7 @@ import { registerPlugin, Capacitor, type PluginListenerHandle } from '@capacitor
  * GitHub Release Update Checker for READER
  */
 
-export const CURRENT_APP_VERSION = '1.2.1';
+export const CURRENT_APP_VERSION = '1.3.0';
 export const DEFAULT_GITHUB_REPO = 'EduardoOG14/READER';
 
 export interface DownloadProgress {

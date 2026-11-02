@@ -59,7 +59,7 @@ export async function fetchOfficialCoverUrl(
   if (isMangaLike) {
     try {
       const mdUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=5&includes[]=cover_art`;
-      const res = await fetch(mdUrl, { signal: AbortSignal.timeout(5000) });
+      const res = await fetch(mdUrl, { signal: AbortSignal.timeout(12000) });
       if (res.ok) {
         const data = await res.json();
         const mangaList = data?.data || [];
@@ -81,7 +81,7 @@ export async function fetchOfficialCoverUrl(
   try {
     const query = author ? `${cleanTitle} ${author}` : cleanTitle;
     const olUrl = `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=5`;
-    const res = await fetch(olUrl, { signal: AbortSignal.timeout(5000) });
+    const res = await fetch(olUrl, { signal: AbortSignal.timeout(10000) });
     if (res.ok) {
       const data = await res.json();
       const docs = data?.docs || [];
@@ -101,7 +101,7 @@ export async function fetchOfficialCoverUrl(
   try {
     const gbQuery = author ? `${cleanTitle} ${author}` : cleanTitle;
     const gbUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(gbQuery)}&maxResults=3`;
-    const res = await fetch(gbUrl, { signal: AbortSignal.timeout(5000) });
+    const res = await fetch(gbUrl, { signal: AbortSignal.timeout(10000) });
     if (res.ok) {
       const data = await res.json();
       const items = data?.items || [];
@@ -122,7 +122,7 @@ export async function fetchOfficialCoverUrl(
   if (!isMangaLike) {
     try {
       const mdUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=3&includes[]=cover_art`;
-      const res = await fetch(mdUrl, { signal: AbortSignal.timeout(4000) });
+      const res = await fetch(mdUrl, { signal: AbortSignal.timeout(10000) });
       if (res.ok) {
         const data = await res.json();
         const manga = data?.data?.[0];
@@ -144,7 +144,7 @@ export async function fetchOfficialCoverUrl(
  */
 export async function fetchCoverBlob(url: string): Promise<Blob | null> {
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(7000) });
+    const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
     if (!res.ok) return null;
     const blob = await res.blob();
     if (blob.size < 500) return null;
