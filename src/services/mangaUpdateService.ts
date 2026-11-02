@@ -36,7 +36,7 @@ export interface UpdateDownloadProgress {
 export async function getLocalHighestChapter(book: Book): Promise<number> {
   try {
     const buffer = await getBookFile(book.fileStorageKey, { id: book.id, fileName: book.fileName });
-    if (!buffer) return 1;
+    if (!buffer) return 0;
 
     const zip = await JSZip.loadAsync(buffer);
     let highestChapter = 0;
@@ -51,14 +51,14 @@ export async function getLocalHighestChapter(book: Book): Promise<number> {
       }
     });
 
-    return highestChapter > 0 ? highestChapter : 1;
+    return highestChapter;
   } catch (err) {
     console.warn('[MangaUpdate] Error reading local chapters:', err);
-    return 1;
+    return 0;
   }
 }
 
-// 2. Check MangaDex for newly available chapters (prioritizes ES, then EN)
+// 2. Check MangaDex for newly available chapters (prioritizes ES, then EN, then any)
 export async function checkForNewEpisodes(book: Book): Promise<MangaUpdateCheckResult> {
   const cleanTitle = normalizeSearchTitle(book.title);
 
@@ -70,7 +70,7 @@ export async function checkForNewEpisodes(book: Book): Promise<MangaUpdateCheckR
       return {
         hasUpdates: false,
         mangaTitle: cleanTitle,
-        currentHighestChapter: 1,
+        currentHighestChapter: 0,
         totalAvailableChapters: 0,
         newChapters: [],
         message: `«${cleanTitle}» no está registrado en el repositorio de MangaDex.`,
@@ -79,13 +79,14 @@ export async function checkForNewEpisodes(book: Book): Promise<MangaUpdateCheckR
 
     const langTiers = [['es', 'es-la'], ['en'], null];
     let chaptersList: any[] = [];
+    let fallbackTierList: any[] = [];
 
     for (const langs of langTiers) {
       let offset = 0;
       let totalToFetch = 1;
       const collected: any[] = [];
 
-      while (offset < totalToFetch && offset < 10000) {
+      while (offset < totalToFetch && offset < 500) {
         const langParams = langs ? langs.map(l => `translatedLanguage[]=${l}`).join('&') : '';
         const queryParams = [langParams, 'order[chapter]=asc', 'limit=100', `offset=${offset}`].filter(Boolean).join('&');
         const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?${queryParams}`;
@@ -98,12 +99,30 @@ export async function checkForNewEpisodes(book: Book): Promise<MangaUpdateCheckR
 
         totalToFetch = feedData?.total || batch.length;
         offset += batch.length;
+
+        // Stop early if this tier already has early chapters (<= 5)
+        if (collected.some((c: any) => parseFloat(c.attributes.chapter) <= 5) && collected.length >= 20) {
+          break;
+        }
       }
 
       if (collected.length > 0) {
-        chaptersList = collected;
-        break;
+        const hasEarlyChapters = collected.some((c: any) => {
+          const num = parseFloat(c.attributes.chapter);
+          return !isNaN(num) && num <= 5;
+        });
+
+        if (hasEarlyChapters) {
+          chaptersList = collected;
+          break;
+        } else if (collected.length > fallbackTierList.length) {
+          fallbackTierList = collected;
+        }
       }
+    }
+
+    if (chaptersList.length === 0 && fallbackTierList.length > 0) {
+      chaptersList = fallbackTierList;
     }
 
     // Group and de-duplicate unique chapters
@@ -414,13 +433,14 @@ export async function downloadAllAvailableEpisodes(
 
   const langTiers = [['es', 'es-la'], ['en'], null];
   let chaptersList: any[] = [];
+  let fallbackTierList: any[] = [];
 
   for (const langs of langTiers) {
     let offset = 0;
     let totalToFetch = 1;
     const collected: any[] = [];
 
-    while (offset < totalToFetch && offset < 10000) {
+    while (offset < totalToFetch && offset < 1000) {
       const langParams = langs ? langs.map(l => `translatedLanguage[]=${l}`).join('&') : '';
       const queryParams = [langParams, 'order[chapter]=asc', 'limit=100', `offset=${offset}`].filter(Boolean).join('&');
       const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?${queryParams}`;
@@ -440,9 +460,22 @@ export async function downloadAllAvailableEpisodes(
     }
 
     if (collected.length > 0) {
-      chaptersList = collected;
-      break;
+      const hasEarlyChapters = collected.some((c: any) => {
+        const num = parseFloat(c.attributes.chapter);
+        return !isNaN(num) && num <= 5;
+      });
+
+      if (hasEarlyChapters) {
+        chaptersList = collected;
+        break;
+      } else if (collected.length > fallbackTierList.length) {
+        fallbackTierList = collected;
+      }
     }
+  }
+
+  if (chaptersList.length === 0 && fallbackTierList.length > 0) {
+    chaptersList = fallbackTierList;
   }
 
   const uniqueChapters = new Map<number, ChapterInfo>();
@@ -466,6 +499,11 @@ export async function downloadAllAvailableEpisodes(
     throw new Error('No se encontraron capítulos con scans alojados para esta obra en MangaDex.');
   }
 
-  const { updatedBook, addedPages } = await downloadAndMergeNewEpisodes(book, allChapters, onProgress);
+  const localHighest = await getLocalHighestChapter(book);
+  const pendingChapters = allChapters.filter(ch => ch.chapter > localHighest);
+  const chaptersToDownload = pendingChapters.length > 0 ? pendingChapters : allChapters;
+  const batchToDownload = chaptersToDownload.slice(0, 35);
+
+  const { updatedBook, addedPages } = await downloadAndMergeNewEpisodes(book, batchToDownload, onProgress);
   return { updatedBook, totalPages: addedPages };
 }

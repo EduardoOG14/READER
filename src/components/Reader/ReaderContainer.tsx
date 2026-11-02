@@ -766,7 +766,10 @@ export const ReaderContainer: React.FC = () => {
       {/* Book Completion Celebration Modal (Rating & Review) */}
       <BookCompletedModal
         isOpen={showCompletedModal}
-        onClose={() => setShowCompletedModal(false)}
+        onClose={() => {
+          hasShownCompletedModalRef.current = true;
+          setShowCompletedModal(false);
+        }}
         book={activeBook}
         onSaveRatingAndReview={handleSaveRatingAndReview}
       />

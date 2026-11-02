@@ -233,10 +233,9 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
           progress = Math.max(0, Math.min(1, (currentSpineIndex + chapterFrac) / totalSpine));
         }
 
-        // Detect if truly at the end of the entire book
-        const isAtEnd = !!location.atEnd;
+        // Detect if truly at the end of the ENTIRE book (must be the last spine item AND at the end)
         const isLastSpine = currentSpineIndex >= totalSpine - 1;
-        const isTrulyAtEnd = isAtEnd || (isLastSpine && progress >= 0.995);
+        const isTrulyAtEnd = isLastSpine && (!!location.atEnd || progress >= 0.995);
 
         let calculatedPage = Math.max(1, Math.min(globalTotal, Math.round(progress * globalTotal) || 1));
 

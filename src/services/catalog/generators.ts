@@ -8,6 +8,7 @@ import {
   normalizeSearchTitle,
 } from '../coverFetcher';
 import { httpGetJson, httpGetBlob, httpGetText } from '../httpClient';
+import { createOptimizedThumbnail } from '../../utils/thumbnail';
 
 // ==========================================
 // 1. Classical Book Cover Generator (Offline Fallback)
@@ -247,10 +248,17 @@ export async function fetchMangaDexOnlineData(
         if (!coverBlob) {
           const coverRel = manga.relationships?.find((r: any) => r.type === 'cover_art');
           if (coverRel?.attributes?.fileName) {
-            const cUrl = `https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}`;
-            coverUrl = cUrl;
-            const cBlob = await fetchCoverBlob(cUrl);
-            if (cBlob) coverBlob = cBlob;
+            const fn = coverRel.attributes.fileName;
+            const thumb512Url = `https://uploads.mangadex.org/covers/${manga.id}/${fn}.512.jpg`;
+            const fullUrl = `https://uploads.mangadex.org/covers/${manga.id}/${fn}`;
+            const cBlob = (await fetchCoverBlob(thumb512Url)) || (await fetchCoverBlob(fullUrl));
+            if (cBlob) {
+              coverBlob = cBlob;
+              try {
+                const dataUrl = await createOptimizedThumbnail(cBlob, 600, 900, 0.88);
+                if (dataUrl) coverUrl = dataUrl;
+              } catch {}
+            }
           }
         }
 
@@ -262,13 +270,14 @@ export async function fetchMangaDexOnlineData(
         ];
 
         let chaptersList: any[] = [];
+        let fallbackTierList: any[] = [];
 
         for (const langs of langTiers) {
           let offset = 0;
           let totalToFetch = 1;
           const collected: any[] = [];
 
-          while (offset < totalToFetch && offset < 10000) {
+          while (offset < totalToFetch && offset < 500) {
             const langParams = langs ? langs.map(l => `translatedLanguage[]=${l}`).join('&') : '';
             const queryParams = [langParams, 'order[chapter]=asc', 'limit=100', `offset=${offset}`].filter(Boolean).join('&');
             const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?${queryParams}`;
@@ -283,15 +292,34 @@ export async function fetchMangaDexOnlineData(
 
               totalToFetch = feedData?.total || batch.length;
               offset += batch.length;
+
+              // If we already collected early chapters (<= 5) and have at least 15 chapters, stop paginating this tier
+              if (collected.some((c: any) => parseFloat(c.attributes.chapter) <= 5) && collected.length >= 20) {
+                break;
+              }
             } catch {
               break;
             }
           }
 
           if (collected.length > 0) {
-            chaptersList = collected;
-            break;
+            // Check if this tier contains early story chapters (<= 5)
+            const hasEarlyChapters = collected.some((c: any) => {
+              const num = parseFloat(c.attributes.chapter);
+              return !isNaN(num) && num <= 5;
+            });
+
+            if (hasEarlyChapters) {
+              chaptersList = collected;
+              break;
+            } else if (collected.length > fallbackTierList.length) {
+              fallbackTierList = collected;
+            }
           }
+        }
+
+        if (chaptersList.length === 0 && fallbackTierList.length > 0) {
+          chaptersList = fallbackTierList;
         }
 
         if (chaptersList.length > 0) {
