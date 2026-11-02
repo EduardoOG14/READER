@@ -103,6 +103,9 @@ export const ReaderContainer: React.FC = () => {
     if (activeBook) {
       setCurrentPage(activeBook.currentPage || 1);
       setTotalPages(activeBook.totalPages || 1);
+      initialSavedPageRef.current = activeBook.currentPage || 1;
+      readerMountTimeRef.current = Date.now();
+      hasShownCompletedModalRef.current = false;
     }
   }, [bookId]);
 
@@ -140,6 +143,7 @@ export const ReaderContainer: React.FC = () => {
 
   const initialSavedPageRef = useRef<number>(activeBook?.currentPage || 1);
   const readerMountTimeRef = useRef<number>(Date.now());
+  const hasShownCompletedModalRef = useRef<boolean>(false);
 
   // Page change handler (updates local state instantly, then persists)
   const handlePageChange = useCallback(
@@ -167,8 +171,15 @@ export const ReaderContainer: React.FC = () => {
       // Record reading stat (page turn)
       recordReadingTime(0, 1).catch(() => {});
 
-      // Celebration dialog if finished
-      if (clamped >= total && total > 1 && !activeBook.completedDate) {
+      // Celebration dialog if finished (strictly once per reading session, only if not already completed)
+      if (
+        !hasShownCompletedModalRef.current &&
+        clamped >= total &&
+        total > 1 &&
+        !activeBook.completedDate &&
+        (activeBook.progress || 0) < 100
+      ) {
+        hasShownCompletedModalRef.current = true;
         setShowCompletedModal(true);
       }
     },

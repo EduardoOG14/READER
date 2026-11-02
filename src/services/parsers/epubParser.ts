@@ -35,7 +35,7 @@ export async function parseEpubFile(buffer: ArrayBuffer): Promise<EpubMetadata> 
     try {
       const coverPath = await book.coverUrl();
       if (coverPath) {
-        const optimized = await createOptimizedThumbnail(coverPath, 320, 460, 0.8);
+        const optimized = await createOptimizedThumbnail(coverPath, 900, 1350, 0.9);
         coverUrl = optimized || coverPath;
       }
     } catch (err) {

@@ -270,7 +270,8 @@ export async function fetchMangaDexOnlineData(
 
           while (offset < totalToFetch && offset < 10000) {
             const langParams = langs ? langs.map(l => `translatedLanguage[]=${l}`).join('&') : '';
-            const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?${langParams}&order[chapter]=asc&limit=100&offset=${offset}`;
+            const queryParams = [langParams, 'order[chapter]=asc', 'limit=100', `offset=${offset}`].filter(Boolean).join('&');
+            const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?${queryParams}`;
             try {
               const feedData = await httpGetJson(feedUrl, { timeoutMs: 15000 });
               const batch = feedData?.data || [];

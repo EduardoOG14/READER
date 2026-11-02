@@ -45,8 +45,8 @@ export async function parseMangaArchive(buffer: ArrayBuffer): Promise<MangaArchi
           const imgBlob = isSvg && (!rawBlob.type || rawBlob.type === 'application/octet-stream')
             ? new Blob([rawBlob], { type: 'image/svg+xml' })
             : rawBlob;
-          const optimized = await createOptimizedThumbnail(imgBlob, 320, 460, 0.8);
-          if (optimized && optimized.length < 100000) {
+          const optimized = await createOptimizedThumbnail(imgBlob, 900, 1350, 0.9);
+          if (optimized) {
             coverUrl = optimized;
           }
         }

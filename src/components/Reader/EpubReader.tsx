@@ -166,8 +166,11 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
     book.ready.then(async () => {
       try {
         await book.locations.generate(600);
-        if (initialSavedPage > 1 && totalPages && totalPages > 1) {
-          const targetFraction = (initialSavedPage - 1) / Math.max(1, totalPages);
+        const locsTotal = book.locations.length() || (book.locations as any).total || 0;
+        const currentTargetTotal = locsTotal > 0 ? locsTotal : (totalPages && totalPages > 1 ? totalPages : 100);
+
+        if (initialSavedPage > 1) {
+          const targetFraction = (initialSavedPage - 1) / Math.max(1, currentTargetTotal);
           const cfi = book.locations.cfiFromPercentage(targetFraction);
           if (cfi) {
             await rendition.display(cfi);
@@ -203,18 +206,55 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
       }
     });
 
-    // Handle location change
+    // Handle location change across the entire EPUB book
     rendition.on('relocated', (location: any) => {
       if (location && location.start) {
-        const displayed = location.start.displayed;
-        if (displayed) {
-          // Ignore premature page 1 callbacks if user had saved progress
-          if (!isPositionedRef.current && initialSavedPage > 1 && displayed.page === 1) {
-            return;
+        const spineItems = (book as any).spine?.items || [];
+        const totalSpine = spineItems.length || 1;
+        const currentSpineIndex = typeof location.start?.index === 'number' ? location.start.index : 0;
+        const hasLocations = book.locations && typeof book.locations.percentageFromCfi === 'function' && book.locations.length() > 0;
+        const locationsTotal = hasLocations ? (book.locations.length() || (book.locations as any).total || 0) : 0;
+
+        // Use book.locations.total if available, or preserve totalPages if > 1, or fallback to total spine items
+        const globalTotal = locationsTotal > 0
+          ? locationsTotal
+          : (totalPages && totalPages > 1 ? totalPages : Math.max(1, totalSpine));
+
+        // Calculate progress across the ENTIRE book (0.0 to 1.0)
+        let progress = 0;
+        if (hasLocations && location.start?.cfi) {
+          const p = book.locations.percentageFromCfi(location.start.cfi);
+          if (typeof p === 'number' && !isNaN(p)) {
+            progress = Math.max(0, Math.min(1, p));
           }
-          prevPageRef.current = displayed.page;
-          onPageChange(displayed.page, displayed.total || totalPages);
+        } else if (totalSpine > 0) {
+          const displayed = location.start?.displayed;
+          const chapterFrac = displayed && displayed.total > 0 ? (displayed.page - 1) / displayed.total : 0;
+          progress = Math.max(0, Math.min(1, (currentSpineIndex + chapterFrac) / totalSpine));
         }
+
+        // Detect if truly at the end of the entire book
+        const isAtEnd = !!location.atEnd;
+        const isLastSpine = currentSpineIndex >= totalSpine - 1;
+        const isTrulyAtEnd = isAtEnd || (isLastSpine && progress >= 0.995);
+
+        let calculatedPage = Math.max(1, Math.min(globalTotal, Math.round(progress * globalTotal) || 1));
+
+        // CRITICAL PROTECTION: Never allow mid-book chapter ends to reach globalTotal!
+        // Only if truly at the end of the whole book can calculatedPage equal globalTotal.
+        if (!isTrulyAtEnd && calculatedPage >= globalTotal) {
+          calculatedPage = Math.max(1, globalTotal - 1);
+        } else if (isTrulyAtEnd) {
+          calculatedPage = globalTotal;
+        }
+
+        // Ignore premature page 1 resets on load if the user had saved progress
+        if (!isPositionedRef.current && initialSavedPage > 1 && calculatedPage === 1) {
+          return;
+        }
+
+        prevPageRef.current = calculatedPage;
+        onPageChange(calculatedPage, globalTotal);
       }
       setTimeout(extractCurrentText, 250);
     });
@@ -227,16 +267,36 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
   // Synchronize external page change (from bottom buttons or slider)
   useEffect(() => {
     if (!renditionRef.current) return;
-    if (currentPage > prevPageRef.current) {
-      renditionRef.current.next();
-      prevPageRef.current = currentPage;
+    if (currentPage === prevPageRef.current) return;
+
+    const diff = currentPage - prevPageRef.current;
+    prevPageRef.current = currentPage;
+
+    if (Math.abs(diff) === 1) {
+      if (diff > 0) {
+        renditionRef.current.next();
+      } else {
+        renditionRef.current.prev();
+      }
       setTimeout(extractCurrentText, 350);
-    } else if (currentPage < prevPageRef.current) {
-      renditionRef.current.prev();
-      prevPageRef.current = currentPage;
+    } else {
+      // Large jump via slider or chapter jump
+      const book = bookRef.current;
+      if (book && book.locations && book.locations.length() > 0) {
+        const total = totalPages || book.locations.total || 100;
+        const frac = Math.max(0, Math.min(1, (currentPage - 1) / Math.max(1, total)));
+        const targetCfi = book.locations.cfiFromPercentage(frac);
+        if (targetCfi) {
+          renditionRef.current.display(targetCfi);
+          setTimeout(extractCurrentText, 350);
+          return;
+        }
+      }
+      if (diff > 0) renditionRef.current.next();
+      else renditionRef.current.prev();
       setTimeout(extractCurrentText, 350);
     }
-  }, [currentPage]);
+  }, [currentPage, totalPages]);
 
   // Apply font size and styling dynamically on changes
   useEffect(() => {

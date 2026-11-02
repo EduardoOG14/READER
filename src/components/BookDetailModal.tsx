@@ -118,7 +118,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
 
     setIsProcessingCover(true);
     try {
-      const optimizedThumbnail = await createOptimizedThumbnail(file, 320, 460, 0.8);
+      const optimizedThumbnail = await createOptimizedThumbnail(file, 900, 1350, 0.9);
       if (optimizedThumbnail) {
         setCoverUrl(optimizedThumbnail);
         await editBook(book.id, { coverUrl: optimizedThumbnail });

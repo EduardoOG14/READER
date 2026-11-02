@@ -237,11 +237,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     setActiveBook(prev => {
       if (!prev || prev.id !== bookId) return prev;
-      const total = totalPages !== undefined ? totalPages : prev.totalPages;
-      const clampedPage = Math.max(1, Math.min(page, Math.max(1, total)));
-      const progress = Math.min(100, Math.round((clampedPage / Math.max(1, total)) * 100));
+      // Do not allow total pages to shrink during reading
+      const total = totalPages !== undefined ? Math.max(totalPages, prev.totalPages || 1) : Math.max(1, prev.totalPages || 1);
+      const clampedPage = Math.max(1, Math.min(page, total));
+      const progress = Math.min(100, Math.round((clampedPage / total) * 100));
 
-      const isCompleted = clampedPage >= total;
+      const isCompleted = clampedPage >= total && total > 1;
       let categoryIds = prev.categoryIds || [];
       if (isCompleted && !categoryIds.includes('cat-completed')) {
         categoryIds = [...categoryIds, 'cat-completed'];
@@ -255,6 +256,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         totalPages: total,
         progress,
         categoryIds,
+        completedDate: isCompleted ? (prev.completedDate || Date.now()) : undefined,
         lastReadDate: Date.now(),
       };
       updatedBookToSave = updated;
@@ -264,11 +266,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setBooks(prev =>
       prev.map(b => {
         if (b.id !== bookId) return b;
-        const total = totalPages !== undefined ? totalPages : b.totalPages;
-        const clampedPage = Math.max(1, Math.min(page, Math.max(1, total)));
-        const progress = Math.min(100, Math.round((clampedPage / Math.max(1, total)) * 100));
+        const total = totalPages !== undefined ? Math.max(totalPages, b.totalPages || 1) : Math.max(1, b.totalPages || 1);
+        const clampedPage = Math.max(1, Math.min(page, total));
+        const progress = Math.min(100, Math.round((clampedPage / total) * 100));
 
-        const isCompleted = clampedPage >= total;
+        const isCompleted = clampedPage >= total && total > 1;
         let categoryIds = b.categoryIds || [];
         if (isCompleted && !categoryIds.includes('cat-completed')) {
           categoryIds = [...categoryIds, 'cat-completed'];
@@ -282,6 +284,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           totalPages: total,
           progress,
           categoryIds,
+          completedDate: isCompleted ? (b.completedDate || Date.now()) : undefined,
           lastReadDate: Date.now(),
         };
         if (!updatedBookToSave) {
