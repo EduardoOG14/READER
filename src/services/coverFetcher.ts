@@ -24,18 +24,21 @@ export function normalizeSearchTitle(rawTitle: string): string {
 export function isMockCover(url?: string): boolean {
   if (!url) return true;
   const lower = url.toLowerCase();
+  if (lower.startsWith('data:image/svg')) return true;
   return (
     lower.includes('mangahalftone') ||
     lower.includes('bggrad') ||
     lower.includes('reader archive') ||
     lower.includes('reader biblioteca') ||
+    lower.includes('biblioteca reader') ||
     lower.includes('panel de acc') ||
     lower.includes('panel 1') ||
     lower.includes('comienzo de mi historia') ||
     lower.includes('cgrad') ||
     lower.includes('ドドド') ||
     lower.includes('silhouette') ||
-    (lower.startsWith('data:image/svg') && (lower.includes('6366f1') || lower.includes('c7d2fe') || lower.includes('e11d48')))
+    lower.includes('tankobon') ||
+    lower.includes('leathergrad')
   );
 }
 
