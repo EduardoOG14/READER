@@ -312,12 +312,16 @@ export async function fetchMangaDexOnlineData(
           }
 
           const sortedChapters = Array.from(uniqueChapters.values()).sort((a, b) => a.chapter - b.chapter);
-          const totalChapters = sortedChapters.length; // Download ALL available chapters
+          // For catalog generation, download the first 2 chapters (~30-60 authentic scanned pages)
+          // so initial import completes fast and reliably without hitting memory or timeout limits.
+          // Remaining chapters can be downloaded via "Descargar TODO" / "Buscar nuevos episodios".
+          const chaptersToDownload = sortedChapters.slice(0, 2);
+          const totalChapters = chaptersToDownload.length;
 
           for (let chIdx = 0; chIdx < totalChapters; chIdx++) {
-            const ch = sortedChapters[chIdx];
+            const ch = chaptersToDownload[chIdx];
             const chNum = ch.chapter;
-            const chapterBasePercent = 30 + Math.round((chIdx / totalChapters) * 65);
+            const chapterBasePercent = 30 + Math.round((chIdx / totalChapters) * 60);
 
             notifyDownloadProgress(
               title,
@@ -330,26 +334,34 @@ export async function fetchMangaDexOnlineData(
                 timeoutMs: 12000,
               });
               const pageFiles: string[] = atHomeData?.chapter?.dataSaver || atHomeData?.chapter?.data || [];
-              for (let pIdx = 0; pIdx < pageFiles.length; pIdx++) {
-                const file = pageFiles[pIdx];
-                const pUrl = `${atHomeData.baseUrl}/data-saver/${atHomeData.chapter.hash}/${file}`;
-                try {
-                  const blob = await httpGetBlob(pUrl, { timeoutMs: 15000 });
-                  if (blob && blob.size > 500) {
-                    const ext = file.split('.').pop() || 'jpg';
-                    const paddedCh = String(Math.floor(chNum)).padStart(4, '0');
-                    const paddedPage = String(pIdx + 1).padStart(3, '0');
-                    pages.push({
-                      name: `ch_${paddedCh}_p${paddedPage}.${ext}`,
-                      blob,
-                    });
-                  }
-                } catch (e) {
-                  console.warn(`[MangaGenerator] Error downloading page:`, e);
-                }
-                // Small delay to avoid rate limiting
-                if (pIdx < pageFiles.length - 1) {
-                  await new Promise(r => setTimeout(r, 120));
+
+              // Download in concurrent batches of 3 for fast, reliable fetching
+              const CONCURRENCY = 3;
+              for (let i = 0; i < pageFiles.length; i += CONCURRENCY) {
+                const chunk = pageFiles.slice(i, i + CONCURRENCY);
+                await Promise.all(
+                  chunk.map(async (file, cIdx) => {
+                    const pIdx = i + cIdx;
+                    const pUrl = `${atHomeData.baseUrl}/data-saver/${atHomeData.chapter.hash}/${file}`;
+                    try {
+                      const blob = await httpGetBlob(pUrl, { timeoutMs: 15000 });
+                      if (blob && blob.size > 500) {
+                        const ext = file.split('.').pop() || 'jpg';
+                        const paddedCh = String(Math.floor(chNum)).padStart(4, '0');
+                        const paddedPage = String(pIdx + 1).padStart(3, '0');
+                        pages.push({
+                          name: `ch_${paddedCh}_p${paddedPage}.${ext}`,
+                          blob,
+                        });
+                      }
+                    } catch (e) {
+                      console.warn(`[MangaGenerator] Error downloading page:`, e);
+                    }
+                  })
+                );
+                // Respectful pacing
+                if (i + CONCURRENCY < pageFiles.length) {
+                  await new Promise(r => setTimeout(r, 60));
                 }
               }
             } catch (e) {

@@ -1,6 +1,7 @@
 // Service to fetch real, official, high-definition book and manga covers
 // APIs used: MangaDex (official covers), OpenLibrary (official book covers), Google Books (fallback)
 import { httpGetJson, httpGetBlob } from './httpClient';
+import { createOptimizedThumbnail } from '../utils/thumbnail';
 
 const coverCache = new Map<string, string>();
 
@@ -26,6 +27,7 @@ export function isMockCover(url?: string): boolean {
   if (!url) return true;
   const lower = url.toLowerCase();
   if (lower.startsWith('data:image/svg')) return true;
+  if (lower.includes('uploads.mangadex.org')) return true;
   return (
     lower.includes('mangahalftone') ||
     lower.includes('bggrad') ||
@@ -68,9 +70,17 @@ export async function fetchOfficialCoverUrl(
       for (const manga of mangaList) {
         const coverRel = manga.relationships?.find((r: any) => r.type === 'cover_art');
         if (coverRel?.attributes?.fileName) {
-          const coverUrl = `https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}`;
-          coverCache.set(cacheKey, coverUrl);
-          return coverUrl;
+          const fn = coverRel.attributes.fileName;
+          const thumb512Url = `https://uploads.mangadex.org/covers/${manga.id}/${fn}.512.jpg`;
+          const fullUrl = `https://uploads.mangadex.org/covers/${manga.id}/${fn}`;
+          const blob = (await fetchCoverBlob(thumb512Url)) || (await fetchCoverBlob(fullUrl));
+          if (blob) {
+            const dataUrl = await createOptimizedThumbnail(blob, 600, 900, 0.88);
+            if (dataUrl) {
+              coverCache.set(cacheKey, dataUrl);
+              return dataUrl;
+            }
+          }
         }
       }
     } catch {
@@ -87,8 +97,14 @@ export async function fetchOfficialCoverUrl(
     for (const doc of docs) {
       if (doc.cover_i) {
         const coverUrl = `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`;
-        coverCache.set(cacheKey, coverUrl);
-        return coverUrl;
+        const blob = await fetchCoverBlob(coverUrl);
+        if (blob) {
+          const dataUrl = await createOptimizedThumbnail(blob, 600, 900, 0.88);
+          if (dataUrl) {
+            coverCache.set(cacheKey, dataUrl);
+            return dataUrl;
+          }
+        }
       }
     }
   } catch {
@@ -113,8 +129,14 @@ export async function fetchOfficialCoverUrl(
           .replace(/^http:\/\//i, 'https://')
           .replace('&edge=curl', '')
           .replace('zoom=1', 'zoom=2');
-        coverCache.set(cacheKey, coverUrl);
-        return coverUrl;
+        const blob = await fetchCoverBlob(coverUrl);
+        if (blob) {
+          const dataUrl = await createOptimizedThumbnail(blob, 600, 900, 0.88);
+          if (dataUrl) {
+            coverCache.set(cacheKey, dataUrl);
+            return dataUrl;
+          }
+        }
       }
     }
   } catch {
@@ -129,9 +151,17 @@ export async function fetchOfficialCoverUrl(
       const manga = data?.data?.[0];
       const coverRel = manga?.relationships?.find((r: any) => r.type === 'cover_art');
       if (coverRel?.attributes?.fileName) {
-        const coverUrl = `https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}`;
-        coverCache.set(cacheKey, coverUrl);
-        return coverUrl;
+        const fn = coverRel.attributes.fileName;
+        const thumb512Url = `https://uploads.mangadex.org/covers/${manga.id}/${fn}.512.jpg`;
+        const fullUrl = `https://uploads.mangadex.org/covers/${manga.id}/${fn}`;
+        const blob = (await fetchCoverBlob(thumb512Url)) || (await fetchCoverBlob(fullUrl));
+        if (blob) {
+          const dataUrl = await createOptimizedThumbnail(blob, 600, 900, 0.88);
+          if (dataUrl) {
+            coverCache.set(cacheKey, dataUrl);
+            return dataUrl;
+          }
+        }
       }
     } catch {}
   }
@@ -144,6 +174,10 @@ export async function fetchOfficialCoverUrl(
  */
 export async function fetchCoverBlob(url: string): Promise<Blob | null> {
   try {
+    if (url.startsWith('data:')) {
+      const res = await fetch(url);
+      return await res.blob();
+    }
     const blob = await httpGetBlob(url, { timeoutMs: 15000 });
     if (blob.size < 500) return null;
     return blob;

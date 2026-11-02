@@ -26,6 +26,12 @@ export const SpotlightHero: React.FC = () => {
     return undefined;
   }, [books, selectedCategoryId]);
 
+  const [imgError, setImgError] = React.useState(false);
+
+  React.useEffect(() => {
+    setImgError(false);
+  }, [inProgressBook?.id, inProgressBook?.coverUrl]);
+
   if (!inProgressBook) {
     return null;
   }
@@ -54,10 +60,11 @@ export const SpotlightHero: React.FC = () => {
             onClick={() => openReader(inProgressBook)}
             className="group relative w-24 sm:w-28 aspect-[3/4.2] rounded-2xl overflow-hidden shadow-md group-hover:shadow-xl transition-all duration-300 shrink-0 cursor-pointer bg-slate-200 dark:bg-zinc-800"
           >
-            {inProgressBook.coverUrl ? (
+            {inProgressBook.coverUrl && !imgError ? (
               <img
                 src={inProgressBook.coverUrl}
                 alt={inProgressBook.title}
+                onError={() => setImgError(true)}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
             ) : (

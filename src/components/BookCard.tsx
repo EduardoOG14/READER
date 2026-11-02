@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MoreVertical, BookOpen, Check } from 'lucide-react';
 import type { Book } from '../types';
 
@@ -8,6 +8,7 @@ interface BookCardProps {
 }
 
 export const BookCard: React.FC<BookCardProps> = ({ book, onOpenDetails }) => {
+  const [imgError, setImgError] = useState(false);
 
   const getFormatBadge = (format: string) => {
     switch (format) {
@@ -37,10 +38,11 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onOpenDetails }) => {
         onClick={() => onOpenDetails(book)}
         className="relative aspect-[3/4.2] w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-rose-100/50 dark:bg-zinc-900 shadow-xs group-hover:shadow-xl group-hover:shadow-rose-900/10 dark:group-hover:shadow-black/60 group-hover:-translate-y-1.5 transition-all duration-300 border border-rose-200/70 dark:border-zinc-700/60"
       >
-        {book.coverUrl ? (
+        {book.coverUrl && !imgError ? (
           <img
             src={book.coverUrl}
             alt={book.title}
+            onError={() => setImgError(true)}
             className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-300"
             loading="lazy"
           />

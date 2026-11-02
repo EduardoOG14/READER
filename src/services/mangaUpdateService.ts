@@ -221,26 +221,33 @@ export async function downloadAndMergeNewEpisodes(
       });
       const pageFiles: string[] = atHomeData?.chapter?.dataSaver || atHomeData?.chapter?.data || [];
 
-      for (let pIdx = 0; pIdx < pageFiles.length; pIdx++) {
-        const file = pageFiles[pIdx];
-        const pageUrl = `${atHomeData.baseUrl}/data-saver/${atHomeData.chapter.hash}/${file}`;
+      // Download chapter pages in concurrent batches of 3
+      const CONCURRENCY = 3;
+      for (let i = 0; i < pageFiles.length; i += CONCURRENCY) {
+        const chunk = pageFiles.slice(i, i + CONCURRENCY);
+        await Promise.all(
+          chunk.map(async (file, cIdx) => {
+            const pIdx = i + cIdx;
+            const pageUrl = `${atHomeData.baseUrl}/data-saver/${atHomeData.chapter.hash}/${file}`;
 
-        try {
-          const blob = await httpGetBlob(pageUrl, { timeoutMs: 15000 });
-          if (blob && blob.size > 500) {
-            const ext = file.split('.').pop() || 'jpg';
-            const paddedCh = String(Math.floor(chNum)).padStart(4, '0');
-            const paddedPage = String(pIdx + 1).padStart(3, '0');
-            const entryName = `ch_${paddedCh}_p${paddedPage}.${ext}`;
+            try {
+              const blob = await httpGetBlob(pageUrl, { timeoutMs: 15000 });
+              if (blob && blob.size > 500) {
+                const ext = file.split('.').pop() || 'jpg';
+                const paddedCh = String(Math.floor(chNum)).padStart(4, '0');
+                const paddedPage = String(pIdx + 1).padStart(3, '0');
+                const entryName = `ch_${paddedCh}_p${paddedPage}.${ext}`;
 
-            zip.file(entryName, blob);
-            totalAddedPages++;
-          }
-        } catch (pageErr) {
-          console.warn(`[MangaUpdate] Failed page ${pIdx + 1} of ch ${chNum}:`, pageErr);
-        }
+                zip.file(entryName, blob);
+                totalAddedPages++;
+              }
+            } catch (pageErr) {
+              console.warn(`[MangaUpdate] Failed page ${pIdx + 1} of ch ${chNum}:`, pageErr);
+            }
+          })
+        );
 
-        const chapterProgress = (pIdx + 1) / Math.max(1, pageFiles.length);
+        const chapterProgress = Math.min(1, (i + CONCURRENCY) / Math.max(1, pageFiles.length));
         const overallPercent = Math.round(
           ((chIdx + chapterProgress) / totalChaptersToDownload) * 100
         );
@@ -249,15 +256,36 @@ export async function downloadAndMergeNewEpisodes(
           currentChapterNum: chNum,
           currentChapterIndex: chIdx + 1,
           totalChaptersToDownload,
-          currentPageIndex: pIdx + 1,
+          currentPageIndex: Math.min(pageFiles.length, i + CONCURRENCY),
           totalPagesInChapter: pageFiles.length,
           percent: overallPercent,
-          message: `Descargando episodio ${chNum}: pág. ${pIdx + 1} de ${pageFiles.length} (${overallPercent}%)...`,
+          message: `Descargando episodio ${chNum}: pág. ${Math.min(pageFiles.length, i + CONCURRENCY)} de ${pageFiles.length} (${overallPercent}%)...`,
         });
 
-        // Small delay to avoid rate limiting
-        if (pIdx < pageFiles.length - 1) {
-          await new Promise(r => setTimeout(r, 120));
+        // Respectful pacing
+        if (i + CONCURRENCY < pageFiles.length) {
+          await new Promise(r => setTimeout(r, 60));
+        }
+      }
+
+      // Incremental progressive save every 2 chapters to guarantee zero data loss
+      if ((chIdx + 1) % 2 === 0 || chIdx === totalChaptersToDownload - 1) {
+        try {
+          const incrementalBlob = await zip.generateAsync({ type: 'blob' });
+          let countPages = 0;
+          zip.forEach((path, entry) => {
+            if (!entry.dir && isImageFile(path)) countPages++;
+          });
+          await saveBookFile(book.id, book.fileName, incrementalBlob);
+          const progressiveBook: Book = {
+            ...book,
+            coverUrl: officialCoverUrl || book.coverUrl,
+            totalPages: Math.max(1, countPages),
+            fileSize: incrementalBlob.size,
+          };
+          await saveBook(progressiveBook);
+        } catch (saveErr) {
+          console.warn('[MangaUpdate] Incremental commit skipped:', saveErr);
         }
       }
     } catch (e) {

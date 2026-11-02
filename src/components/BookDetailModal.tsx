@@ -54,6 +54,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
   const [rating, setRating] = useState<number>(0);
   const [review, setReview] = useState('');
   const [coverUrl, setCoverUrl] = useState<string | undefined>(undefined);
+  const [imgError, setImgError] = useState(false);
   const [assignedCats, setAssignedCats] = useState<string[]>([]);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [isProcessingCover, setIsProcessingCover] = useState(false);
@@ -83,6 +84,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
       setRating(book.rating || 0);
       setReview(book.review || '');
       setCoverUrl(book.coverUrl);
+      setImgError(false);
       setAssignedCats(book.categoryIds || []);
       setIsEditingDescription(false);
       setNotification(null);
@@ -359,10 +361,11 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
             {/* Book Cover with 1-tap change & online search */}
             <div className="flex flex-col items-center shrink-0">
               <div className="relative group w-24 sm:w-28 aspect-[3/4.2] rounded-2xl overflow-hidden bg-rose-100 dark:bg-zinc-800 shadow-md border border-rose-200/80 dark:border-zinc-700">
-                {coverUrl ? (
+                {coverUrl && !imgError ? (
                   <img
                     src={coverUrl}
                     alt={book.title}
+                    onError={() => setImgError(true)}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                   />
                 ) : (

@@ -150,7 +150,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           // 3. Asynchronously enhance existing books with REAL official covers from MangaDex / OpenLibrary
           setTimeout(async () => {
             for (const book of healedBooks) {
-              if (isMockCover(book.coverUrl) || book.coverUrl?.startsWith('data:image/svg+xml')) {
+              if (
+                isMockCover(book.coverUrl) ||
+                book.coverUrl?.startsWith('data:image/svg+xml') ||
+                book.coverUrl?.includes('uploads.mangadex.org')
+              ) {
                 try {
                   const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
                   const match = SPANISH_CATALOG.find(c => norm(c.title) === norm(book.title));
