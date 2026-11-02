@@ -429,6 +429,18 @@ export async function generateMangaCbz(
     console.warn('[MangaGenerator] Online fetch unavailable, using illustrated art:', err);
   }
 
+  // If coverBlob is not available yet (e.g. Western comics, graphic novels), fetch official cover
+  if (!onlineData.coverBlob) {
+    try {
+      const realCover = await fetchOfficialCoverUrl(title, author, category);
+      if (realCover) {
+        onlineData.coverUrl = realCover;
+        const cBlob = await fetchCoverBlob(realCover);
+        if (cBlob) onlineData.coverBlob = cBlob;
+      }
+    } catch {}
+  }
+
   // 1. Cover: First entry in zip is 000_portada so it naturally becomes the book cover
   if (onlineData.coverBlob && onlineData.coverBlob.size > 1000) {
     zip.file('000_portada.jpg', onlineData.coverBlob);

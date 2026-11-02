@@ -241,19 +241,19 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
       currentPageIndex: 0,
       totalPagesInChapter: 0,
       percent: 5,
-      message: 'Conectando con MangaDex para consultar la serie completa...',
+      message: 'Consultando disponibilidad de episodios en el repositorio oficial...',
     });
     try {
       const { updatedBook, totalPages } = await downloadAllAvailableEpisodes(book, p => setUpdateProgress(p));
       await refreshLibrary();
-      showNotice(`¡Manga completo descargado con éxito! (${totalPages} páginas locales).`);
+      showNotice(`¡«${book.title}» actualizado con éxito! (${totalPages} páginas locales).`);
       setUpdateResult({
         hasUpdates: false,
         mangaTitle: book.title,
         currentHighestChapter: 0,
         totalAvailableChapters: 0,
         newChapters: [],
-        message: `Serie completa descargada al día (Total: ${updatedBook.totalPages} páginas locales).`,
+        message: `Obra al día (Total: ${updatedBook.totalPages} páginas locales).`,
       });
       setUpdateProgress(null);
     } catch (err: any) {

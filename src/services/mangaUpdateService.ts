@@ -70,10 +70,10 @@ export async function checkForNewEpisodes(book: Book): Promise<MangaUpdateCheckR
       return {
         hasUpdates: false,
         mangaTitle: cleanTitle,
-        currentHighestChapter: 0,
-        totalAvailableChapters: 0,
+        currentHighestChapter: 1,
+        totalAvailableChapters: 1,
         newChapters: [],
-        message: `«${cleanTitle}» no está registrado en el repositorio de MangaDex.`,
+        message: `«${book.title}» es una obra completa e íntegra (tomo único). Tu ejemplar está al día.`,
       };
     }
 
@@ -429,7 +429,35 @@ export async function downloadAllAvailableEpisodes(
   const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=1&order[relevance]=desc`;
   const searchData = await httpGetJson(searchUrl, { timeoutMs: 12000 });
   const manga = searchData?.data?.[0];
-  if (!manga) throw new Error(`«${cleanTitle}» no se encontró en MangaDex.`);
+  if (!manga) {
+    // If not found in MangaDex (e.g. Western Comic, Graphic Novel, standalone volume):
+    // Ensure the book's cover is updated to the real official cover if it was a placeholder
+    let officialCoverUrl = book.coverUrl;
+    try {
+      const realCover = await fetchOfficialCoverUrl(book.title, book.author, 'comics');
+      if (realCover) {
+        officialCoverUrl = realCover;
+      }
+    } catch {}
+
+    const updatedBook: Book = {
+      ...book,
+      coverUrl: officialCoverUrl || book.coverUrl,
+    };
+    await saveBook(updatedBook);
+
+    onProgress?.({
+      currentChapterNum: 1,
+      currentChapterIndex: 1,
+      totalChaptersToDownload: 1,
+      currentPageIndex: 1,
+      totalPagesInChapter: 1,
+      percent: 100,
+      message: `«${book.title}» es una obra completa e íntegra (tomo único). Obra al día.`,
+    });
+
+    return { updatedBook, totalPages: updatedBook.totalPages };
+  }
 
   const langTiers = [['es', 'es-la'], ['en'], null];
   let chaptersList: any[] = [];

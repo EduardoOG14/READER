@@ -88,15 +88,39 @@ export async function fetchOfficialCoverUrl(
     }
   }
 
+  // Extract primary author cleanly (e.g. "Frank Miller & David Mazzucchelli" -> "Frank Miller")
+  const primaryAuthor = author
+    ? author
+        .split(/[&,]|(?:\s+y\s+)/i)[0]
+        .replace(/[^\w\s\u00C0-\u017F'-]/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+    : '';
+
+  const candidateQueries: string[] = [];
+  if (primaryAuthor) {
+    candidateQueries.push(`${cleanTitle} ${primaryAuthor}`);
+  }
+  candidateQueries.push(cleanTitle);
+
+  if (title.includes(':') || title.includes('-')) {
+    const mainTitle = normalizeSearchTitle(title.split(/[:-]/)[0]);
+    if (mainTitle && mainTitle !== cleanTitle) {
+      if (primaryAuthor) candidateQueries.push(`${mainTitle} ${primaryAuthor}`);
+      candidateQueries.push(mainTitle);
+    }
+  }
+
   // 2. OpenLibrary search (Superb for Books, Classic Literature, Graphic Novels, Western Comics)
-  try {
-    const query = author ? `${cleanTitle} ${author}` : cleanTitle;
-    const olUrl = `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=5`;
-    const data = await httpGetJson(olUrl, { timeoutMs: 12000 });
-    const docs = data?.docs || [];
-    for (const doc of docs) {
-      if (doc.cover_i) {
-        const coverUrl = `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`;
+  for (const q of candidateQueries) {
+    try {
+      const olUrl = `https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&limit=6`;
+      const data = await httpGetJson(olUrl, { timeoutMs: 12000 });
+      const docs = data?.docs || [];
+      const exactMatch = docs.find((d: any) => d.cover_i && normalizeSearchTitle(d.title) === cleanTitle);
+      const docWithCover = exactMatch || docs.find((d: any) => d.cover_i);
+      if (docWithCover?.cover_i) {
+        const coverUrl = `https://covers.openlibrary.org/b/id/${docWithCover.cover_i}-L.jpg`;
         const blob = await fetchCoverBlob(coverUrl);
         if (blob) {
           const dataUrl = await createOptimizedThumbnail(blob, 600, 900, 0.88);
@@ -106,41 +130,42 @@ export async function fetchOfficialCoverUrl(
           }
         }
       }
+    } catch {
+      // Continue to next candidate query
     }
-  } catch {
-    // Continue to Google Books
   }
 
   // 3. Google Books API fallback (Excellent for Spanish titles & international comics)
-  try {
-    const gbQuery = author ? `${cleanTitle} ${author}` : cleanTitle;
-    const gbUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(gbQuery)}&maxResults=3`;
-    const data = await httpGetJson(gbUrl, { timeoutMs: 10000 });
-    const items = data?.items || [];
-    for (const item of items) {
-      const thumbnail =
-        item.volumeInfo?.imageLinks?.extraLarge ||
-        item.volumeInfo?.imageLinks?.large ||
-        item.volumeInfo?.imageLinks?.medium ||
-        item.volumeInfo?.imageLinks?.thumbnail ||
-        item.volumeInfo?.imageLinks?.smallThumbnail;
-      if (thumbnail) {
-        const coverUrl = thumbnail
-          .replace(/^http:\/\//i, 'https://')
-          .replace('&edge=curl', '')
-          .replace('zoom=1', 'zoom=2');
-        const blob = await fetchCoverBlob(coverUrl);
-        if (blob) {
-          const dataUrl = await createOptimizedThumbnail(blob, 600, 900, 0.88);
-          if (dataUrl) {
-            coverCache.set(cacheKey, dataUrl);
-            return dataUrl;
+  for (const q of candidateQueries) {
+    try {
+      const gbUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=3`;
+      const data = await httpGetJson(gbUrl, { timeoutMs: 10000 });
+      const items = data?.items || [];
+      for (const item of items) {
+        const thumbnail =
+          item.volumeInfo?.imageLinks?.extraLarge ||
+          item.volumeInfo?.imageLinks?.large ||
+          item.volumeInfo?.imageLinks?.medium ||
+          item.volumeInfo?.imageLinks?.thumbnail ||
+          item.volumeInfo?.imageLinks?.smallThumbnail;
+        if (thumbnail) {
+          const coverUrl = thumbnail
+            .replace(/^http:\/\//i, 'https://')
+            .replace('&edge=curl', '')
+            .replace('zoom=1', 'zoom=2');
+          const blob = await fetchCoverBlob(coverUrl);
+          if (blob) {
+            const dataUrl = await createOptimizedThumbnail(blob, 600, 900, 0.88);
+            if (dataUrl) {
+              coverCache.set(cacheKey, dataUrl);
+              return dataUrl;
+            }
           }
         }
       }
+    } catch {
+      // Continue to next query
     }
-  } catch {
-    // Fallback below
   }
 
   // 4. If MangaDex wasn't tried earlier (e.g. category was comics or manhwa), try MangaDex now

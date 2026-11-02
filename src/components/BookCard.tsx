@@ -17,7 +17,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onOpenDetails }) => {
       case 'cbz':
       case 'cbr':
       case 'zip':
-        return { bg: 'bg-purple-600/95 text-white', label: 'MANGA' };
+        return { bg: 'bg-purple-600/95 text-white', label: 'CBZ' };
       case 'epub':
         return { bg: 'bg-emerald-600/95 text-white', label: 'EPUB' };
       case 'txt':
