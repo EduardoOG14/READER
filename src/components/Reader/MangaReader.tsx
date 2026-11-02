@@ -17,58 +17,88 @@ interface MangaReaderProps {
 interface WebtoonPageProps {
   filename: string;
   pageNum: number;
+  pageIndex: number;
   url?: string;
-  onLoad: () => void;
+  onLoadPage: (pageIndex: number) => void;
+  onPageVisible: (pageNum: number) => void;
 }
 
-const WebtoonPage: React.FC<WebtoonPageProps> = React.memo(({ pageNum, url, onLoad }) => {
-  const pageRef = useRef<HTMLDivElement>(null);
-  const [isInView, setIsInView] = useState(false);
+const WebtoonPage: React.FC<WebtoonPageProps> = React.memo(
+  ({ pageNum, pageIndex, url, onLoadPage, onPageVisible }) => {
+    const pageRef = useRef<HTMLDivElement>(null);
+    const [isInView, setIsInView] = useState(false);
 
-  useEffect(() => {
-    const el = pageRef.current;
-    if (!el) return;
+    useEffect(() => {
+      const el = pageRef.current;
+      if (!el) return;
 
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting) {
-          setIsInView(true);
-        }
-      },
-      { rootMargin: '1200px 0px' }
+      const observer = new IntersectionObserver(
+        entries => {
+          if (entries[0].isIntersecting) {
+            setIsInView(true);
+          }
+        },
+        { rootMargin: '1200px 0px' }
+      );
+
+      observer.observe(el);
+      return () => observer.disconnect();
+    }, []);
+
+    useEffect(() => {
+      if (isInView && !url) {
+        onLoadPage(pageIndex);
+      }
+    }, [isInView, url, onLoadPage, pageIndex]);
+
+    // Track active page position seamlessly as user scrolls
+    useEffect(() => {
+      const el = pageRef.current;
+      if (!el) return;
+
+      const tracker = new IntersectionObserver(
+        entries => {
+          if (entries[0].isIntersecting) {
+            onPageVisible(pageNum);
+          }
+        },
+        { threshold: [0.1], rootMargin: '-15% 0px -70% 0px' }
+      );
+
+      tracker.observe(el);
+      return () => tracker.disconnect();
+    }, [pageNum, onPageVisible]);
+
+    return (
+      <div
+        ref={pageRef}
+        data-page={pageNum}
+        className="w-full min-h-[300px] flex items-center justify-center bg-slate-900/10"
+        style={{
+          contentVisibility: 'auto',
+          containIntrinsicSize: '0 800px',
+        }}
+      >
+        {url ? (
+          <img
+            src={url}
+            alt={`Página ${pageNum}`}
+            decoding="async"
+            className="w-full h-auto block select-none pointer-events-none"
+            style={{
+              transform: 'translateZ(0)',
+              backfaceVisibility: 'hidden',
+            }}
+          />
+        ) : (
+          <div className="h-64 flex items-center justify-center text-slate-400 text-xs">
+            Cargando página {pageNum}...
+          </div>
+        )}
+      </div>
     );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (isInView && !url) {
-      onLoad();
-    }
-  }, [isInView, url, onLoad]);
-
-  return (
-    <div
-      ref={pageRef}
-      data-page={pageNum}
-      className="w-full min-h-[300px] flex items-center justify-center bg-slate-900/10"
-    >
-      {url ? (
-        <img
-          src={url}
-          alt={`Página ${pageNum}`}
-          className="w-full h-auto block select-none pointer-events-none"
-          loading="lazy"
-        />
-      ) : (
-        <div className="h-64 flex items-center justify-center text-slate-400 text-xs">
-          Cargando página {pageNum}...
-        </div>
-      )}
-    </div>
-  );
-});
+  }
+);
 
 export const MangaReader: React.FC<MangaReaderProps> = ({
   buffer,
@@ -211,6 +241,17 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
     };
   }, [buffer]);
 
+  // Batch state updates for newly loaded page URLs to avoid rapid-fire re-renders
+  const rafPendingRef = useRef(false);
+  const triggerBatchUrlsUpdate = useCallback(() => {
+    if (rafPendingRef.current) return;
+    rafPendingRef.current = true;
+    requestAnimationFrame(() => {
+      rafPendingRef.current = false;
+      setPageUrls(new Map(urlsRef.current));
+    });
+  }, []);
+
   // Load page image URL on demand
   const loadPageUrl = useCallback(
     async (pageIndex: number) => {
@@ -241,10 +282,10 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
 
       const url = URL.createObjectURL(blob);
       urlsRef.current.set(pageIndex, url);
-      setPageUrls(new Map(urlsRef.current));
+      triggerBatchUrlsUpdate();
       return url;
     },
-    [zip, pageFilenames]
+    [zip, pageFilenames, triggerBatchUrlsUpdate]
   );
 
   // Preload current, previous, and next page
@@ -272,13 +313,33 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
     }
   }, [zip, currentPage, pageFilenames, loadPageUrl, settings.mangaDirection]);
 
-  // Scroll to current page instantly when in webtoon mode
+  // Track active visible page and coordinate Webtoon scrolling without flickering
+  const internalActivePageRef = useRef<number>(currentPage);
+  const isWebtoonPositionedRef = useRef<boolean>(false);
+
+  const handleWebtoonPageVisible = useCallback(
+    (page: number) => {
+      if (internalActivePageRef.current === page) return;
+      internalActivePageRef.current = page;
+      onPageChange(page, pageFilenames.length);
+    },
+    [onPageChange, pageFilenames.length]
+  );
+
+  // Scroll to current page when in webtoon mode (initial position or external slider/jump)
   useEffect(() => {
-    if (settings.mangaDirection === 'webtoon' && containerRef.current && pageFilenames.length > 0) {
-      const pageEl = containerRef.current.querySelector(`[data-page="${currentPage}"]`);
-      if (pageEl) {
-        pageEl.scrollIntoView({ behavior: 'auto', block: 'start' });
-      }
+    if (settings.mangaDirection !== 'webtoon' || !containerRef.current || pageFilenames.length === 0) return;
+
+    // Prevent snapping back when page change was triggered by user's natural scrolling
+    if (currentPage === internalActivePageRef.current && isWebtoonPositionedRef.current) {
+      return;
+    }
+
+    internalActivePageRef.current = currentPage;
+    const pageEl = containerRef.current.querySelector(`[data-page="${currentPage}"]`);
+    if (pageEl) {
+      pageEl.scrollIntoView({ behavior: isWebtoonPositionedRef.current ? 'smooth' : 'auto', block: 'start' });
+      isWebtoonPositionedRef.current = true;
     }
   }, [currentPage, settings.mangaDirection, pageFilenames.length]);
 
@@ -432,7 +493,7 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
         {renderZoomBar()}
 
         <div
-          className="w-full flex flex-col items-center transition-all duration-150"
+          className="w-full flex flex-col items-center"
           style={{
             maxWidth: `${Math.round(768 * scale)}px`,
             width: `${Math.round(100 * scale)}%`,
@@ -447,8 +508,10 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
                 key={filename}
                 filename={filename}
                 pageNum={pageNum}
+                pageIndex={index}
                 url={url}
-                onLoad={() => loadPageUrl(index)}
+                onLoadPage={loadPageUrl}
+                onPageVisible={handleWebtoonPageVisible}
               />
             );
           })}
