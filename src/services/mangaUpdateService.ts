@@ -4,6 +4,7 @@ import { getBookFile, saveBookFile, saveBook } from './storage';
 import { isImageFile } from './parsers/mangaParser';
 import { fetchOfficialCoverUrl, fetchCoverBlob, normalizeSearchTitle } from './coverFetcher';
 import { generateBookFile, createDefaultBookChapters } from './catalog/generators';
+import { httpGetJson, httpGetBlob } from './httpClient';
 
 export interface ChapterInfo {
   id: string;
@@ -63,19 +64,7 @@ export async function checkForNewEpisodes(book: Book): Promise<MangaUpdateCheckR
 
   try {
     const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=1`;
-    const searchRes = await fetch(searchUrl, { signal: AbortSignal.timeout(12000) });
-    if (!searchRes.ok) {
-      return {
-        hasUpdates: false,
-        mangaTitle: cleanTitle,
-        currentHighestChapter: 1,
-        totalAvailableChapters: 0,
-        newChapters: [],
-        message: 'No se pudo conectar con el servidor de mangas.',
-      };
-    }
-
-    const searchData = await searchRes.json();
+    const searchData = await httpGetJson(searchUrl, { timeoutMs: 12000 });
     const manga = searchData?.data?.[0];
     if (!manga) {
       return {
@@ -99,10 +88,7 @@ export async function checkForNewEpisodes(book: Book): Promise<MangaUpdateCheckR
       while (offset < totalToFetch && offset < 10000) {
         const langParams = langs ? langs.map(l => `translatedLanguage[]=${l}`).join('&') : '';
         const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?${langParams}&order[chapter]=asc&limit=100&offset=${offset}`;
-        const feedRes = await fetch(feedUrl, { signal: AbortSignal.timeout(15000) });
-        if (!feedRes.ok) break;
-
-        const feedData = await feedRes.json();
+        const feedData = await httpGetJson(feedUrl, { timeoutMs: 15000 });
         const batch = feedData?.data || [];
         if (batch.length === 0) break;
 
@@ -229,28 +215,28 @@ export async function downloadAndMergeNewEpisodes(
     });
 
     try {
-      const atHomeRes = await fetch(`https://api.mangadex.org/at-home/server/${ch.id}`, {
-        signal: AbortSignal.timeout(12000),
+      const atHomeData = await httpGetJson(`https://api.mangadex.org/at-home/server/${ch.id}`, {
+        timeoutMs: 12000,
       });
-      if (!atHomeRes.ok) continue;
-
-      const atHomeData = await atHomeRes.json();
       const pageFiles: string[] = atHomeData?.chapter?.dataSaver || atHomeData?.chapter?.data || [];
 
       for (let pIdx = 0; pIdx < pageFiles.length; pIdx++) {
         const file = pageFiles[pIdx];
         const pageUrl = `${atHomeData.baseUrl}/data-saver/${atHomeData.chapter.hash}/${file}`;
 
-        const pageRes = await fetch(pageUrl, { signal: AbortSignal.timeout(15000) });
-        if (pageRes.ok) {
-          const blob = await pageRes.blob();
-          const ext = file.split('.').pop() || 'jpg';
-          const paddedCh = String(Math.floor(chNum)).padStart(4, '0');
-          const paddedPage = String(pIdx + 1).padStart(3, '0');
-          const entryName = `ch_${paddedCh}_p${paddedPage}.${ext}`;
+        try {
+          const blob = await httpGetBlob(pageUrl, { timeoutMs: 15000 });
+          if (blob && blob.size > 500) {
+            const ext = file.split('.').pop() || 'jpg';
+            const paddedCh = String(Math.floor(chNum)).padStart(4, '0');
+            const paddedPage = String(pIdx + 1).padStart(3, '0');
+            const entryName = `ch_${paddedCh}_p${paddedPage}.${ext}`;
 
-          zip.file(entryName, blob);
-          totalAddedPages++;
+            zip.file(entryName, blob);
+            totalAddedPages++;
+          }
+        } catch (pageErr) {
+          console.warn(`[MangaUpdate] Failed page ${pIdx + 1} of ch ${chNum}:`, pageErr);
         }
 
         const chapterProgress = (pIdx + 1) / Math.max(1, pageFiles.length);
@@ -270,7 +256,7 @@ export async function downloadAndMergeNewEpisodes(
 
         // Small delay to avoid rate limiting
         if (pIdx < pageFiles.length - 1) {
-          await new Promise(r => setTimeout(r, 150));
+          await new Promise(r => setTimeout(r, 120));
         }
       }
     } catch (e) {
@@ -393,10 +379,7 @@ export async function downloadAllAvailableEpisodes(
   });
 
   const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=1`;
-  const searchRes = await fetch(searchUrl, { signal: AbortSignal.timeout(12000) });
-  if (!searchRes.ok) throw new Error('No se pudo conectar con MangaDex.');
-
-  const searchData = await searchRes.json();
+  const searchData = await httpGetJson(searchUrl, { timeoutMs: 12000 });
   const manga = searchData?.data?.[0];
   if (!manga) throw new Error(`«${cleanTitle}» no se encontró en MangaDex.`);
 
@@ -411,18 +394,19 @@ export async function downloadAllAvailableEpisodes(
     while (offset < totalToFetch && offset < 10000) {
       const langParams = langs ? langs.map(l => `translatedLanguage[]=${l}`).join('&') : '';
       const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?${langParams}&order[chapter]=asc&limit=100&offset=${offset}`;
-      const feedRes = await fetch(feedUrl, { signal: AbortSignal.timeout(15000) });
-      if (!feedRes.ok) break;
+      try {
+        const feedData = await httpGetJson(feedUrl, { timeoutMs: 15000 });
+        const batch = feedData?.data || [];
+        if (batch.length === 0) break;
 
-      const feedData = await feedRes.json();
-      const batch = feedData?.data || [];
-      if (batch.length === 0) break;
+        const hostedBatch = batch.filter((ch: any) => !ch.attributes.externalUrl && (ch.attributes.pages || 0) > 0);
+        collected.push(...hostedBatch);
 
-      const hostedBatch = batch.filter((ch: any) => !ch.attributes.externalUrl && (ch.attributes.pages || 0) > 0);
-      collected.push(...hostedBatch);
-
-      totalToFetch = feedData?.total || batch.length;
-      offset += batch.length;
+        totalToFetch = feedData?.total || batch.length;
+        offset += batch.length;
+      } catch {
+        break;
+      }
     }
 
     if (collected.length > 0) {

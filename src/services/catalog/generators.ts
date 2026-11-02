@@ -7,6 +7,7 @@ import {
   createMangaTankobonCoverSvg,
   normalizeSearchTitle,
 } from '../coverFetcher';
+import { httpGetJson, httpGetBlob, httpGetText } from '../httpClient';
 
 // ==========================================
 // 1. Classical Book Cover Generator (Offline Fallback)
@@ -237,45 +238,41 @@ export async function fetchMangaDexOnlineData(
     // 2. Query MangaDex for hosted scanlation chapters
     let pages: { name: string; blob: Blob }[] = [];
     try {
-      const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=1`;
-      const searchRes = await fetch(searchUrl, { signal: AbortSignal.timeout(12000) });
-      if (searchRes.ok) {
-        const searchData = await searchRes.json();
-        const manga = searchData?.data?.[0];
+      const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=1&includes[]=cover_art`;
+      const searchData = await httpGetJson(searchUrl, { timeoutMs: 12000 });
+      const manga = searchData?.data?.[0];
 
-        if (manga?.id) {
-          // If coverBlob is not set yet, try MangaDex cover art
-          if (!coverBlob) {
-            const coverRel = manga.relationships?.find((r: any) => r.type === 'cover_art');
-            if (coverRel?.attributes?.fileName) {
-              const cUrl = `https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}.512.jpg`;
-              coverUrl = cUrl;
-              const cBlob = await fetchCoverBlob(cUrl);
-              if (cBlob) coverBlob = cBlob;
-            }
+      if (manga?.id) {
+        // If coverBlob is not set yet, try MangaDex cover art
+        if (!coverBlob) {
+          const coverRel = manga.relationships?.find((r: any) => r.type === 'cover_art');
+          if (coverRel?.attributes?.fileName) {
+            const cUrl = `https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}.1024.jpg`;
+            coverUrl = cUrl;
+            const cBlob = await fetchCoverBlob(cUrl);
+            if (cBlob) coverBlob = cBlob;
           }
+        }
 
-          // Try finding chapters with language priority: es, es-la -> en -> any
-          const langTiers: (string[] | null)[] = [
-            ['es', 'es-la'],
-            ['en'],
-            null, // any language fallback
-          ];
+        // Try finding chapters with language priority: es, es-la -> en -> any
+        const langTiers: (string[] | null)[] = [
+          ['es', 'es-la'],
+          ['en'],
+          null, // any language fallback
+        ];
 
-          let chaptersList: any[] = [];
+        let chaptersList: any[] = [];
 
-          for (const langs of langTiers) {
-            let offset = 0;
-            let totalToFetch = 1;
-            const collected: any[] = [];
+        for (const langs of langTiers) {
+          let offset = 0;
+          let totalToFetch = 1;
+          const collected: any[] = [];
 
-            while (offset < totalToFetch && offset < 10000) {
-              const langParams = langs ? langs.map(l => `translatedLanguage[]=${l}`).join('&') : '';
-              const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?${langParams}&order[chapter]=asc&limit=100&offset=${offset}`;
-              const feedRes = await fetch(feedUrl, { signal: AbortSignal.timeout(15000) });
-              if (!feedRes.ok) break;
-
-              const feedData = await feedRes.json();
+          while (offset < totalToFetch && offset < 10000) {
+            const langParams = langs ? langs.map(l => `translatedLanguage[]=${l}`).join('&') : '';
+            const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?${langParams}&order[chapter]=asc&limit=100&offset=${offset}`;
+            try {
+              const feedData = await httpGetJson(feedUrl, { timeoutMs: 15000 });
               const batch = feedData?.data || [];
               if (batch.length === 0) break;
 
@@ -285,75 +282,77 @@ export async function fetchMangaDexOnlineData(
 
               totalToFetch = feedData?.total || batch.length;
               offset += batch.length;
-            }
-
-            if (collected.length > 0) {
-              chaptersList = collected;
+            } catch {
               break;
             }
           }
 
-          if (chaptersList.length > 0) {
-            // Group and de-duplicate unique chapters by chapter number
-            const uniqueChapters = new Map<number, { id: string; chapter: number; pages: number }>();
-            for (const ch of chaptersList) {
-              const chNum = parseFloat(ch.attributes.chapter);
-              if (!isNaN(chNum)) {
-                const numPages = ch.attributes.pages || 0;
-                if (!uniqueChapters.has(chNum) || numPages > (uniqueChapters.get(chNum)?.pages || 0)) {
-                  uniqueChapters.set(chNum, {
-                    id: ch.id,
-                    chapter: chNum,
-                    pages: numPages,
-                  });
-                }
+          if (collected.length > 0) {
+            chaptersList = collected;
+            break;
+          }
+        }
+
+        if (chaptersList.length > 0) {
+          // Group and de-duplicate unique chapters by chapter number
+          const uniqueChapters = new Map<number, { id: string; chapter: number; pages: number }>();
+          for (const ch of chaptersList) {
+            const chNum = parseFloat(ch.attributes.chapter);
+            if (!isNaN(chNum)) {
+              const numPages = ch.attributes.pages || 0;
+              if (!uniqueChapters.has(chNum) || numPages > (uniqueChapters.get(chNum)?.pages || 0)) {
+                uniqueChapters.set(chNum, {
+                  id: ch.id,
+                  chapter: chNum,
+                  pages: numPages,
+                });
               }
             }
+          }
 
-            const sortedChapters = Array.from(uniqueChapters.values()).sort((a, b) => a.chapter - b.chapter);
-            const totalChapters = sortedChapters.length; // Download ALL available chapters
+          const sortedChapters = Array.from(uniqueChapters.values()).sort((a, b) => a.chapter - b.chapter);
+          const totalChapters = sortedChapters.length; // Download ALL available chapters
 
-            for (let chIdx = 0; chIdx < totalChapters; chIdx++) {
-              const ch = sortedChapters[chIdx];
-              const chNum = ch.chapter;
-              const chapterBasePercent = 30 + Math.round((chIdx / totalChapters) * 65);
+          for (let chIdx = 0; chIdx < totalChapters; chIdx++) {
+            const ch = sortedChapters[chIdx];
+            const chNum = ch.chapter;
+            const chapterBasePercent = 30 + Math.round((chIdx / totalChapters) * 65);
 
-              notifyDownloadProgress(
-                title,
-                `Descargando episodio ${chNum} (${chIdx + 1} de ${totalChapters})...`,
-                chapterBasePercent
-              );
+            notifyDownloadProgress(
+              title,
+              `Descargando episodio ${chNum} (${chIdx + 1} de ${totalChapters})...`,
+              chapterBasePercent
+            );
 
-              try {
-                const atHomeRes = await fetch(`https://api.mangadex.org/at-home/server/${ch.id}`, {
-                  signal: AbortSignal.timeout(12000),
-                });
-                if (atHomeRes.ok) {
-                  const atHomeData = await atHomeRes.json();
-                  const pageFiles: string[] = atHomeData?.chapter?.dataSaver || atHomeData?.chapter?.data || [];
-                  for (let pIdx = 0; pIdx < pageFiles.length; pIdx++) {
-                    const file = pageFiles[pIdx];
-                    const pUrl = `${atHomeData.baseUrl}/data-saver/${atHomeData.chapter.hash}/${file}`;
-                    const pRes = await fetch(pUrl, { signal: AbortSignal.timeout(15000) });
-                    if (pRes.ok) {
-                      const blob = await pRes.blob();
-                      const ext = file.split('.').pop() || 'jpg';
-                      const paddedCh = String(Math.floor(chNum)).padStart(4, '0');
-                      const paddedPage = String(pIdx + 1).padStart(3, '0');
-                      pages.push({
-                        name: `ch_${paddedCh}_p${paddedPage}.${ext}`,
-                        blob,
-                      });
-                    }
-                    // Small delay to avoid rate limiting
-                    if (pIdx < pageFiles.length - 1) {
-                      await new Promise(r => setTimeout(r, 150));
-                    }
+            try {
+              const atHomeData = await httpGetJson(`https://api.mangadex.org/at-home/server/${ch.id}`, {
+                timeoutMs: 12000,
+              });
+              const pageFiles: string[] = atHomeData?.chapter?.dataSaver || atHomeData?.chapter?.data || [];
+              for (let pIdx = 0; pIdx < pageFiles.length; pIdx++) {
+                const file = pageFiles[pIdx];
+                const pUrl = `${atHomeData.baseUrl}/data-saver/${atHomeData.chapter.hash}/${file}`;
+                try {
+                  const blob = await httpGetBlob(pUrl, { timeoutMs: 15000 });
+                  if (blob && blob.size > 500) {
+                    const ext = file.split('.').pop() || 'jpg';
+                    const paddedCh = String(Math.floor(chNum)).padStart(4, '0');
+                    const paddedPage = String(pIdx + 1).padStart(3, '0');
+                    pages.push({
+                      name: `ch_${paddedCh}_p${paddedPage}.${ext}`,
+                      blob,
+                    });
                   }
+                } catch (e) {
+                  console.warn(`[MangaGenerator] Error downloading page:`, e);
                 }
-              } catch (e) {
-                console.warn(`[MangaGenerator] Error downloading chapter ${chNum}:`, e);
+                // Small delay to avoid rate limiting
+                if (pIdx < pageFiles.length - 1) {
+                  await new Promise(r => setTimeout(r, 120));
+                }
               }
+            } catch (e) {
+              console.warn(`[MangaGenerator] Error downloading chapter ${chNum}:`, e);
             }
           }
         }
@@ -481,10 +480,7 @@ async function fetchGutenbergChapters(title: string): Promise<BookChapterData[] 
   try {
     notifyDownloadProgress(title, 'Descargando obra completa desde Project Gutenberg...', 20);
     const url = `https://www.gutenberg.org/cache/epub/${gutenbergId}/pg${gutenbergId}.txt`;
-    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
-    if (!res.ok) return null;
-
-    const rawText = await res.text();
+    const rawText = await httpGetText(url, { timeoutMs: 35000 });
     if (rawText.length < 5000) return null;
 
     notifyDownloadProgress(title, 'Estructurando capítulos de la obra completa...', 60);

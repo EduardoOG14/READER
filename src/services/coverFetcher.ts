@@ -1,5 +1,6 @@
 // Service to fetch real, official, high-definition book and manga covers
 // APIs used: MangaDex (official covers), OpenLibrary (official book covers), Google Books (fallback)
+import { httpGetJson, httpGetBlob } from './httpClient';
 
 const coverCache = new Map<string, string>();
 
@@ -62,20 +63,17 @@ export async function fetchOfficialCoverUrl(
   if (isMangaLike) {
     try {
       const mdUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=5&includes[]=cover_art`;
-      const res = await fetch(mdUrl, { signal: AbortSignal.timeout(12000) });
-      if (res.ok) {
-        const data = await res.json();
-        const mangaList = data?.data || [];
-        for (const manga of mangaList) {
-          const coverRel = manga.relationships?.find((r: any) => r.type === 'cover_art');
-          if (coverRel?.attributes?.fileName) {
-            const coverUrl = `https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}.512.jpg`;
-            coverCache.set(cacheKey, coverUrl);
-            return coverUrl;
-          }
+      const data = await httpGetJson(mdUrl, { timeoutMs: 12000 });
+      const mangaList = data?.data || [];
+      for (const manga of mangaList) {
+        const coverRel = manga.relationships?.find((r: any) => r.type === 'cover_art');
+        if (coverRel?.attributes?.fileName) {
+          const coverUrl = `https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}.1024.jpg`;
+          coverCache.set(cacheKey, coverUrl);
+          return coverUrl;
         }
       }
-    } catch (e) {
+    } catch {
       // Continue to OpenLibrary
     }
   }
@@ -84,19 +82,16 @@ export async function fetchOfficialCoverUrl(
   try {
     const query = author ? `${cleanTitle} ${author}` : cleanTitle;
     const olUrl = `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=5`;
-    const res = await fetch(olUrl, { signal: AbortSignal.timeout(10000) });
-    if (res.ok) {
-      const data = await res.json();
-      const docs = data?.docs || [];
-      for (const doc of docs) {
-        if (doc.cover_i) {
-          const coverUrl = `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`;
-          coverCache.set(cacheKey, coverUrl);
-          return coverUrl;
-        }
+    const data = await httpGetJson(olUrl, { timeoutMs: 12000 });
+    const docs = data?.docs || [];
+    for (const doc of docs) {
+      if (doc.cover_i) {
+        const coverUrl = `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`;
+        coverCache.set(cacheKey, coverUrl);
+        return coverUrl;
       }
     }
-  } catch (e) {
+  } catch {
     // Continue to Google Books
   }
 
@@ -104,20 +99,25 @@ export async function fetchOfficialCoverUrl(
   try {
     const gbQuery = author ? `${cleanTitle} ${author}` : cleanTitle;
     const gbUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(gbQuery)}&maxResults=3`;
-    const res = await fetch(gbUrl, { signal: AbortSignal.timeout(10000) });
-    if (res.ok) {
-      const data = await res.json();
-      const items = data?.items || [];
-      for (const item of items) {
-        const thumbnail = item.volumeInfo?.imageLinks?.thumbnail || item.volumeInfo?.imageLinks?.smallThumbnail;
-        if (thumbnail) {
-          const coverUrl = thumbnail.replace(/^http:\/\//i, 'https://');
-          coverCache.set(cacheKey, coverUrl);
-          return coverUrl;
-        }
+    const data = await httpGetJson(gbUrl, { timeoutMs: 10000 });
+    const items = data?.items || [];
+    for (const item of items) {
+      const thumbnail =
+        item.volumeInfo?.imageLinks?.extraLarge ||
+        item.volumeInfo?.imageLinks?.large ||
+        item.volumeInfo?.imageLinks?.medium ||
+        item.volumeInfo?.imageLinks?.thumbnail ||
+        item.volumeInfo?.imageLinks?.smallThumbnail;
+      if (thumbnail) {
+        const coverUrl = thumbnail
+          .replace(/^http:\/\//i, 'https://')
+          .replace('&edge=curl', '')
+          .replace('zoom=1', 'zoom=2');
+        coverCache.set(cacheKey, coverUrl);
+        return coverUrl;
       }
     }
-  } catch (e) {
+  } catch {
     // Fallback below
   }
 
@@ -125,16 +125,13 @@ export async function fetchOfficialCoverUrl(
   if (!isMangaLike) {
     try {
       const mdUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=3&includes[]=cover_art`;
-      const res = await fetch(mdUrl, { signal: AbortSignal.timeout(10000) });
-      if (res.ok) {
-        const data = await res.json();
-        const manga = data?.data?.[0];
-        const coverRel = manga?.relationships?.find((r: any) => r.type === 'cover_art');
-        if (coverRel?.attributes?.fileName) {
-          const coverUrl = `https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}.512.jpg`;
-          coverCache.set(cacheKey, coverUrl);
-          return coverUrl;
-        }
+      const data = await httpGetJson(mdUrl, { timeoutMs: 10000 });
+      const manga = data?.data?.[0];
+      const coverRel = manga?.relationships?.find((r: any) => r.type === 'cover_art');
+      if (coverRel?.attributes?.fileName) {
+        const coverUrl = `https://uploads.mangadex.org/covers/${manga.id}/${coverRel.attributes.fileName}.1024.jpg`;
+        coverCache.set(cacheKey, coverUrl);
+        return coverUrl;
       }
     } catch {}
   }
@@ -147,9 +144,7 @@ export async function fetchOfficialCoverUrl(
  */
 export async function fetchCoverBlob(url: string): Promise<Blob | null> {
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
-    if (!res.ok) return null;
-    const blob = await res.blob();
+    const blob = await httpGetBlob(url, { timeoutMs: 15000 });
     if (blob.size < 500) return null;
     return blob;
   } catch {

@@ -6,9 +6,9 @@
  */
 export async function createOptimizedThumbnail(
   source: Blob | string,
-  maxWidth = 320,
-  maxHeight = 460,
-  quality = 0.8
+  maxWidth = 900,
+  maxHeight = 1350,
+  quality = 0.9
 ): Promise<string> {
   return new Promise((resolve) => {
     try {

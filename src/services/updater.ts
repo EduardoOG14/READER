@@ -1,10 +1,11 @@
 import { registerPlugin, Capacitor, type PluginListenerHandle } from '@capacitor/core';
+import { httpGetJson } from './httpClient';
 
 /**
  * GitHub Release Update Checker for READER
  */
 
-export const CURRENT_APP_VERSION = '1.3.0';
+export const CURRENT_APP_VERSION = '1.3.1';
 export const DEFAULT_GITHUB_REPO = 'EduardoOG14/READER';
 
 export interface DownloadProgress {
@@ -88,31 +89,24 @@ export async function checkForUpdates(repo: string = DEFAULT_GITHUB_REPO): Promi
   const targetRepo = (repo || DEFAULT_GITHUB_REPO).trim().replace(/^https?:\/\/github\.com\//i, '');
   const url = `https://api.github.com/repos/${targetRepo}/releases/latest`;
 
-  let response: Response;
+  let release: any;
   try {
-    response = await fetch(url, {
+    release = await httpGetJson(url, {
       headers: {
         Accept: 'application/vnd.github.v3+json',
       },
-      cache: 'no-store',
+      timeoutMs: 12000,
     });
-  } catch {
+  } catch (err: any) {
+    if (err.message?.includes('404')) {
+      throw new Error(`Aún no hay ningún release publicado en el repositorio ${targetRepo}.`);
+    }
+    if (err.message?.includes('403')) {
+      throw new Error('Límite de solicitudes de la API de GitHub alcanzado. Intenta de nuevo en unos minutos.');
+    }
     throw new Error('No se pudo conectar a GitHub. Verifica tu conexión a internet.');
   }
 
-  if (response.status === 404) {
-    throw new Error(`Aún no hay ningún release publicado en el repositorio ${targetRepo}.`);
-  }
-
-  if (response.status === 403) {
-    throw new Error('Límite de solicitudes de la API de GitHub alcanzado. Intenta de nuevo en unos minutos.');
-  }
-
-  if (!response.ok) {
-    throw new Error(`Error de GitHub (${response.status}): ${response.statusText}`);
-  }
-
-  const release = await response.json();
   const rawTag = release.tag_name || '';
   const latestVersion = rawTag.replace(/^v/i, '').trim();
   const hasUpdate = compareSemver(latestVersion, CURRENT_APP_VERSION) > 0;

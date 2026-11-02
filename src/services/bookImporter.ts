@@ -88,9 +88,9 @@ export async function importBookFile(
   // Fallback cover if none could be extracted
   if (!coverUrl) {
     coverUrl = createMinimalistTextCover(title, format.toUpperCase());
-  } else if (!coverUrl.startsWith('data:image/svg+xml')) {
+  } else if (!coverUrl.startsWith('data:image/svg+xml') && !coverUrl.startsWith('http://') && !coverUrl.startsWith('https://')) {
     try {
-      const optimized = await createOptimizedThumbnail(coverUrl, 320, 460, 0.8);
+      const optimized = await createOptimizedThumbnail(coverUrl, 900, 1350, 0.9);
       if (optimized) {
         coverUrl = optimized;
       }
