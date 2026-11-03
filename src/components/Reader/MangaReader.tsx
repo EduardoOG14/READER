@@ -73,10 +73,10 @@ const WebtoonPage: React.FC<WebtoonPageProps> = React.memo(
       <div
         ref={pageRef}
         data-page={pageNum}
-        className="w-full min-h-[300px] flex items-center justify-center bg-slate-900/10"
+        className="w-full flex items-center justify-center bg-transparent"
         style={{
-          contentVisibility: 'auto',
-          containIntrinsicSize: '0 800px',
+          minHeight: '200px',
+          contain: 'paint layout',
         }}
       >
         {url ? (
@@ -84,6 +84,7 @@ const WebtoonPage: React.FC<WebtoonPageProps> = React.memo(
             src={url}
             alt={`Página ${pageNum}`}
             decoding="async"
+            loading="lazy"
             className="w-full h-auto block select-none pointer-events-none"
             style={{
               transform: 'translateZ(0)',
@@ -91,7 +92,7 @@ const WebtoonPage: React.FC<WebtoonPageProps> = React.memo(
             }}
           />
         ) : (
-          <div className="h-64 flex items-center justify-center text-slate-400 text-xs">
+          <div className="h-64 flex items-center justify-center text-slate-400 dark:text-zinc-500 text-xs">
             Cargando página {pageNum}...
           </div>
         )}

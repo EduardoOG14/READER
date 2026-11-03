@@ -18,12 +18,14 @@ import {
   Clock,
   Sparkles,
   Info,
+  Download,
 } from 'lucide-react';
 import type { Book } from '../types';
 import { useApp } from '../context/AppContext';
 import { createOptimizedThumbnail } from '../utils/thumbnail';
 import { useBackHandler } from '../services/backButton';
 import { fetchOfficialCoverUrl } from '../services/coverFetcher';
+import { EpisodeSelectorModal } from './EpisodeSelectorModal';
 import {
   checkForNewEpisodes,
   downloadAndMergeNewEpisodes,
@@ -62,6 +64,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
 
   const [isCheckingEpisodes, setIsCheckingEpisodes] = useState(false);
   const [isDownloadingEpisodes, setIsDownloadingEpisodes] = useState(false);
+  const [isEpisodeSelectorOpen, setIsEpisodeSelectorOpen] = useState(false);
   const [updateResult, setUpdateResult] = useState<MangaUpdateCheckResult | null>(null);
   const [updateProgress, setUpdateProgress] = useState<UpdateDownloadProgress | null>(null);
 
@@ -334,6 +337,8 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
 
         {/* Modal Top Bar */}
         <div className="px-4 py-3 sm:px-5 sm:py-3.5 border-b border-rose-100 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-[#fff5f8]/80 dark:bg-zinc-900/80">
+          {/* Mobile drag handle */}
+          <div className="sm:hidden w-12 h-1 bg-rose-200 dark:bg-zinc-700 rounded-full mx-auto absolute top-2 left-1/2 -translate-x-1/2" />
           <div className="flex items-center gap-2 min-w-0">
             <span
               className={`text-[9.5px] font-black px-2.5 py-0.5 rounded-md uppercase tracking-wider shadow-2xs ${getFormatBadge(
@@ -506,24 +511,35 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                     </div>
                   </div>
 
-                  {/* 2 Main Action Buttons: Buscar Nuevos & Descargar TODO */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                  {/* 3 Action Buttons: Elegir Episodios, Buscar Nuevos & Descargar TODO */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setIsEpisodeSelectorOpen(true)}
+                      disabled={isCheckingEpisodes || isDownloadingEpisodes}
+                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
+                      title="Elegir y descargar episodios específicos"
+                    >
+                      <Download className="w-4 h-4" />
+                      <span>Elegir episodios</span>
+                    </button>
+
                     <button
                       type="button"
                       onClick={handleCheckForNewEpisodes}
                       disabled={isCheckingEpisodes || isDownloadingEpisodes}
-                      className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
+                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
                       title="Comprobar si hay nuevos episodios disponibles"
                     >
                       <RefreshCw className={`w-4 h-4 ${isCheckingEpisodes ? 'animate-spin' : ''}`} />
-                      <span>{isCheckingEpisodes ? 'Buscando...' : 'Buscar nuevos episodios'}</span>
+                      <span>{isCheckingEpisodes ? 'Buscando...' : 'Buscar nuevos'}</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={handleDownloadAllSeries}
                       disabled={isCheckingEpisodes || isDownloadingEpisodes}
-                      className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
+                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 dark:bg-zinc-700 dark:hover:bg-zinc-600 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition-all active:scale-95 cursor-pointer"
                       title="Descargar todos los episodios disponibles de la serie completa"
                     >
                       <DownloadCloud className="w-4 h-4" />
@@ -846,7 +862,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
         </div>
 
         {/* Modal Ergonomic Footer */}
-        <div className="p-3.5 sm:p-4 border-t border-rose-100 dark:border-zinc-800 flex items-center justify-between shrink-0 gap-2 bg-[#fff5f8]/80 dark:bg-zinc-900/80">
+        <div className="p-3.5 sm:p-4 border-t border-rose-100 dark:border-zinc-800 flex items-center justify-between shrink-0 gap-2 bg-[#fff5f8]/80 dark:bg-zinc-900/80 pb-[max(env(safe-area-inset-bottom,14px),14px)]">
           <button
             type="button"
             onClick={handleDelete}
@@ -860,15 +876,44 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
           <div className="flex items-center gap-2">
             <button
               type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-xl bg-rose-100/70 hover:bg-rose-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-[#881337] dark:text-zinc-200 text-xs font-bold transition-colors cursor-pointer"
+            >
+              Cerrar
+            </button>
+            <button
+              type="button"
               onClick={handleSaveDetails}
               className="flex items-center gap-1.5 bg-rose-500 hover:bg-rose-600 dark:bg-zinc-200 dark:hover:bg-white text-white dark:text-zinc-950 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
             >
               <Save className="w-4 h-4 stroke-[2.2]" />
-              <span>Guardar Cambios</span>
+              <span>Guardar</span>
             </button>
           </div>
         </div>
       </div>
+
+      {/* Episode Selector Submodal */}
+      {isEpisodeSelectorOpen && (
+        <EpisodeSelectorModal
+          item={{
+            id: book.id,
+            title: book.title,
+            author: book.author || '',
+            genre: 'Manga / Cómic',
+            badgeText: 'MANGA',
+            format: (book.format as any) || 'cbz',
+            category: (book.categoryIds?.includes('cat-comics') ? 'comics' : book.categoryIds?.includes('cat-manhwa') ? 'manhwa' : 'manga') as any,
+            totalPages: book.totalPages,
+            description: book.description || '',
+            coverGradient: { from: '#f43f5e', to: '#be123c', accent: '#f43f5e' },
+            coverUrl: coverUrl || book.coverUrl,
+          }}
+          isOpen={isEpisodeSelectorOpen}
+          onClose={() => setIsEpisodeSelectorOpen(false)}
+          onEnqueued={(t, count) => showNotice(`«${t}» (${count} eps) añadido al Centro de Descargas.`)}
+        />
+      )}
     </div>
   );
 };

@@ -9,6 +9,7 @@ import {
 } from '../coverFetcher';
 import { httpGetJson, httpGetBlob, httpGetText } from '../httpClient';
 import { createOptimizedThumbnail } from '../../utils/thumbnail';
+import { findBestMangaDexManga } from '../mangaSearchService';
 
 // ==========================================
 // 1. Classical Book Cover Generator (Offline Fallback)
@@ -236,14 +237,13 @@ export async function fetchMangaDexOnlineData(
 
     notifyDownloadProgress(title, 'Consultando episodios disponibles...', 25);
 
-    // 2. Query MangaDex for hosted scanlation chapters
+    // 2. Query MangaDex for hosted scanlation chapters (strictly ES or EN, never unknown languages)
     let pages: { name: string; blob: Blob }[] = [];
     try {
-      const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=1&order[relevance]=desc&includes[]=cover_art`;
-      const searchData = await httpGetJson(searchUrl, { timeoutMs: 12000 });
-      const manga = searchData?.data?.[0];
+      const match = await findBestMangaDexManga(cleanTitle, { maxChaptersToFetch: 20 });
 
-      if (manga?.id) {
+      if (match?.manga?.id) {
+        const manga = match.manga;
         // If coverBlob is not set yet, try MangaDex cover art
         if (!coverBlob) {
           const coverRel = manga.relationships?.find((r: any) => r.type === 'cover_art');
@@ -262,65 +262,7 @@ export async function fetchMangaDexOnlineData(
           }
         }
 
-        // Try finding chapters with language priority: es, es-la -> en -> any
-        const langTiers: (string[] | null)[] = [
-          ['es', 'es-la'],
-          ['en'],
-          null, // any language fallback
-        ];
-
-        let chaptersList: any[] = [];
-        let fallbackTierList: any[] = [];
-
-        for (const langs of langTiers) {
-          let offset = 0;
-          let totalToFetch = 1;
-          const collected: any[] = [];
-
-          while (offset < totalToFetch && offset < 500) {
-            const langParams = langs ? langs.map(l => `translatedLanguage[]=${l}`).join('&') : '';
-            const queryParams = [langParams, 'order[chapter]=asc', 'limit=100', `offset=${offset}`].filter(Boolean).join('&');
-            const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?${queryParams}`;
-            try {
-              const feedData = await httpGetJson(feedUrl, { timeoutMs: 15000 });
-              const batch = feedData?.data || [];
-              if (batch.length === 0) break;
-
-              // Only take chapters with hosted pages (not external links)
-              const hostedBatch = batch.filter((ch: any) => !ch.attributes.externalUrl && (ch.attributes.pages || 0) > 0);
-              collected.push(...hostedBatch);
-
-              totalToFetch = feedData?.total || batch.length;
-              offset += batch.length;
-
-              // If we already collected early chapters (<= 5) and have at least 15 chapters, stop paginating this tier
-              if (collected.some((c: any) => parseFloat(c.attributes.chapter) <= 5) && collected.length >= 20) {
-                break;
-              }
-            } catch {
-              break;
-            }
-          }
-
-          if (collected.length > 0) {
-            // Check if this tier contains early story chapters (<= 5)
-            const hasEarlyChapters = collected.some((c: any) => {
-              const num = parseFloat(c.attributes.chapter);
-              return !isNaN(num) && num <= 5;
-            });
-
-            if (hasEarlyChapters) {
-              chaptersList = collected;
-              break;
-            } else if (collected.length > fallbackTierList.length) {
-              fallbackTierList = collected;
-            }
-          }
-        }
-
-        if (chaptersList.length === 0 && fallbackTierList.length > 0) {
-          chaptersList = fallbackTierList;
-        }
+        const chaptersList = match.chapters || [];
 
         if (chaptersList.length > 0) {
           // Group and de-duplicate unique chapters by chapter number

@@ -4,15 +4,18 @@ import {
   Search,
   BookOpen,
   CheckCircle2,
-  BookmarkCheck,
   Play,
   Filter,
   Loader2,
+  Download,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useBackHandler } from '../services/backButton';
 import { SPANISH_CATALOG, type CatalogItem } from '../services/catalogData';
 import { downloadQueue, type QueueState } from '../services/downloadQueue';
+import { CatalogCoverImage } from './CatalogCoverImage';
+import { EpisodeSelectorModal } from './EpisodeSelectorModal';
+import { DownloadCenterModal } from './DownloadCenterModal';
 import type { Book } from '../types';
 
 interface ExploreModalProps {
@@ -20,7 +23,7 @@ interface ExploreModalProps {
   onClose: () => void;
 }
 
-type CategoryFilter = 'todos' | 'libros' | 'manga' | 'manhwa' | 'comics';
+type CategoryFilter = 'todos' | 'libros' | 'manga' | 'manhwa';
 
 export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) => {
   const { books, openReader, refreshLibrary } = useApp();
@@ -31,6 +34,8 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [queueState, setQueueState] = useState<QueueState>(downloadQueue.getState());
+  const [isDownloadCenterOpen, setIsDownloadCenterOpen] = useState(false);
+  const [selectedMangaForEpisodes, setSelectedMangaForEpisodes] = useState<CatalogItem | null>(null);
 
   useEffect(() => {
     downloadQueue.setRefreshHandler(refreshLibrary);
@@ -76,7 +81,6 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
       libros: SPANISH_CATALOG.filter(i => i.category === 'libros').length,
       manga: SPANISH_CATALOG.filter(i => i.category === 'manga').length,
       manhwa: SPANISH_CATALOG.filter(i => i.category === 'manhwa').length,
-      comics: SPANISH_CATALOG.filter(i => i.category === 'comics').length,
     };
   }, []);
 
@@ -112,10 +116,10 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
     setDisplayLimit(PAGE_SIZE);
   };
 
-  // Handle "Marcar cómo propio" action via async download queue
-  const handleMarkAsOwned = (item: CatalogItem) => {
+  // Handle direct download for books
+  const handleDownloadBook = (item: CatalogItem) => {
     downloadQueue.enqueue(item);
-    showToast(`«${item.title}» se ha añadido a la cola de descargas.`);
+    showToast(`«${item.title}» añadido al Centro de Descargas.`);
   };
 
   // Handle "Leer ahora" for already owned book
@@ -127,7 +131,7 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
@@ -135,7 +139,9 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
       />
 
       {/* Main Catalog Dialog */}
-      <div className="relative w-full max-w-4xl bg-white dark:bg-[#18191c] border border-rose-200 dark:border-zinc-700/80 rounded-3xl shadow-2xl p-4 sm:p-6 z-10 animate-in zoom-in-95 duration-200 text-[#4c0519] dark:text-[#f3f4f6] flex flex-col max-h-[92vh]">
+      <div className="relative w-full max-w-4xl bg-white dark:bg-[#18191c] border-t sm:border border-rose-200 dark:border-zinc-700/80 rounded-t-3xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 z-10 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200 text-[#4c0519] dark:text-[#f3f4f6] flex flex-col max-h-[92vh] pb-[max(env(safe-area-inset-bottom,16px),16px)]">
+        {/* Native Pull / Drag Indicator on mobile */}
+        <div className="sm:hidden w-12 h-1 bg-rose-200 dark:bg-zinc-700 rounded-full mx-auto mb-2 shrink-0" />
         
         {/* Floating Toast notification */}
         {toastMessage && (
@@ -166,13 +172,28 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="p-2 rounded-full hover:bg-rose-100 dark:hover:bg-zinc-800 text-rose-400 dark:text-zinc-400 transition-colors cursor-pointer"
-            title="Cerrar"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsDownloadCenterOpen(true)}
+              className="relative py-1.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-rose-700 dark:text-zinc-200 border border-rose-200/80 dark:border-zinc-700 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
+              title="Abrir Centro de Descargas"
+            >
+              <Download className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+              <span className="hidden sm:inline">Centro de Descargas</span>
+              {(queueState.totalCount > 0 || queueState.activeItem) && (
+                <span className="w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center shrink-0">
+                  {queueState.pendingItems.length + (queueState.activeItem ? 1 : 0)}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-full hover:bg-rose-100 dark:hover:bg-zinc-800 text-rose-400 dark:text-zinc-400 transition-colors cursor-pointer"
+              title="Cerrar"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Filters and Instant Local Search Bar */}
@@ -242,16 +263,6 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
             >
               Manhwas y Webtoons ({categoryCounts.manhwa})
             </button>
-            <button
-              onClick={() => handleCategoryChange('comics')}
-              className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
-                activeCategory === 'comics'
-                  ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
-                  : 'bg-rose-50 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 hover:bg-rose-100 dark:hover:bg-zinc-700'
-              }`}
-            >
-              Cómics ({categoryCounts.comics})
-            </button>
           </div>
         </div>
 
@@ -276,58 +287,60 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
                   return (
                     <div
                       key={item.id}
-                      className="p-3 sm:p-3.5 rounded-2xl bg-rose-50/40 dark:bg-zinc-900/60 border border-rose-200/70 dark:border-zinc-800 hover:border-rose-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between gap-3 shadow-xs"
+                      className="p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-zinc-900/80 border border-rose-200/80 dark:border-zinc-800 hover:border-rose-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between gap-2.5 shadow-xs"
                     >
-                      {/* Header info */}
-                      <div className="space-y-2">
-                        {/* Gradient preview badge */}
-                        <div
-                          className="h-24 sm:h-28 rounded-xl p-3 flex flex-col justify-between text-white shadow-xs relative overflow-hidden"
-                          style={{
-                            background: `linear-gradient(135deg, ${item.coverGradient.from}, ${item.coverGradient.to})`,
-                          }}
-                        >
-                          <div className="flex items-center justify-between text-[10px] font-bold tracking-wider uppercase">
-                            <span className="px-2 py-0.5 rounded-full bg-black/35 backdrop-blur-xs">
-                              {item.format.toUpperCase()}
-                            </span>
-                            <span
-                              className="px-2 py-0.5 rounded-full"
-                              style={{ backgroundColor: `${item.coverGradient.accent}40` }}
-                            >
-                              {item.badgeText}
-                            </span>
-                          </div>
+                      {/* Top Section: Lateral Official Cover + Metadata */}
+                      <div className="flex gap-3 items-start">
+                        {/* Real Official Cover (Left) */}
+                        <div className="relative w-20 sm:w-24 aspect-[3/4.2] rounded-xl overflow-hidden shrink-0 shadow-md border border-rose-200/60 dark:border-zinc-700/60 bg-slate-900/10">
+                          <CatalogCoverImage item={item} ownedCoverUrl={ownedBook?.coverUrl} />
+                          {/* Format badge overlay */}
+                          <span className="absolute top-1.5 left-1.5 z-10 px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-black/60 text-white backdrop-blur-xs">
+                            {item.format.toUpperCase()}
+                          </span>
+                        </div>
 
-                          <div className="z-10">
-                            <h4 className="font-extrabold text-sm sm:text-base leading-tight drop-shadow-sm line-clamp-2">
+                        {/* Right Column: Badges, Title, Author, Genre */}
+                        <div className="flex-1 min-w-0 flex flex-col justify-between self-stretch">
+                          <div>
+                            <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                              <span
+                                className="px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase text-white shadow-2xs"
+                                style={{ backgroundColor: item.coverGradient.accent }}
+                              >
+                                {item.badgeText}
+                              </span>
+                              {item.year && (
+                                <span className="text-[10px] font-mono text-slate-500 dark:text-zinc-400">
+                                  {item.year}
+                                </span>
+                              )}
+                            </div>
+
+                            <h4
+                              className="font-extrabold text-sm sm:text-base leading-snug line-clamp-2 text-[#4c0519] dark:text-[#f3f4f6]"
+                              title={item.title}
+                            >
                               {item.title}
                             </h4>
-                            <p className="text-[11px] opacity-90 truncate drop-shadow-xs">
-                              {item.author} {item.year ? `(${item.year})` : ''}
+                            <p className="text-xs text-slate-700 dark:text-zinc-300 font-medium truncate mt-0.5">
+                              {item.author}
                             </p>
                           </div>
 
-                          {/* Subtle decorative circle */}
-                          <div
-                            className="absolute -right-4 -bottom-4 w-20 h-20 rounded-full opacity-20 pointer-events-none"
-                            style={{ backgroundColor: item.coverGradient.accent }}
-                          />
+                          <div className="pt-1 flex items-center justify-between text-[11px] text-slate-600 dark:text-zinc-400 font-mono">
+                            <span className="font-sans font-semibold text-rose-700 dark:text-rose-400 truncate max-w-[130px]">
+                              {item.genre}
+                            </span>
+                            <span className="shrink-0">{item.totalPages} págs</span>
+                          </div>
                         </div>
-
-                        {/* Genre & Meta */}
-                        <div className="flex items-center justify-between text-[11px] text-slate-700 dark:text-zinc-300 font-mono">
-                          <span className="font-sans font-semibold text-rose-700 dark:text-zinc-200 truncate max-w-[160px]">
-                            {item.genre}
-                          </span>
-                          <span>{item.totalPages} págs. aprox</span>
-                        </div>
-
-                        {/* Synopsis */}
-                        <p className="text-xs text-slate-800 dark:text-zinc-200 line-clamp-3 leading-relaxed">
-                          {item.description}
-                        </p>
                       </div>
+
+                      {/* Synopsis */}
+                      <p className="text-xs text-slate-700 dark:text-zinc-300 line-clamp-2 leading-relaxed">
+                        {item.description}
+                      </p>
 
                       {/* Action buttons */}
                       <div className="pt-2 border-t border-rose-100 dark:border-zinc-800">
@@ -335,8 +348,19 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
                           <div className="flex items-center gap-2">
                             <div className="flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] border border-emerald-500/30">
                               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                              <span>En tu biblioteca</span>
+                              <span className="truncate">En biblioteca</span>
                             </div>
+
+                            {item.category !== 'libros' && (
+                              <button
+                                onClick={() => setSelectedMangaForEpisodes(item)}
+                                className="py-2 px-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-rose-700 dark:text-zinc-200 font-bold text-xs flex items-center gap-1 border border-rose-200/80 dark:border-zinc-700 transition-colors cursor-pointer shrink-0"
+                                title="Descargar más episodios"
+                              >
+                                <Download className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                                <span>Episodios</span>
+                              </button>
+                            )}
 
                             <button
                               onClick={() => handleReadOwnedBook(ownedBook)}
@@ -349,7 +373,13 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
                           </div>
                         ) : (
                           <button
-                            onClick={() => handleMarkAsOwned(item)}
+                            onClick={() => {
+                              if (item.category === 'libros') {
+                                handleDownloadBook(item);
+                              } else {
+                                setSelectedMangaForEpisodes(item);
+                              }
+                            }}
                             disabled={isQueued}
                             className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 dark:from-zinc-200 dark:to-zinc-300 dark:hover:from-white dark:hover:to-zinc-200 text-white dark:text-zinc-950 font-bold text-xs shadow-xs active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                           >
@@ -361,12 +391,17 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
                             ) : isItemPending ? (
                               <>
                                 <Loader2 className="w-4 h-4 animate-spin opacity-60 text-white dark:text-zinc-900" />
-                                <span>En cola de descarga...</span>
+                                <span>En cola de descargas...</span>
+                              </>
+                            ) : item.category === 'libros' ? (
+                              <>
+                                <Download className="w-4 h-4 stroke-[2.2]" />
+                                <span>Descargar libro</span>
                               </>
                             ) : (
                               <>
-                                <BookmarkCheck className="w-4 h-4 stroke-[2.2]" />
-                                <span>Marca cómo propio</span>
+                                <Download className="w-4 h-4 stroke-[2.2]" />
+                                <span>Descargar episodios</span>
                               </>
                             )}
                           </button>
@@ -400,14 +435,18 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
 
         {/* Floating Download Queue Progress Bar */}
         {queueState.totalCount > 0 && (
-          <div className="mx-1 mb-2 p-3 rounded-2xl bg-slate-900/95 dark:bg-zinc-800 text-white border border-rose-400/40 shadow-xl flex items-center justify-between gap-3 text-xs shrink-0 animate-in fade-in slide-in-from-bottom-2">
+          <div
+            onClick={() => setIsDownloadCenterOpen(true)}
+            className="mx-1 mb-2 p-3 rounded-2xl bg-slate-900/95 dark:bg-zinc-800 text-white border border-rose-400/40 shadow-xl flex items-center justify-between gap-3 text-xs shrink-0 animate-in fade-in slide-in-from-bottom-2 cursor-pointer hover:border-rose-400 transition-all"
+            title="Abrir Centro de Descargas"
+          >
             <div className="flex items-center gap-2.5 min-w-0">
-              <Loader2 className="w-4 h-4 animate-spin text-rose-400 shrink-0" />
+              <Loader2 className={`w-4 h-4 text-rose-400 shrink-0 ${queueState.isProcessing ? 'animate-spin' : ''}`} />
               <div className="min-w-0">
                 <p className="font-bold truncate">
                   {queueState.isProcessing
-                    ? (queueState.activeItem?.progressMessage || `Guardando: ${queueState.activeItem?.item.title || 'obra'}...`)
-                    : 'Descargas finalizadas con éxito'}
+                    ? (queueState.activeItem?.progressMessage || `Descargando: ${queueState.activeItem?.item.title || 'obra'}...`)
+                    : 'Descargas finalizadas con éxito (Toca para abrir)'}
                 </p>
                 <p className="text-[10px] text-slate-300">
                   {queueState.completedCount} de {queueState.totalCount} obras descargadas en la biblioteca
@@ -426,18 +465,42 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
         )}
 
         {/* Footer */}
-        <div className="pt-3 border-t border-rose-100 dark:border-zinc-800 flex items-center justify-between text-xs text-[#881337]/90 dark:text-zinc-300 shrink-0 font-medium">
-          <span>
-            Mostrando {Math.min(visibleItems.length, filteredCatalog.length)} de {filteredCatalog.length} {filteredCatalog.length === 1 ? 'obra' : 'obras'} en español
-          </span>
+        <div className="pt-3 border-t border-rose-100 dark:border-zinc-800 flex items-center justify-between text-xs text-[#881337]/90 dark:text-zinc-300 shrink-0 font-medium gap-2">
+          <button
+            onClick={() => setIsDownloadCenterOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-zinc-800 text-rose-700 dark:text-zinc-200 font-bold transition-all cursor-pointer"
+          >
+            <Download className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+            <span className="hidden sm:inline">Centro de Descargas</span>
+            <span className="sm:hidden">Descargas</span>
+            {(queueState.totalCount > 0 || queueState.activeItem) && (
+              <span className="w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center">
+                {queueState.pendingItems.length + (queueState.activeItem ? 1 : 0)}
+              </span>
+            )}
+          </button>
+
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-rose-100/70 hover:bg-rose-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-[#881337] dark:text-zinc-200 font-bold transition-colors cursor-pointer"
+            className="px-5 py-2 rounded-xl bg-rose-500 hover:bg-rose-600 dark:bg-zinc-200 dark:hover:bg-white text-white dark:text-zinc-950 font-bold transition-colors cursor-pointer shadow-xs active:scale-95"
           >
             Cerrar
           </button>
         </div>
       </div>
+
+      {/* Sub-modals */}
+      <EpisodeSelectorModal
+        item={selectedMangaForEpisodes}
+        isOpen={!!selectedMangaForEpisodes}
+        onClose={() => setSelectedMangaForEpisodes(null)}
+        onEnqueued={(title, count) => showToast(`«${title}» (${count} eps) añadido al Centro de Descargas.`)}
+      />
+
+      <DownloadCenterModal
+        isOpen={isDownloadCenterOpen}
+        onClose={() => setIsDownloadCenterOpen(false)}
+      />
     </div>
   );
 };

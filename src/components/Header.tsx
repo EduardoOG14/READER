@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Search,
   Moon,
@@ -10,17 +10,25 @@ import {
   SlidersHorizontal,
   BookOpen,
   Check,
+  Download,
 } from 'lucide-react';
 import { useApp, type SortOption } from '../context/AppContext';
 import { useBackHandler } from '../services/backButton';
+import { downloadQueue, type QueueState } from '../services/downloadQueue';
 
 interface HeaderProps {
   onOpenImport: () => void;
   onOpenSettings: () => void;
   onOpenExplore: () => void;
+  onOpenDownloadCenter?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenImport, onOpenSettings, onOpenExplore }) => {
+export const Header: React.FC<HeaderProps> = ({ onOpenImport, onOpenSettings, onOpenExplore, onOpenDownloadCenter }) => {
+  const [queueState, setQueueState] = useState<QueueState>(downloadQueue.getState());
+
+  useEffect(() => {
+    return downloadQueue.subscribe(state => setQueueState(state));
+  }, []);
   const {
     searchQuery,
     setSearchQuery,
@@ -116,19 +124,35 @@ export const Header: React.FC<HeaderProps> = ({ onOpenImport, onOpenSettings, on
 
         {/* Action Controls Bar */}
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-          {/* 1. Instant Search Trigger */}
+          {/* Download Center Trigger (Desktop) */}
+          {onOpenDownloadCenter && (
+            <button
+              onClick={onOpenDownloadCenter}
+              className="hidden sm:flex relative p-2 sm:p-2.5 rounded-2xl text-[#881337] dark:text-zinc-300 hover:bg-rose-100/70 dark:hover:bg-zinc-800 active:scale-95 transition-all cursor-pointer"
+              title="Centro de Descargas"
+            >
+              <Download className="w-5 h-5 stroke-[2]" />
+              {(queueState.isProcessing || queueState.pendingItems.length > 0) ? (
+                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-white dark:ring-zinc-900 animate-pulse" />
+              ) : queueState.completedCount > 0 ? (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-zinc-900" />
+              ) : null}
+            </button>
+          )}
+
+          {/* 1. Instant Search Trigger (Desktop) */}
           {!showSearch && (
             <button
               onClick={() => setShowSearch(true)}
-              className="p-2 sm:p-2.5 rounded-2xl text-[#881337] dark:text-zinc-300 hover:bg-rose-100/70 dark:hover:bg-zinc-800 active:scale-95 transition-all cursor-pointer"
+              className="hidden sm:flex p-2 sm:p-2.5 rounded-2xl text-[#881337] dark:text-zinc-300 hover:bg-rose-100/70 dark:hover:bg-zinc-800 active:scale-95 transition-all cursor-pointer"
               title="Buscar obras"
             >
               <Search className="w-5 h-5 stroke-[2]" />
             </button>
           )}
 
-          {/* 2. Visual View & Sort Options (Ergonomic Sheet on mobile, Popover on desktop) */}
-          <div className="relative">
+          {/* 2. Visual View & Sort Options (Desktop) */}
+          <div className="hidden sm:block relative">
             <button
               onClick={() => setShowViewOptions(prev => !prev)}
               className={`p-2 sm:p-2.5 rounded-2xl transition-all active:scale-95 cursor-pointer ${

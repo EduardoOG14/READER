@@ -4,7 +4,7 @@ export interface CatalogItem {
   id: string;
   title: string;
   author: string;
-  category: 'libros' | 'manga' | 'manhwa' | 'comics';
+  category: 'libros' | 'manga' | 'manhwa';
   format: BookFormat;
   genre: string;
   totalPages: number;
@@ -12,7 +12,8 @@ export interface CatalogItem {
   description: string;
   coverGradient: { from: string; to: string; accent: string };
   badgeText: string;
-  createFile: (onProgress?: (msg: string, percent: number) => void) => Promise<File>;
+  coverUrl?: string;
+  createFile?: (onProgress?: (msg: string, percent: number) => void) => Promise<File>;
 }
 
 export interface ComicPanelData {

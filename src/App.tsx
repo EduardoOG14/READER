@@ -11,6 +11,9 @@ import { CategoryManagerModal } from './components/CategoryManagerModal';
 import { BookDetailModal } from './components/BookDetailModal';
 import { SettingsModal } from './components/SettingsModal';
 import { ExploreModal } from './components/ExploreModal';
+import { DownloadCenterModal } from './components/DownloadCenterModal';
+import { BottomQuickMenuModal } from './components/BottomQuickMenuModal';
+import { BottomSearchSheet } from './components/BottomSearchSheet';
 import { MobileDock } from './components/MobileDock';
 import { ReaderContainer } from './components/Reader/ReaderContainer';
 import { ReaderErrorBoundary } from './components/ReaderErrorBoundary';
@@ -27,6 +30,9 @@ const LibraryView: React.FC = () => {
   const [isCatManagerOpen, setIsCatManagerOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isExploreOpen, setIsExploreOpen] = useState(false);
+  const [isDownloadCenterOpen, setIsDownloadCenterOpen] = useState(false);
+  const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
+  const [isSearchSheetOpen, setIsSearchSheetOpen] = useState(false);
   const [selectedBookForDetails, setSelectedBookForDetails] = useState<Book | null>(null);
   const [showExitToast, setShowExitToast] = useState(false);
   const [groupBySeries, setGroupBySeries] = useState(false);
@@ -124,6 +130,14 @@ const LibraryView: React.FC = () => {
     return false;
   }, 110, isExploreOpen);
 
+  useBackHandler(() => {
+    if (isDownloadCenterOpen) {
+      setIsDownloadCenterOpen(false);
+      return true;
+    }
+    return false;
+  }, 110, isDownloadCenterOpen);
+
   const completedCount = books.filter(b => b.progress >= 100 || b.currentPage >= b.totalPages).length;
   const activeCategory = categories.find(c => c.id === selectedCategoryId);
 
@@ -141,6 +155,7 @@ const LibraryView: React.FC = () => {
         onOpenImport={() => setIsImportOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenExplore={() => setIsExploreOpen(true)}
+        onOpenDownloadCenter={() => setIsDownloadCenterOpen(true)}
       />
 
       {/* Responsive Category Navigation Bar */}
@@ -319,17 +334,39 @@ const LibraryView: React.FC = () => {
       {/* Floating Bottom Dock for Mobile */}
       {!activeBook && (
         <MobileDock
-          onOpenImport={() => setIsImportOpen(true)}
-          onOpenCategoryManager={() => setIsCatManagerOpen(true)}
-          onOpenSettings={() => setIsSettingsOpen(true)}
+          onOpenQuickMenu={() => setIsQuickMenuOpen(true)}
+          onOpenSearch={() => setIsSearchSheetOpen(true)}
           onOpenExplore={() => setIsExploreOpen(true)}
+          onOpenDownloadCenter={() => setIsDownloadCenterOpen(true)}
         />
       )}
 
-      {/* Modals */}
+      {/* Modals & Ergonomic Bottom Sheets */}
+      <BottomQuickMenuModal
+        isOpen={isQuickMenuOpen}
+        onClose={() => setIsQuickMenuOpen(false)}
+        onOpenImport={() => setIsImportOpen(true)}
+        onOpenExplore={() => setIsExploreOpen(true)}
+        onOpenDownloadCenter={() => setIsDownloadCenterOpen(true)}
+        onOpenCategoryManager={() => setIsCatManagerOpen(true)}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+      />
+
+      <BottomSearchSheet
+        isOpen={isSearchSheetOpen}
+        onClose={() => setIsSearchSheetOpen(false)}
+        onOpenBookDetails={b => setSelectedBookForDetails(b)}
+        onOpenExplore={() => setIsExploreOpen(true)}
+      />
+
       <ExploreModal
         isOpen={isExploreOpen}
         onClose={() => setIsExploreOpen(false)}
+      />
+
+      <DownloadCenterModal
+        isOpen={isDownloadCenterOpen}
+        onClose={() => setIsDownloadCenterOpen(false)}
       />
 
       <ImportModal
@@ -354,9 +391,9 @@ const LibraryView: React.FC = () => {
       />
 
       {/* Floating Download Queue Pill across Library */}
-      {queueState.isProcessing && !activeBook && !isExploreOpen && (
+      {queueState.isProcessing && !activeBook && !isExploreOpen && !isDownloadCenterOpen && (
         <div
-          onClick={() => setIsExploreOpen(true)}
+          onClick={() => setIsDownloadCenterOpen(true)}
           className="fixed bottom-24 sm:bottom-6 right-4 sm:right-6 z-40 bg-slate-900/95 dark:bg-zinc-800 text-white border border-rose-400/50 rounded-2xl px-4 py-2.5 shadow-2xl backdrop-blur-md flex items-center gap-3 text-xs font-semibold cursor-pointer animate-in fade-in slide-in-from-bottom-3 max-w-sm"
         >
           <Loader2 className="w-4 h-4 animate-spin text-rose-400 shrink-0" />

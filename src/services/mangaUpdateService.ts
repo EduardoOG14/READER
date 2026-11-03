@@ -2,9 +2,10 @@ import JSZip from 'jszip';
 import type { Book } from '../types';
 import { getBookFile, saveBookFile, saveBook } from './storage';
 import { isImageFile } from './parsers/mangaParser';
-import { fetchOfficialCoverUrl, fetchCoverBlob, normalizeSearchTitle } from './coverFetcher';
+import { fetchOfficialCoverUrl, fetchCoverBlob } from './coverFetcher';
 import { generateBookFile, createDefaultBookChapters } from './catalog/generators';
 import { httpGetJson, httpGetBlob } from './httpClient';
+import { findBestMangaDexManga, normalizeSearchTitle } from './mangaSearchService';
 
 export interface ChapterInfo {
   id: string;
@@ -58,76 +59,33 @@ export async function getLocalHighestChapter(book: Book): Promise<number> {
   }
 }
 
-// 2. Check MangaDex for newly available chapters (prioritizes ES, then EN, then any)
+// 2. Check MangaDex for newly available chapters (prioritizes ES, then EN, NEVER unknown languages)
 export async function checkForNewEpisodes(book: Book): Promise<MangaUpdateCheckResult> {
   const cleanTitle = normalizeSearchTitle(book.title);
 
   try {
-    const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=1&order[relevance]=desc`;
-    const searchData = await httpGetJson(searchUrl, { timeoutMs: 12000 });
-    const manga = searchData?.data?.[0];
-    if (!manga) {
+    const match = await findBestMangaDexManga(book.title, { maxChaptersToFetch: 500 });
+    const localHighest = await getLocalHighestChapter(book);
+
+    if (!match || match.chapters.length === 0) {
+      const isComic =
+        book.categoryIds?.includes('cat-comics') ||
+        /comic|dc|marvel|batman|superman|spiderman|watchmen/i.test(book.title);
       return {
         hasUpdates: false,
         mangaTitle: cleanTitle,
-        currentHighestChapter: 1,
-        totalAvailableChapters: 1,
+        currentHighestChapter: localHighest || 1,
+        totalAvailableChapters: localHighest || 1,
         newChapters: [],
-        message: `«${book.title}» es una obra completa e íntegra (tomo único). Tu ejemplar está al día.`,
+        message: isComic
+          ? `«${book.title}» es un cómic occidental no alojado en MangaDex (servidor de manga y manhwa).`
+          : `«${book.title}» no cuenta con episodios traducidos al español en MangaDex.`,
       };
-    }
-
-    const langTiers = [['es', 'es-la'], ['en'], null];
-    let chaptersList: any[] = [];
-    let fallbackTierList: any[] = [];
-
-    for (const langs of langTiers) {
-      let offset = 0;
-      let totalToFetch = 1;
-      const collected: any[] = [];
-
-      while (offset < totalToFetch && offset < 500) {
-        const langParams = langs ? langs.map(l => `translatedLanguage[]=${l}`).join('&') : '';
-        const queryParams = [langParams, 'order[chapter]=asc', 'limit=100', `offset=${offset}`].filter(Boolean).join('&');
-        const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?${queryParams}`;
-        const feedData = await httpGetJson(feedUrl, { timeoutMs: 15000 });
-        const batch = feedData?.data || [];
-        if (batch.length === 0) break;
-
-        const hostedBatch = batch.filter((ch: any) => !ch.attributes.externalUrl && (ch.attributes.pages || 0) > 0);
-        collected.push(...hostedBatch);
-
-        totalToFetch = feedData?.total || batch.length;
-        offset += batch.length;
-
-        // Stop early if this tier already has early chapters (<= 5)
-        if (collected.some((c: any) => parseFloat(c.attributes.chapter) <= 5) && collected.length >= 20) {
-          break;
-        }
-      }
-
-      if (collected.length > 0) {
-        const hasEarlyChapters = collected.some((c: any) => {
-          const num = parseFloat(c.attributes.chapter);
-          return !isNaN(num) && num <= 5;
-        });
-
-        if (hasEarlyChapters) {
-          chaptersList = collected;
-          break;
-        } else if (collected.length > fallbackTierList.length) {
-          fallbackTierList = collected;
-        }
-      }
-    }
-
-    if (chaptersList.length === 0 && fallbackTierList.length > 0) {
-      chaptersList = fallbackTierList;
     }
 
     // Group and de-duplicate unique chapters
     const uniqueChapters = new Map<number, ChapterInfo>();
-    for (const ch of chaptersList) {
+    for (const ch of match.chapters) {
       const chNum = parseFloat(ch.attributes.chapter);
       if (!isNaN(chNum)) {
         const pages = ch.attributes.pages || 0;
@@ -143,7 +101,6 @@ export async function checkForNewEpisodes(book: Book): Promise<MangaUpdateCheckR
     }
 
     const sortedChapterNums = Array.from(uniqueChapters.keys()).sort((a, b) => a - b);
-    const localHighest = await getLocalHighestChapter(book);
 
     // Filter chapters strictly greater than local highest chapter
     const newChapters = sortedChapterNums
@@ -414,8 +371,6 @@ export async function downloadAllAvailableEpisodes(
   }
 
   // B. For Manga / Comics / Webtoons: Download all hosted chapters from MangaDex
-  const cleanTitle = normalizeSearchTitle(book.title);
-
   onProgress?.({
     currentChapterNum: 1,
     currentChapterIndex: 1,
@@ -426,15 +381,14 @@ export async function downloadAllAvailableEpisodes(
     message: 'Buscando obra oficial en MangaDex...',
   });
 
-  const searchUrl = `https://api.mangadex.org/manga?title=${encodeURIComponent(cleanTitle)}&limit=1&order[relevance]=desc`;
-  const searchData = await httpGetJson(searchUrl, { timeoutMs: 12000 });
-  const manga = searchData?.data?.[0];
-  if (!manga) {
-    // If not found in MangaDex (e.g. Western Comic, Graphic Novel, standalone volume):
+  const match = await findBestMangaDexManga(book.title, { maxChaptersToFetch: 1000 });
+
+  if (!match || match.chapters.length === 0) {
+    // If not found in MangaDex or no Spanish/English chapters available:
     // Ensure the book's cover is updated to the real official cover if it was a placeholder
     let officialCoverUrl = book.coverUrl;
     try {
-      const realCover = await fetchOfficialCoverUrl(book.title, book.author, 'comics');
+      const realCover = await fetchOfficialCoverUrl(book.title, book.author, 'manga');
       if (realCover) {
         officialCoverUrl = realCover;
       }
@@ -446,6 +400,9 @@ export async function downloadAllAvailableEpisodes(
     };
     await saveBook(updatedBook);
 
+    const isComic =
+      book.categoryIds?.includes('cat-comics') ||
+      /comic|dc|marvel|batman|superman|spiderman|watchmen/i.test(book.title);
     onProgress?.({
       currentChapterNum: 1,
       currentChapterIndex: 1,
@@ -453,61 +410,16 @@ export async function downloadAllAvailableEpisodes(
       currentPageIndex: 1,
       totalPagesInChapter: 1,
       percent: 100,
-      message: `«${book.title}» es una obra completa e íntegra (tomo único). Obra al día.`,
+      message: isComic
+        ? `«${book.title}» es un cómic occidental no alojado en MangaDex (servidor de manga y manhwa).`
+        : `«${book.title}» no cuenta con episodios en español disponibles en MangaDex.`,
     });
 
     return { updatedBook, totalPages: updatedBook.totalPages };
   }
 
-  const langTiers = [['es', 'es-la'], ['en'], null];
-  let chaptersList: any[] = [];
-  let fallbackTierList: any[] = [];
-
-  for (const langs of langTiers) {
-    let offset = 0;
-    let totalToFetch = 1;
-    const collected: any[] = [];
-
-    while (offset < totalToFetch && offset < 1000) {
-      const langParams = langs ? langs.map(l => `translatedLanguage[]=${l}`).join('&') : '';
-      const queryParams = [langParams, 'order[chapter]=asc', 'limit=100', `offset=${offset}`].filter(Boolean).join('&');
-      const feedUrl = `https://api.mangadex.org/manga/${manga.id}/feed?${queryParams}`;
-      try {
-        const feedData = await httpGetJson(feedUrl, { timeoutMs: 15000 });
-        const batch = feedData?.data || [];
-        if (batch.length === 0) break;
-
-        const hostedBatch = batch.filter((ch: any) => !ch.attributes.externalUrl && (ch.attributes.pages || 0) > 0);
-        collected.push(...hostedBatch);
-
-        totalToFetch = feedData?.total || batch.length;
-        offset += batch.length;
-      } catch {
-        break;
-      }
-    }
-
-    if (collected.length > 0) {
-      const hasEarlyChapters = collected.some((c: any) => {
-        const num = parseFloat(c.attributes.chapter);
-        return !isNaN(num) && num <= 5;
-      });
-
-      if (hasEarlyChapters) {
-        chaptersList = collected;
-        break;
-      } else if (collected.length > fallbackTierList.length) {
-        fallbackTierList = collected;
-      }
-    }
-  }
-
-  if (chaptersList.length === 0 && fallbackTierList.length > 0) {
-    chaptersList = fallbackTierList;
-  }
-
   const uniqueChapters = new Map<number, ChapterInfo>();
-  for (const ch of chaptersList) {
+  for (const ch of match.chapters) {
     const chNum = parseFloat(ch.attributes.chapter);
     if (!isNaN(chNum)) {
       const pages = ch.attributes.pages || 0;
@@ -524,7 +436,21 @@ export async function downloadAllAvailableEpisodes(
 
   const allChapters = Array.from(uniqueChapters.values()).sort((a, b) => a.chapter - b.chapter);
   if (allChapters.length === 0) {
-    throw new Error('No se encontraron capítulos con scans alojados para esta obra en MangaDex.');
+    const isComic =
+      book.categoryIds?.includes('cat-comics') ||
+      /comic|dc|marvel|batman|superman|spiderman|watchmen/i.test(book.title);
+    onProgress?.({
+      currentChapterNum: 1,
+      currentChapterIndex: 1,
+      totalChaptersToDownload: 1,
+      currentPageIndex: 1,
+      totalPagesInChapter: 1,
+      percent: 100,
+      message: isComic
+        ? `«${book.title}» es un cómic occidental no alojado en MangaDex (servidor de manga y manhwa).`
+        : `«${book.title}» no cuenta con episodios en español disponibles en MangaDex.`,
+    });
+    return { updatedBook: book, totalPages: book.totalPages };
   }
 
   const localHighest = await getLocalHighestChapter(book);
