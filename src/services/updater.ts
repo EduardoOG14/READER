@@ -5,7 +5,7 @@ import { httpGetJson } from './httpClient';
  * GitHub Release Update Checker for READER
  */
 
-export const CURRENT_APP_VERSION = '1.3.6';
+export const CURRENT_APP_VERSION = '1.3.7';
 export const DEFAULT_GITHUB_REPO = 'EduardoOG14/READER';
 
 export interface DownloadProgress {

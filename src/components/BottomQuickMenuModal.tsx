@@ -200,7 +200,7 @@ export const BottomQuickMenuModal: React.FC<BottomQuickMenuModalProps> = ({
         {/* 4. MODO OSCURO / MODO CLARO */}
         <button
           onClick={toggleTheme}
-          className="w-full p-3.5 rounded-2xl bg-white dark:bg-zinc-850 border border-rose-200/80 dark:border-zinc-700 flex items-center justify-between active:scale-98 transition-all cursor-pointer shadow-xs hover:bg-rose-50 dark:hover:bg-zinc-800"
+          className="w-full p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-rose-200/80 dark:border-zinc-800 flex items-center justify-between active:scale-98 transition-all cursor-pointer shadow-xs hover:bg-rose-50 dark:hover:bg-zinc-800/80"
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
@@ -221,7 +221,7 @@ export const BottomQuickMenuModal: React.FC<BottomQuickMenuModalProps> = ({
               </span>
             </div>
           </div>
-          <span className="text-xs font-bold text-rose-600 dark:text-zinc-300">
+          <span className="px-2.5 py-1 rounded-xl bg-rose-50 dark:bg-zinc-800 text-xs font-bold text-rose-600 dark:text-zinc-200">
             Cambiar
           </span>
         </button>
@@ -233,7 +233,7 @@ export const BottomQuickMenuModal: React.FC<BottomQuickMenuModalProps> = ({
               onClose();
               onOpenCategoryManager();
             }}
-            className="p-3.5 rounded-2xl bg-white dark:bg-zinc-850 border border-rose-200/80 dark:border-zinc-700 flex items-center gap-3 hover:bg-rose-50 dark:hover:bg-zinc-800 active:scale-96 transition-all cursor-pointer shadow-xs"
+            className="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-rose-200/80 dark:border-zinc-800 flex items-center gap-3 hover:bg-rose-50 dark:hover:bg-zinc-800/80 active:scale-96 transition-all cursor-pointer shadow-xs"
           >
             <div className="w-9 h-9 rounded-xl bg-purple-100 dark:bg-zinc-800 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
               <FolderTree className="w-5 h-5 stroke-[2.3]" />
@@ -253,7 +253,7 @@ export const BottomQuickMenuModal: React.FC<BottomQuickMenuModalProps> = ({
               onClose();
               onOpenSettings();
             }}
-            className="p-3.5 rounded-2xl bg-white dark:bg-zinc-850 border border-rose-200/80 dark:border-zinc-700 flex items-center gap-3 hover:bg-rose-50 dark:hover:bg-zinc-800 active:scale-96 transition-all cursor-pointer shadow-xs"
+            className="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-rose-200/80 dark:border-zinc-800 flex items-center gap-3 hover:bg-rose-50 dark:hover:bg-zinc-800/80 active:scale-96 transition-all cursor-pointer shadow-xs"
           >
             <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-slate-700 dark:text-zinc-300 shrink-0">
               <Settings className="w-5 h-5 stroke-[2.3]" />
