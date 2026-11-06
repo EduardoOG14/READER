@@ -480,8 +480,8 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center justify-between text-[11px] text-rose-800/60 dark:text-zinc-500">
-                  <span>Repositorio: <strong className="font-mono text-rose-900/80 dark:text-zinc-400">{targetRepo}</strong></span>
+                <div className="flex items-center justify-between text-[11px] text-rose-800/60 dark:text-zinc-300">
+                  <span>Repositorio: <strong className="font-mono text-rose-900/80 dark:text-zinc-200">{targetRepo}</strong></span>
                   <button
                     onClick={() => setIsEditingRepo(true)}
                     className="text-rose-500 dark:text-zinc-400 hover:underline cursor-pointer"

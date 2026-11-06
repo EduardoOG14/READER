@@ -48,12 +48,12 @@ export class ReaderErrorBoundary extends Component<Props, State> {
             No se pudo mostrar el contenido
           </h2>
 
-          <p className="text-xs text-zinc-400 max-w-sm mb-6 leading-relaxed">
+          <p className="text-xs text-zinc-200 max-w-sm mb-6 leading-relaxed">
             Ocurrió un error inesperado al procesar este archivo. Puedes volver a la biblioteca o intentar abrirlo de nuevo.
           </p>
 
           {this.state.error && (
-            <div className="w-full max-w-md bg-zinc-900/90 border border-zinc-800 rounded-2xl p-3 mb-6 text-left overflow-auto max-h-32 text-[11px] font-mono text-zinc-400">
+            <div className="w-full max-w-md bg-zinc-900/90 border border-zinc-800 rounded-2xl p-3 mb-6 text-left overflow-auto max-h-32 text-[11px] font-mono text-zinc-300">
               <span className="text-rose-400 font-semibold">Detalle:</span> {this.state.error.message || String(this.state.error)}
             </div>
           )}

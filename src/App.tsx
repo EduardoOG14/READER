@@ -24,7 +24,7 @@ import { useBackHandler, subscribeExitToast } from './services/backButton';
 import { downloadQueue, type QueueState } from './services/downloadQueue';
 
 const LibraryView: React.FC = () => {
-  const { filteredBooks, books, viewMode, isLoading, activeBook, closeReader, selectedCategoryId, categories, refreshLibrary } = useApp();
+  const { filteredBooks, books, viewMode, isLoading, activeBook, openReader, closeReader, selectedCategoryId, categories, refreshLibrary } = useApp();
 
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [isCatManagerOpen, setIsCatManagerOpen] = useState(false);
@@ -165,9 +165,9 @@ const LibraryView: React.FC = () => {
       <main className="flex-1 w-full overflow-hidden flex flex-col">
         <PullToRefresh onRefresh={refreshLibrary} className="flex-1 w-full max-w-6xl mx-auto p-4 sm:p-6">
           {isLoading ? (
-          <div className="h-72 flex flex-col items-center justify-center text-rose-300 dark:text-zinc-500 gap-3">
+          <div className="h-72 flex flex-col items-center justify-center text-rose-300 dark:text-zinc-400 gap-3">
             <Loader2 className="w-9 h-9 animate-spin text-rose-500 dark:text-zinc-400" />
-            <p className="text-xs font-semibold uppercase tracking-wider text-rose-900/60 dark:text-zinc-300/70">
+            <p className="text-xs font-bold uppercase tracking-wider text-rose-900/60 dark:text-zinc-300">
               Cargando biblioteca READER...
             </p>
           </div>
@@ -182,7 +182,7 @@ const LibraryView: React.FC = () => {
             <SpotlightHero />
 
             {/* Collection Section Header / Counter & Sagas Toggle */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-2 border-b border-rose-200/50 dark:border-zinc-800/40 text-xs text-[#881337]/75 dark:text-zinc-400/75">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-2 border-b border-rose-200/50 dark:border-zinc-800/40 text-xs text-[#881337]/75 dark:text-zinc-300">
               <div className="flex items-center gap-2">
                 {selectedSeriesName ? (
                   <button
@@ -303,6 +303,7 @@ const LibraryView: React.FC = () => {
                     <BookCard
                       key={book.id}
                       book={book}
+                      onRead={b => openReader(b)}
                       onOpenDetails={b => setSelectedBookForDetails(b)}
                     />
                   ))}
@@ -313,6 +314,7 @@ const LibraryView: React.FC = () => {
                     <BookListItem
                       key={book.id}
                       book={book}
+                      onRead={b => openReader(b)}
                       onOpenDetails={b => setSelectedBookForDetails(b)}
                     />
                   ))}
@@ -367,6 +369,10 @@ const LibraryView: React.FC = () => {
       <DownloadCenterModal
         isOpen={isDownloadCenterOpen}
         onClose={() => setIsDownloadCenterOpen(false)}
+        onOpenExplore={() => {
+          setIsDownloadCenterOpen(false);
+          setIsExploreOpen(true);
+        }}
       />
 
       <ImportModal

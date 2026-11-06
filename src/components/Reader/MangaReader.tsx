@@ -92,7 +92,7 @@ const WebtoonPage: React.FC<WebtoonPageProps> = React.memo(
             }}
           />
         ) : (
-          <div className="h-64 flex items-center justify-center text-slate-400 dark:text-zinc-500 text-xs">
+          <div className="h-64 flex items-center justify-center text-slate-500 dark:text-zinc-300 font-semibold text-xs">
             Cargando página {pageNum}...
           </div>
         )}
@@ -474,7 +474,7 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
           title="Toca para restablecer al 100%"
         >
           <span>{Math.round(scale * 100)}%</span>
-          <span className="text-[10px] text-slate-400 font-sans font-normal underline ml-0.5">Restablecer</span>
+          <span className="text-[10px] text-slate-300 dark:text-zinc-300 font-sans font-normal underline ml-0.5">Restablecer</span>
         </button>
       </div>
     );
@@ -564,7 +564,7 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
           />
         </div>
       ) : (
-        <div className="text-slate-400 text-sm">Cargando página {currentPage}...</div>
+        <div className="text-slate-300 dark:text-zinc-300 text-sm">Cargando página {currentPage}...</div>
       )}
 
       {/* Floating Zoom Toast */}

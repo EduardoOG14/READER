@@ -5,9 +5,10 @@ import type { Book } from '../types';
 interface BookCardProps {
   book: Book;
   onOpenDetails: (book: Book) => void;
+  onRead?: (book: Book) => void;
 }
 
-export const BookCard: React.FC<BookCardProps> = ({ book, onOpenDetails }) => {
+export const BookCard: React.FC<BookCardProps> = ({ book, onOpenDetails, onRead }) => {
   const [imgError, setImgError] = useState(false);
 
   const getFormatBadge = (format: string) => {
@@ -31,11 +32,19 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onOpenDetails }) => {
   const badge = getFormatBadge(book.format);
   const isCompleted = book.progress >= 100 || (book.currentPage >= book.totalPages && book.totalPages > 1);
 
+  const handleCardClick = () => {
+    if (onRead) {
+      onRead(book);
+    } else {
+      onOpenDetails(book);
+    }
+  };
+
   return (
     <div className="group relative flex flex-col cursor-pointer select-none">
       {/* Cover Card */}
       <div
-        onClick={() => onOpenDetails(book)}
+        onClick={handleCardClick}
         className="relative aspect-[3/4.2] w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-rose-100/50 dark:bg-zinc-900 shadow-xs group-hover:shadow-xl group-hover:shadow-rose-900/10 dark:group-hover:shadow-black/60 group-hover:-translate-y-1.5 transition-all duration-300 border border-rose-200/70 dark:border-zinc-700/60"
       >
         {book.coverUrl && !imgError ? (
@@ -48,7 +57,7 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onOpenDetails }) => {
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center bg-gradient-to-b from-rose-50 to-pink-100 dark:from-zinc-800 dark:to-zinc-900">
-            <BookOpen className="w-8 h-8 text-rose-300 dark:text-zinc-500 mb-2" />
+            <BookOpen className="w-8 h-8 text-rose-300 dark:text-zinc-400 mb-2" />
             <span className="text-xs font-semibold text-[#881337] dark:text-zinc-300 line-clamp-3">
               {book.title}
             </span>
@@ -59,24 +68,24 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onOpenDetails }) => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
         {/* Format Badge */}
-        <div className="absolute top-2 left-2 z-10">
+        <div className="absolute top-2 left-2 z-10 pointer-events-none">
           <span
-            className={`text-[9px] font-black px-2 py-0.5 rounded-md shadow-xs backdrop-blur-xs tracking-wider uppercase ${badge.bg}`}
+            className={`text-[9.5px] font-black px-2 py-0.5 rounded-md shadow-xs backdrop-blur-xs tracking-wider uppercase ${badge.bg}`}
           >
             {badge.label}
           </span>
         </div>
 
-        {/* Quick Menu Button */}
+        {/* Quick Menu Button (Always visible & tap-friendly) */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             onOpenDetails(book);
           }}
-          className="absolute top-2 right-2 p-1.5 rounded-full bg-black/45 hover:bg-black/70 text-white backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity z-10 cursor-pointer"
-          title="Opciones de libro"
+          className="absolute top-2 right-2 p-1.5 sm:p-2 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-md shadow-md z-10 cursor-pointer active:scale-90 transition-transform"
+          title="Opciones y detalles del libro"
         >
-          <MoreVertical className="w-3.5 h-3.5" />
+          <MoreVertical className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
         </button>
 
         {/* Progress Bar (if in progress) */}

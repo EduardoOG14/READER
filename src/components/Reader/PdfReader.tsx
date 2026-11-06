@@ -181,9 +181,9 @@ const ContinuousPage: React.FC<ContinuousPageProps> = React.memo(({
       >
         <canvas ref={canvasRef} className="block w-full h-auto mx-auto select-none m-0 p-0" />
         {!hasRenderedOnceRef.current && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-white text-slate-600 text-xs gap-2.5 select-none min-h-[380px]">
-            <div className="w-6 h-6 border-2 border-slate-300 border-t-zinc-600 rounded-full animate-spin" />
-            <span className="font-semibold text-slate-700">Cargando página {pageNum}...</span>
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-white dark:bg-zinc-900 text-slate-600 dark:text-zinc-200 text-xs gap-2.5 select-none min-h-[380px]">
+            <div className="w-6 h-6 border-2 border-slate-300 dark:border-zinc-700 border-t-zinc-600 dark:border-t-zinc-200 rounded-full animate-spin" />
+            <span className="font-semibold text-slate-700 dark:text-zinc-200">Cargando página {pageNum}...</span>
           </div>
         )}
       </div>
@@ -673,7 +673,7 @@ export const PdfReader: React.FC<PdfReaderProps> = ({
         style={{ backgroundColor: containerBg }}
       >
         <div className="animate-spin rounded-full h-9 w-9 border-b-2 border-emerald-500" />
-        <p className="text-xs opacity-75 text-slate-400">Cargando libro...</p>
+        <p className="text-xs opacity-90 text-slate-500 dark:text-zinc-300 font-medium">Cargando libro...</p>
       </div>
     );
   }

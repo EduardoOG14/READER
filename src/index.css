@@ -27,7 +27,7 @@
     --border-subtle: #2b2d34;
     --text-primary: #f3f4f6;      /* Blanco/gris claro nítido */
     --text-secondary: #d1d5db;    /* Gris neutro suave */
-    --text-muted: #9ca3af;        /* Gris medio */
+    --text-muted: #a1a1aa;        /* Gris neutro legible */
     --accent: #71717a;            /* Gris industrial zinc */
     --accent-hover: #52525b;
     --accent-subtle: #27272a;
@@ -40,9 +40,9 @@
   .dark [class*="dark:bg-[#061a12]"] { background-color: #18191d !important; }
   .dark [class*="dark:bg-[#0f382c]"] { background-color: #2a2c33 !important; }
   .dark [class*="dark:border-emerald-"] { border-color: rgba(113, 113, 122, 0.45) !important; }
-  .dark [class*="dark:text-emerald-"] { color: #e4e4e7 !important; }
+  .dark [class*="dark:text-emerald-"] { color: #f4f4f5 !important; }
   .dark [class*="dark:text-[#ecfdf5]"] { color: #f4f4f5 !important; }
-  .dark [class*="dark:text-[#a7f3d0]"] { color: #a1a1aa !important; }
+  .dark [class*="dark:text-[#a7f3d0]"] { color: #e4e4e7 !important; }
   .dark [class*="dark:from-emerald-"] { --tw-gradient-from: #52525b !important; }
   .dark [class*="dark:to-teal-"], .dark [class*="dark:to-emerald-"] { --tw-gradient-to: #3f3f46 !important; }
 

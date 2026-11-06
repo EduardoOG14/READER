@@ -61,7 +61,7 @@ export const BookmarksDrawer: React.FC<BookmarksDrawerProps> = ({
             disabled={isCurrentPageBookmarked}
             className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
               isCurrentPageBookmarked
-                ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
+                ? 'bg-slate-100 dark:bg-zinc-800 text-slate-400 dark:text-zinc-400 cursor-not-allowed'
                 : 'bg-amber-500 hover:bg-amber-600 text-white shadow-sm hover:shadow-md'
             }`}
           >
@@ -77,9 +77,9 @@ export const BookmarksDrawer: React.FC<BookmarksDrawerProps> = ({
         {/* List of bookmarks */}
         <div className="flex-1 overflow-y-auto space-y-2 pr-1 min-h-[140px]">
           {bookmarks.length === 0 ? (
-            <div className="py-10 text-center text-slate-400 dark:text-slate-500 flex flex-col items-center gap-2">
-              <BookmarkIcon className="w-8 h-8 opacity-30 stroke-[1.5]" />
-              <p className="text-sm font-medium">No hay marcadores aún</p>
+            <div className="py-10 text-center text-slate-500 dark:text-zinc-400 flex flex-col items-center gap-2">
+              <BookmarkIcon className="w-8 h-8 opacity-40 stroke-[1.5]" />
+              <p className="text-sm font-bold text-slate-700 dark:text-zinc-200">No hay marcadores aún</p>
               <p className="text-xs max-w-xs">
                 Toca el botón superior o el icono de marcador en la barra de lectura para guardar páginas.
               </p>
@@ -100,7 +100,7 @@ export const BookmarksDrawer: React.FC<BookmarksDrawerProps> = ({
                   className={`group flex items-center justify-between p-3 rounded-2xl border transition-all ${
                     isCurrent
                       ? 'border-amber-400/60 bg-amber-50/50 dark:bg-amber-950/20'
-                      : 'border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 bg-slate-50/60 dark:bg-slate-800/40'
+                      : 'border-slate-100 dark:border-zinc-800 hover:border-slate-200 dark:hover:border-zinc-700 bg-slate-50/60 dark:bg-zinc-800/40'
                   }`}
                 >
                   <button
@@ -124,7 +124,7 @@ export const BookmarksDrawer: React.FC<BookmarksDrawerProps> = ({
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5 text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">
                         <Clock className="w-3 h-3" />
                         <span>{formattedDate}</span>
                         {bm.note && <span className="truncate italic">• {bm.note}</span>}

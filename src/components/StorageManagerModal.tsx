@@ -129,7 +129,7 @@ export const StorageManagerModal: React.FC<StorageManagerModalProps> = ({
             />
           </div>
 
-          <div className="flex items-center justify-between text-[11px] text-slate-400">
+          <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-zinc-400">
             <span>{books.length} obras descargadas ({totalBooksSizeMB} MB de archivos)</span>
             {quotaInfo.totalMB > 0 && <span>Total disponible: {(quotaInfo.totalMB / 1024).toFixed(1)} GB</span>}
           </div>
@@ -162,7 +162,7 @@ export const StorageManagerModal: React.FC<StorageManagerModalProps> = ({
                     <p className="font-bold truncate text-slate-800 dark:text-zinc-200">
                       {book.title}
                     </p>
-                    <p className="text-[10px] text-slate-400 uppercase font-mono">
+                    <p className="text-[10px] text-slate-500 dark:text-zinc-400 uppercase font-mono">
                       {book.format} • {book.totalPages} págs.
                     </p>
                   </div>

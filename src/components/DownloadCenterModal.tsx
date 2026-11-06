@@ -18,9 +18,10 @@ import { useBackHandler } from '../services/backButton';
 interface DownloadCenterModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpenExplore?: () => void;
 }
 
-export const DownloadCenterModal: React.FC<DownloadCenterModalProps> = ({ isOpen, onClose }) => {
+export const DownloadCenterModal: React.FC<DownloadCenterModalProps> = ({ isOpen, onClose, onOpenExplore }) => {
   const { books, openReader } = useApp();
   const [queueState, setQueueState] = useState<QueueState>(downloadQueue.getState());
 
@@ -117,14 +118,30 @@ export const DownloadCenterModal: React.FC<DownloadCenterModalProps> = ({ isOpen
         {/* Content Queue List */}
         <div className="py-3 flex-1 overflow-y-auto space-y-3 pr-1">
           {queueState.items.length === 0 ? (
-            <div className="py-16 text-center space-y-2">
-              <Download className="w-10 h-10 text-rose-300 dark:text-zinc-600 mx-auto" />
-              <p className="text-sm font-bold text-[#881337] dark:text-zinc-300">
-                No hay descargas activas en este momento
-              </p>
-              <p className="text-xs text-slate-500 dark:text-zinc-400 max-w-sm mx-auto">
-                Los capítulos y libros que descargues desde el catálogo se gestionarán automáticamente aquí.
-              </p>
+            <div className="py-16 text-center space-y-3">
+              <Download className="w-12 h-12 text-rose-300 dark:text-zinc-400 mx-auto stroke-[1.8]" />
+              <div className="space-y-1">
+                <p className="text-base font-black text-[#4c0519] dark:text-[#f3f4f6]">
+                  No tienes descargas pendientes
+                </p>
+                <p className="text-xs text-slate-500 dark:text-zinc-400 max-w-sm mx-auto">
+                  Aquí verás el progreso de los libros y episodios que descargues del catálogo.
+                </p>
+              </div>
+
+              {onOpenExplore && (
+                <div className="pt-2">
+                  <button
+                    onClick={() => {
+                      onClose();
+                      onOpenExplore();
+                    }}
+                    className="py-3 px-5 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-black text-xs inline-flex items-center gap-2 shadow-md active:scale-95 cursor-pointer"
+                  >
+                    <span>✨ Ir al Catálogo de Libros Gratis</span>
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <div className="space-y-3">
@@ -278,7 +295,7 @@ export const DownloadCenterModal: React.FC<DownloadCenterModalProps> = ({ isOpen
               <span>Limpiar completadas ({queueState.completedItems.length})</span>
             </button>
           ) : (
-            <span className="text-xs text-slate-400 dark:text-zinc-500 font-mono">
+            <span className="text-xs text-slate-500 dark:text-zinc-300 font-mono">
               {queueState.totalCount} obras en cola/historial
             </span>
           )}

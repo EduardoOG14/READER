@@ -6,6 +6,7 @@ import {
   Play,
   CheckCircle2,
   Compass,
+  MoreVertical,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useBackHandler } from '../services/backButton';
@@ -102,26 +103,26 @@ export const BottomSearchSheet: React.FC<BottomSearchSheetProps> = ({
             type="text"
             value={localQuery}
             onChange={e => setLocalQuery(e.target.value)}
-            placeholder="Buscar por título, autor o formato..."
-            className="w-full pl-11 pr-10 py-3 text-sm bg-rose-50/70 dark:bg-zinc-900 border border-rose-200 dark:border-zinc-700 rounded-2xl outline-none text-[#4c0519] dark:text-[#f3f4f6] placeholder-rose-300 dark:placeholder-zinc-500 font-semibold focus:ring-2 focus:ring-rose-400/40 dark:focus:ring-zinc-600 transition-all shadow-inner"
+            placeholder="Escribe el nombre de un libro o manga..."
+            className="w-full pl-11 pr-10 py-3 text-sm bg-rose-50/70 dark:bg-zinc-900 border border-rose-200 dark:border-zinc-700 rounded-2xl outline-none text-[#4c0519] dark:text-[#f3f4f6] placeholder-rose-400/70 dark:placeholder-zinc-500 font-bold focus:ring-2 focus:ring-rose-400/40 dark:focus:ring-zinc-600 transition-all shadow-inner"
           />
           {localQuery && (
             <button
               onClick={() => setLocalQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-rose-400 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-zinc-200 rounded-full"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-rose-400 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-zinc-200 rounded-full cursor-pointer"
             >
-              <X className="w-4 h-4" />
+              <X className="w-4 h-4 stroke-[2.5]" />
             </button>
           )}
         </div>
 
         {/* Format Filter Chips */}
-        <div className="flex items-center gap-1.5 overflow-x-auto py-2.5 no-scrollbar shrink-0 text-xs">
+        <div className="flex items-center gap-2 overflow-x-auto py-2.5 no-scrollbar shrink-0 text-xs">
           <button
             onClick={() => setFormatFilter('todos')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-xl font-extrabold transition-all shrink-0 cursor-pointer ${
               formatFilter === 'todos'
-                ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
+                ? 'bg-rose-500 text-white dark:bg-zinc-100 dark:text-zinc-950 shadow-sm'
                 : 'bg-rose-50 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300'
             }`}
           >
@@ -129,23 +130,23 @@ export const BottomSearchSheet: React.FC<BottomSearchSheetProps> = ({
           </button>
           <button
             onClick={() => setFormatFilter('libros')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-xl font-extrabold transition-all shrink-0 cursor-pointer ${
               formatFilter === 'libros'
-                ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
+                ? 'bg-rose-500 text-white dark:bg-zinc-100 dark:text-zinc-950 shadow-sm'
                 : 'bg-rose-50 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300'
             }`}
           >
-            Libros
+            📚 Libros
           </button>
           <button
             onClick={() => setFormatFilter('manga')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-xl font-extrabold transition-all shrink-0 cursor-pointer ${
               formatFilter === 'manga'
-                ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
+                ? 'bg-rose-500 text-white dark:bg-zinc-100 dark:text-zinc-950 shadow-sm'
                 : 'bg-rose-50 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300'
             }`}
           >
-            Mangas
+            🎨 Mangas
           </button>
         </div>
 
@@ -157,11 +158,11 @@ export const BottomSearchSheet: React.FC<BottomSearchSheetProps> = ({
                 <Search className="w-6 h-6 stroke-[2]" />
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-bold text-[#4c0519] dark:text-[#f3f4f6]">
-                  Sin coincidencias en tu biblioteca local
+                <p className="text-sm font-black text-[#4c0519] dark:text-[#f3f4f6]">
+                  No se encontró ese libro en tus lecturas
                 </p>
-                <p className="text-xs text-slate-500 dark:text-zinc-400">
-                  ¿Buscas una nueva obra para leer?
+                <p className="text-xs text-slate-500 dark:text-zinc-400 font-medium">
+                  ¿Quieres buscarlo gratis en el catálogo?
                 </p>
               </div>
 
@@ -171,10 +172,10 @@ export const BottomSearchSheet: React.FC<BottomSearchSheetProps> = ({
                     onClose();
                     onOpenExplore();
                   }}
-                  className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer"
+                  className="py-3 px-5 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-black text-xs inline-flex items-center gap-2 shadow-md active:scale-95 cursor-pointer"
                 >
-                  <Compass className="w-4 h-4" />
-                  <span>Explorar Catálogo Público</span>
+                  <Compass className="w-4 h-4 stroke-[2.4]" />
+                  <span>Buscar en el Catálogo Gratis</span>
                 </button>
               )}
             </div>
@@ -182,18 +183,16 @@ export const BottomSearchSheet: React.FC<BottomSearchSheetProps> = ({
             filtered.map(b => (
               <div
                 key={b.id}
-                className="p-2.5 rounded-2xl bg-white dark:bg-zinc-900 border border-rose-100 dark:border-zinc-800 hover:border-rose-300 dark:hover:border-zinc-700 flex items-center justify-between gap-3 shadow-2xs transition-all"
+                onClick={() => handleRead(b)}
+                className="p-2.5 rounded-2xl bg-white dark:bg-zinc-900 border border-rose-100 dark:border-zinc-800 hover:border-rose-300 dark:hover:border-zinc-700 flex items-center justify-between gap-3 shadow-2xs transition-all cursor-pointer active:scale-98"
               >
                 {/* Book Thumbnail + Info */}
-                <div
-                  onClick={() => handleDetails(b)}
-                  className="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer"
-                >
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
                   <div className="w-11 h-14 rounded-lg overflow-hidden bg-slate-900/10 shrink-0 shadow-xs border border-rose-200/50 dark:border-zinc-700">
                     {b.coverUrl ? (
                       <img src={b.coverUrl} alt={b.title} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-rose-300 dark:text-zinc-600 bg-rose-50 dark:bg-zinc-800">
+                      <div className="w-full h-full flex items-center justify-center text-rose-300 dark:text-zinc-400 bg-rose-50 dark:bg-zinc-800">
                         <BookOpen className="w-5 h-5" />
                       </div>
                     )}
@@ -210,7 +209,7 @@ export const BottomSearchSheet: React.FC<BottomSearchSheetProps> = ({
                         </span>
                       )}
                     </div>
-                    <h4 className="text-xs font-extrabold text-[#4c0519] dark:text-[#f3f4f6] truncate">
+                    <h4 className="text-xs font-black text-[#4c0519] dark:text-[#f3f4f6] truncate">
                       {b.title}
                     </h4>
                     <p className="text-[11px] text-slate-500 dark:text-zinc-400 truncate">
@@ -219,15 +218,33 @@ export const BottomSearchSheet: React.FC<BottomSearchSheetProps> = ({
                   </div>
                 </div>
 
-                {/* Read Button */}
-                <button
-                  onClick={() => handleRead(b)}
-                  className="py-2 px-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-bold text-xs flex items-center gap-1 shadow-xs active:scale-95 cursor-pointer shrink-0"
-                  title="Leer ahora"
-                >
-                  <Play className="w-3.5 h-3.5 fill-white" />
-                  <span>Leer</span>
-                </button>
+                {/* Read & Options Buttons */}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRead(b);
+                    }}
+                    className="py-2 px-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-extrabold text-xs flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer"
+                    title="Leer ahora"
+                  >
+                    <Play className="w-3.5 h-3.5 fill-white" />
+                    <span>Leer</span>
+                  </button>
+
+                  {onOpenBookDetails && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDetails(b);
+                      }}
+                      className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-rose-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                      title="Ver opciones y detalles"
+                    >
+                      <MoreVertical className="w-4 h-4 stroke-[2.3]" />
+                    </button>
+                  )}
+                </div>
               </div>
             ))
           )}
@@ -237,9 +254,9 @@ export const BottomSearchSheet: React.FC<BottomSearchSheetProps> = ({
         <div className="pt-2 shrink-0">
           <button
             onClick={onClose}
-            className="w-full py-3 rounded-2xl bg-rose-100 hover:bg-rose-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-[#881337] dark:text-zinc-200 font-extrabold text-xs transition-colors cursor-pointer active:scale-98"
+            className="w-full py-3.5 rounded-2xl bg-rose-100 hover:bg-rose-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-[#881337] dark:text-zinc-200 font-black text-xs transition-colors cursor-pointer active:scale-98"
           >
-            Cerrar Búsqueda
+            ✓ Listo, cerrar búsqueda
           </button>
         </div>
       </div>

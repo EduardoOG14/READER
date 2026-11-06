@@ -260,20 +260,24 @@ export const EpisodeSelectorModal: React.FC<EpisodeSelectorModalProps> = ({
                 </div>
 
                 {/* Quick Selection Buttons */}
-                <div className="flex items-center gap-1.5 flex-wrap">
+                <div className="flex items-center gap-2 flex-wrap">
                   <button
                     onClick={isAllSelected ? deselectAll : selectAll}
-                    className="py-1 px-2.5 rounded-lg text-xs font-semibold bg-rose-100/70 hover:bg-rose-200/70 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-[#4c0519] dark:text-[#f3f4f6] transition-colors cursor-pointer flex items-center gap-1"
+                    className={`py-2 px-3.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs ${
+                      isAllSelected
+                        ? 'bg-rose-500 text-white dark:bg-zinc-100 dark:text-zinc-950'
+                        : 'bg-rose-100 hover:bg-rose-200 dark:bg-zinc-800 text-[#4c0519] dark:text-[#f3f4f6]'
+                    }`}
                   >
                     {isAllSelected ? (
                       <>
-                        <Square className="w-3.5 h-3.5" />
+                        <Square className="w-4 h-4 stroke-[2.5]" />
                         <span>Deseleccionar todo</span>
                       </>
                     ) : (
                       <>
-                        <CheckSquare className="w-3.5 h-3.5" />
-                        <span>Seleccionar todo ({chapters.length})</span>
+                        <CheckSquare className="w-4 h-4 stroke-[2.5]" />
+                        <span>⚡ Marcar Todo ({chapters.length} cap.)</span>
                       </>
                     )}
                   </button>
@@ -281,7 +285,7 @@ export const EpisodeSelectorModal: React.FC<EpisodeSelectorModalProps> = ({
                   {chapters.length > 10 && (
                     <button
                       onClick={() => selectRange(10)}
-                      className="py-1 px-2.5 rounded-lg text-xs font-semibold bg-rose-50 hover:bg-rose-100 dark:bg-zinc-800/60 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 transition-colors cursor-pointer"
+                      className="py-2 px-3 rounded-xl text-xs font-bold bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-rose-200/80 dark:border-zinc-700 hover:bg-rose-50 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
                     >
                       Primeros 10
                     </button>
@@ -290,7 +294,7 @@ export const EpisodeSelectorModal: React.FC<EpisodeSelectorModalProps> = ({
                   {chapters.length > 25 && (
                     <button
                       onClick={() => selectRange(25)}
-                      className="py-1 px-2.5 rounded-lg text-xs font-semibold bg-rose-50 hover:bg-rose-100 dark:bg-zinc-800/60 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 transition-colors cursor-pointer"
+                      className="py-2 px-3 rounded-xl text-xs font-bold bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-rose-200/80 dark:border-zinc-700 hover:bg-rose-50 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
                     >
                       Primeros 25
                     </button>
@@ -347,7 +351,7 @@ export const EpisodeSelectorModal: React.FC<EpisodeSelectorModalProps> = ({
                         </div>
                       </div>
 
-                      <span className="text-[10px] font-mono text-slate-500 dark:text-zinc-400 shrink-0">
+                      <span className="text-[10px] font-mono text-slate-500 dark:text-zinc-300 shrink-0">
                         {ch.pages} págs
                       </span>
                     </div>
@@ -362,7 +366,7 @@ export const EpisodeSelectorModal: React.FC<EpisodeSelectorModalProps> = ({
         <div className="pt-3 border-t border-rose-100 dark:border-zinc-800 shrink-0 flex items-center gap-2">
           <button
             onClick={onClose}
-            className="py-2.5 px-4 rounded-xl bg-rose-100/80 hover:bg-rose-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-[#881337] dark:text-zinc-200 font-bold text-xs transition-colors cursor-pointer shrink-0"
+            className="py-3 px-4 rounded-xl bg-rose-100/80 hover:bg-rose-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-[#881337] dark:text-zinc-200 font-black text-xs transition-colors cursor-pointer shrink-0"
           >
             Cerrar
           </button>
@@ -371,13 +375,13 @@ export const EpisodeSelectorModal: React.FC<EpisodeSelectorModalProps> = ({
             <button
               onClick={handleDownloadSelected}
               disabled={selectedNums.size === 0}
-              className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 dark:from-zinc-200 dark:to-zinc-300 dark:hover:from-white dark:hover:to-zinc-200 text-white dark:text-zinc-950 font-bold text-xs shadow-md active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40"
+              className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-rose-500 via-pink-500 to-rose-400 hover:from-rose-600 hover:to-pink-600 dark:from-zinc-100 dark:to-zinc-300 dark:text-zinc-950 text-white font-black text-xs sm:text-sm shadow-md active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40"
             >
-              <Download className="w-4 h-4 stroke-[2.2]" />
+              <Download className="w-4 h-4 stroke-[2.5]" />
               <span className="truncate">
                 {selectedNums.size === chapters.length
-                  ? `Descargar todos (${chapters.length})`
-                  : `Descargar seleccionados (${selectedNums.size})`}
+                  ? `⬇️ Descargar TODO (${chapters.length} cap.)`
+                  : `⬇️ Descargar (${selectedNums.size} cap.)`}
               </span>
             </button>
           )}

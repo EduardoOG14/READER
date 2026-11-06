@@ -4,19 +4,16 @@ import {
   LayoutGrid,
   List,
   Plus,
-  Download,
   Moon,
   Sun,
-  SlidersHorizontal,
   FolderTree,
   Check,
-  Compass,
   ArrowUpDown,
+  Settings,
   Sparkles,
 } from 'lucide-react';
 import { useApp, type SortOption } from '../context/AppContext';
 import { useBackHandler } from '../services/backButton';
-import { downloadQueue, type QueueState } from '../services/downloadQueue';
 
 interface BottomQuickMenuModalProps {
   isOpen: boolean;
@@ -32,8 +29,6 @@ export const BottomQuickMenuModal: React.FC<BottomQuickMenuModalProps> = ({
   isOpen,
   onClose,
   onOpenImport,
-  onOpenExplore,
-  onOpenDownloadCenter,
   onOpenCategoryManager,
   onOpenSettings,
 }) => {
@@ -46,12 +41,6 @@ export const BottomQuickMenuModal: React.FC<BottomQuickMenuModalProps> = ({
     updateSettings,
     books,
   } = useApp();
-
-  const [queueState, setQueueState] = React.useState<QueueState>(downloadQueue.getState());
-
-  React.useEffect(() => {
-    return downloadQueue.subscribe(state => setQueueState(state));
-  }, []);
 
   // Priority 120 for closing sheet on back button
   useBackHandler(() => {
@@ -68,238 +57,225 @@ export const BottomQuickMenuModal: React.FC<BottomQuickMenuModalProps> = ({
     updateSettings({ theme: settings.theme === 'dark' ? 'light' : 'dark' });
   };
 
-  const sortOptions: { id: SortOption; label: string; desc: string }[] = [
-    { id: 'recent', label: 'Última lectura', desc: 'Leídos recientemente' },
-    { id: 'title', label: 'Título (A - Z)', desc: 'Orden alfabético' },
-    { id: 'progress', label: 'Mayor progreso', desc: 'Más avanzados primero' },
-    { id: 'dateAdded', label: 'Fecha añadido', desc: 'Últimos importados' },
+  const sortChoices: { id: SortOption; label: string; icon: string }[] = [
+    { id: 'recent', label: 'Los últimos que leí', icon: '🕒' },
+    { id: 'title', label: 'Por nombre (A - Z)', icon: '🔤' },
+    { id: 'dateAdded', label: 'Recién añadidos', icon: '📅' },
   ];
-
-  const hasActiveDownloads = queueState.isProcessing || queueState.pendingItems.length > 0;
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+        className="fixed inset-0 bg-black/65 backdrop-blur-xs animate-in fade-in duration-200"
         onClick={onClose}
       />
 
       {/* Bottom Sheet Container */}
-      <div className="relative w-full max-w-xl mx-auto bg-white dark:bg-[#18191c] border-t border-rose-200/90 dark:border-zinc-800 rounded-t-3xl shadow-2xl p-4 sm:p-5 z-10 animate-in slide-in-from-bottom duration-250 text-[#4c0519] dark:text-[#f3f4f6] max-h-[85vh] overflow-y-auto pb-[max(env(safe-area-inset-bottom,20px),20px)] space-y-4">
-        {/* Native Pull / Drag Indicator */}
+      <div className="relative w-full max-w-lg mx-auto bg-white dark:bg-[#18191c] border-t border-rose-200/90 dark:border-zinc-800 rounded-t-[32px] shadow-2xl p-4 sm:p-6 z-10 animate-in slide-in-from-bottom duration-200 text-[#4c0519] dark:text-[#f3f4f6] max-h-[88vh] overflow-y-auto pb-[max(env(safe-area-inset-bottom,20px),20px)] space-y-4">
+        
+        {/* Native Pull Handle */}
         <div className="w-12 h-1.5 bg-rose-200 dark:bg-zinc-700 rounded-full mx-auto" />
 
         {/* Sheet Header */}
-        <div className="flex items-center justify-between pb-2 border-b border-rose-100 dark:border-zinc-800">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-rose-500 to-pink-500 text-white flex items-center justify-center shadow-xs">
-              <Sparkles className="w-4 h-4" />
+        <div className="flex items-center justify-between pb-3 border-b border-rose-100 dark:border-zinc-800">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-500 to-pink-500 text-white flex items-center justify-center shadow-md shadow-rose-500/25">
+              <Sparkles className="w-5 h-5 stroke-[2.4]" />
             </div>
             <div>
-              <h3 className="text-sm font-extrabold text-[#4c0519] dark:text-[#f3f4f6]">
-                Centro de Control Rápido
+              <h3 className="text-base font-black text-[#4c0519] dark:text-[#f3f4f6]">
+                Menú de Opciones
               </h3>
-              <p className="text-[10.5px] text-slate-500 dark:text-zinc-400 font-medium">
-                Acciones continuas al alcance de tu pulgar
+              <p className="text-xs text-slate-500 dark:text-zinc-300 font-medium">
+                ¿Qué deseas hacer en tu biblioteca?
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-rose-100 dark:hover:bg-zinc-800 text-rose-400 dark:text-zinc-400 cursor-pointer transition-colors"
-            title="Cerrar menú"
+            className="w-9 h-9 rounded-full bg-rose-50 dark:bg-zinc-800 flex items-center justify-center text-rose-500 dark:text-zinc-300 hover:bg-rose-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
+            title="Cerrar"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 stroke-[2.5]" />
           </button>
         </div>
 
-        {/* 1. Primary Action Cards: Importar + Descargas */}
-        <div className="grid grid-cols-2 gap-2.5">
-          <button
-            onClick={() => {
-              onClose();
-              onOpenImport();
-            }}
-            className="p-3 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 text-white flex flex-col justify-between items-start gap-1.5 shadow-md shadow-rose-500/20 active:scale-97 transition-all cursor-pointer text-left"
-          >
-            <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center">
-              <Plus className="w-5 h-5 stroke-[2.5]" />
+        {/* 1. BOTÓN GIGANTE: AÑADIR LIBRO */}
+        <button
+          onClick={() => {
+            onClose();
+            onOpenImport();
+          }}
+          className="w-full p-4 rounded-2xl bg-gradient-to-r from-rose-500 via-pink-500 to-rose-500 text-white flex items-center justify-between shadow-lg shadow-rose-500/30 active:scale-98 transition-all cursor-pointer text-left"
+        >
+          <div className="flex items-center gap-3.5 min-w-0">
+            <div className="w-11 h-11 rounded-xl bg-white/25 backdrop-blur-xs flex items-center justify-center shrink-0">
+              <Plus className="w-6 h-6 stroke-[3]" />
             </div>
-            <div>
-              <span className="font-extrabold text-xs block">Importar Obra</span>
-              <span className="text-[9.5px] opacity-85">EPUB, CBZ, PDF, TXT</span>
+            <div className="min-w-0">
+              <span className="font-black text-sm block">➕ Añadir Libro o Manga</span>
+              <span className="text-[11px] opacity-90 truncate block">
+                Abre archivos PDF, EPUB o cómics de tu teléfono
+              </span>
             </div>
-          </button>
+          </div>
+          <span className="px-2.5 py-1 rounded-xl bg-white/20 text-white font-bold text-xs shrink-0">
+            Abrir
+          </span>
+        </button>
 
-          <button
-            onClick={() => {
-              onClose();
-              onOpenDownloadCenter();
-            }}
-            className="relative p-3 rounded-2xl bg-rose-50 hover:bg-rose-100/80 dark:bg-zinc-800/80 dark:hover:bg-zinc-800 border border-rose-200/80 dark:border-zinc-700/80 flex flex-col justify-between items-start gap-1.5 active:scale-97 transition-all cursor-pointer text-left"
-          >
-            {hasActiveDownloads && (
-              <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full bg-rose-500 text-white text-[9px] font-black uppercase tracking-wider animate-pulse">
-                {queueState.pendingItems.length + (queueState.activeItem ? 1 : 0)} activa(s)
-              </span>
-            )}
-            <div className="w-8 h-8 rounded-xl bg-rose-100 dark:bg-zinc-700 text-rose-600 dark:text-rose-400 flex items-center justify-center">
-              <Download className="w-4 h-4 stroke-[2.2]" />
-            </div>
-            <div>
-              <span className="font-extrabold text-xs text-[#4c0519] dark:text-[#f3f4f6] block">
-                Descargas
-              </span>
-              <span className="text-[9.5px] text-slate-500 dark:text-zinc-400">
-                {hasActiveDownloads ? 'Descarga en curso...' : `${queueState.completedCount} completadas`}
-              </span>
-            </div>
-          </button>
-        </div>
-
-        {/* 2. Visual View Mode (Cuadrícula vs Lista) */}
-        <div className="p-3 rounded-2xl bg-rose-50/60 dark:bg-zinc-900/60 border border-rose-200/60 dark:border-zinc-800 space-y-2">
+        {/* 2. ¿CÓMO QUIERES VER TUS LIBROS? (Portadas vs Lista) */}
+        <div className="p-3.5 rounded-2xl bg-rose-50/70 dark:bg-zinc-900 border border-rose-200/70 dark:border-zinc-800 space-y-2.5">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-extrabold text-rose-900/70 dark:text-zinc-400 uppercase tracking-wider">
-              Diseño de biblioteca
+            <span className="text-xs font-black text-[#4c0519] dark:text-zinc-200">
+              ¿Cómo quieres ver tus libros?
             </span>
-            <span className="text-[10px] text-slate-500 dark:text-zinc-400 font-mono">
-              {books.length} obras
+            <span className="text-[11px] text-slate-500 dark:text-zinc-300 font-bold">
+              {books.length} {books.length === 1 ? 'libro' : 'libros'}
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 bg-white dark:bg-zinc-800 p-1 rounded-xl border border-rose-100 dark:border-zinc-700/60">
+          <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => setViewMode('grid')}
-              className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-extrabold transition-all cursor-pointer border ${
                 viewMode === 'grid'
-                  ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
-                  : 'text-slate-700 dark:text-zinc-300 hover:bg-rose-50 dark:hover:bg-zinc-700'
+                  ? 'bg-rose-500 text-white border-rose-600 dark:bg-zinc-100 dark:text-zinc-950 dark:border-white shadow-md'
+                  : 'bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border-rose-200/60 dark:border-zinc-700 hover:bg-rose-100/50 dark:hover:bg-zinc-700'
               }`}
             >
-              <LayoutGrid className="w-3.5 h-3.5" />
-              <span>Cuadrícula</span>
+              <LayoutGrid className="w-4 h-4 stroke-[2.4]" />
+              <span>Portadas Grandes</span>
+              {viewMode === 'grid' && <Check className="w-4 h-4 stroke-[3]" />}
             </button>
 
             <button
               onClick={() => setViewMode('list')}
-              className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-extrabold transition-all cursor-pointer border ${
                 viewMode === 'list'
-                  ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
-                  : 'text-slate-700 dark:text-zinc-300 hover:bg-rose-50 dark:hover:bg-zinc-700'
+                  ? 'bg-rose-500 text-white border-rose-600 dark:bg-zinc-100 dark:text-zinc-950 dark:border-white shadow-md'
+                  : 'bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border-rose-200/60 dark:border-zinc-700 hover:bg-rose-100/50 dark:hover:bg-zinc-700'
               }`}
             >
-              <List className="w-3.5 h-3.5" />
-              <span>Lista</span>
+              <List className="w-4 h-4 stroke-[2.4]" />
+              <span>Lista Simple</span>
+              {viewMode === 'list' && <Check className="w-4 h-4 stroke-[3]" />}
             </button>
           </div>
         </div>
 
-        {/* 3. Sort Options (1-tap pills) */}
-        <div className="p-3 rounded-2xl bg-rose-50/60 dark:bg-zinc-900/60 border border-rose-200/60 dark:border-zinc-800 space-y-2">
-          <div className="flex items-center gap-1.5 text-[10px] font-extrabold text-rose-900/70 dark:text-zinc-400 uppercase tracking-wider">
-            <ArrowUpDown className="w-3 h-3" />
-            <span>Ordenar biblioteca</span>
+        {/* 3. ORDENAR LIBROS */}
+        <div className="p-3.5 rounded-2xl bg-rose-50/70 dark:bg-zinc-900 border border-rose-200/70 dark:border-zinc-800 space-y-2.5">
+          <div className="flex items-center gap-1.5 text-xs font-black text-[#4c0519] dark:text-zinc-200">
+            <ArrowUpDown className="w-4 h-4" />
+            <span>Ordenar libros por:</span>
           </div>
 
-          <div className="grid grid-cols-2 gap-1.5">
-            {sortOptions.map(opt => {
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {sortChoices.map(opt => {
               const isSelected = sortBy === opt.id;
               return (
                 <button
                   key={opt.id}
                   onClick={() => setSortBy(opt.id)}
-                  className={`flex items-center justify-between p-2 rounded-xl text-xs font-semibold transition-all cursor-pointer border ${
+                  className={`flex items-center justify-between p-3 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
                     isSelected
-                      ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 border-rose-600 dark:border-zinc-300 font-bold shadow-xs'
-                      : 'bg-white dark:bg-zinc-800/80 text-slate-700 dark:text-zinc-300 border-rose-100 dark:border-zinc-700/60 hover:bg-rose-100/50'
+                      ? 'bg-rose-500 text-white border-rose-600 dark:bg-zinc-100 dark:text-zinc-950 dark:border-white shadow-sm'
+                      : 'bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border-rose-200/60 dark:border-zinc-700 hover:bg-rose-100/50 dark:hover:bg-zinc-700'
                   }`}
                 >
-                  <span className="truncate">{opt.label}</span>
-                  {isSelected && <Check className="w-3.5 h-3.5 shrink-0 stroke-[2.5]" />}
+                  <span className="flex items-center gap-2 truncate">
+                    <span>{opt.icon}</span>
+                    <span>{opt.label}</span>
+                  </span>
+                  {isSelected && <Check className="w-4 h-4 stroke-[3] shrink-0" />}
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* 4. Quick Toggles & Navigation (Theme, Categories, Settings, Public Catalog) */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className="p-2.5 rounded-xl bg-white dark:bg-zinc-850 border border-rose-200/70 dark:border-zinc-700 flex items-center gap-2 hover:bg-rose-50 dark:hover:bg-zinc-800 active:scale-96 transition-all cursor-pointer"
-          >
-            {settings.theme === 'dark' ? (
-              <Sun className="w-4 h-4 text-amber-400 shrink-0" />
-            ) : (
-              <Moon className="w-4 h-4 text-rose-500 shrink-0" />
-            )}
-            <div className="text-left min-w-0">
-              <span className="block text-[11px] font-bold text-[#4c0519] dark:text-[#f3f4f6] truncate">
-                {settings.theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}
+        {/* 4. MODO OSCURO / MODO CLARO */}
+        <button
+          onClick={toggleTheme}
+          className="w-full p-3.5 rounded-2xl bg-white dark:bg-zinc-850 border border-rose-200/80 dark:border-zinc-700 flex items-center justify-between active:scale-98 transition-all cursor-pointer shadow-xs hover:bg-rose-50 dark:hover:bg-zinc-800"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+              {settings.theme === 'dark' ? (
+                <Sun className="w-5 h-5 text-amber-500 stroke-[2.4]" />
+              ) : (
+                <Moon className="w-5 h-5 text-indigo-600 stroke-[2.4]" />
+              )}
+            </div>
+            <div className="text-left">
+              <span className="block text-xs font-black text-[#4c0519] dark:text-zinc-100">
+                {settings.theme === 'dark'
+                  ? 'Cambiar a Modo Claro (Fondo blanco)'
+                  : 'Cambiar a Modo Oscuro (Para la noche)'}
+              </span>
+              <span className="text-[11px] text-slate-500 dark:text-zinc-300 font-medium">
+                {settings.theme === 'dark' ? 'Actualmente en tema oscuro' : 'Actualmente en tema claro'}
               </span>
             </div>
-          </button>
+          </div>
+          <span className="text-xs font-bold text-rose-600 dark:text-zinc-300">
+            Cambiar
+          </span>
+        </button>
 
-          {/* Categories */}
+        {/* 5. CARPETAS Y CONFIGURACIÓN */}
+        <div className="grid grid-cols-2 gap-2.5">
           <button
             onClick={() => {
               onClose();
               onOpenCategoryManager();
             }}
-            className="p-2.5 rounded-xl bg-white dark:bg-zinc-850 border border-rose-200/70 dark:border-zinc-700 flex items-center gap-2 hover:bg-rose-50 dark:hover:bg-zinc-800 active:scale-96 transition-all cursor-pointer"
+            className="p-3.5 rounded-2xl bg-white dark:bg-zinc-850 border border-rose-200/80 dark:border-zinc-700 flex items-center gap-3 hover:bg-rose-50 dark:hover:bg-zinc-800 active:scale-96 transition-all cursor-pointer shadow-xs"
           >
-            <FolderTree className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+            <div className="w-9 h-9 rounded-xl bg-purple-100 dark:bg-zinc-800 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
+              <FolderTree className="w-5 h-5 stroke-[2.3]" />
+            </div>
             <div className="text-left min-w-0">
-              <span className="block text-[11px] font-bold text-[#4c0519] dark:text-[#f3f4f6] truncate">
-                Categorías
+              <span className="block text-xs font-black text-[#4c0519] dark:text-[#f3f4f6] truncate">
+                Mis Carpetas
+              </span>
+              <span className="text-[10px] text-slate-500 dark:text-zinc-300 truncate block font-medium">
+                Organizar libros
               </span>
             </div>
           </button>
 
-          {/* Public Catalog */}
-          <button
-            onClick={() => {
-              onClose();
-              onOpenExplore();
-            }}
-            className="p-2.5 rounded-xl bg-white dark:bg-zinc-850 border border-rose-200/70 dark:border-zinc-700 flex items-center gap-2 hover:bg-rose-50 dark:hover:bg-zinc-800 active:scale-96 transition-all cursor-pointer"
-          >
-            <Compass className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <div className="text-left min-w-0">
-              <span className="block text-[11px] font-bold text-[#4c0519] dark:text-[#f3f4f6] truncate">
-                Catálogo
-              </span>
-            </div>
-          </button>
-
-          {/* Full Settings */}
           <button
             onClick={() => {
               onClose();
               onOpenSettings();
             }}
-            className="p-2.5 rounded-xl bg-white dark:bg-zinc-850 border border-rose-200/70 dark:border-zinc-700 flex items-center gap-2 hover:bg-rose-50 dark:hover:bg-zinc-800 active:scale-96 transition-all cursor-pointer"
+            className="p-3.5 rounded-2xl bg-white dark:bg-zinc-850 border border-rose-200/80 dark:border-zinc-700 flex items-center gap-3 hover:bg-rose-50 dark:hover:bg-zinc-800 active:scale-96 transition-all cursor-pointer shadow-xs"
           >
-            <SlidersHorizontal className="w-4 h-4 text-slate-700 dark:text-zinc-300 shrink-0" />
+            <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-slate-700 dark:text-zinc-300 shrink-0">
+              <Settings className="w-5 h-5 stroke-[2.3]" />
+            </div>
             <div className="text-left min-w-0">
-              <span className="block text-[11px] font-bold text-[#4c0519] dark:text-[#f3f4f6] truncate">
+              <span className="block text-xs font-black text-[#4c0519] dark:text-[#f3f4f6] truncate">
                 Ajustes
+              </span>
+              <span className="text-[10px] text-slate-500 dark:text-zinc-300 truncate block font-medium">
+                Configuración app
               </span>
             </div>
           </button>
         </div>
 
-        {/* 5. Big Ergonomic Bottom Close Button */}
+        {/* 6. BOTÓN GRANDE PARA CERRAR */}
         <div className="pt-2">
           <button
             onClick={onClose}
-            className="w-full py-3 rounded-2xl bg-rose-100 hover:bg-rose-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-[#881337] dark:text-zinc-200 font-extrabold text-xs transition-colors cursor-pointer active:scale-98"
+            className="w-full py-3.5 rounded-2xl bg-rose-100 hover:bg-rose-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-[#881337] dark:text-zinc-200 font-black text-xs transition-colors cursor-pointer active:scale-98"
           >
-            Cerrar Menú
+            ✓ Listo, cerrar menú
           </button>
         </div>
       </div>

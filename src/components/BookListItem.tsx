@@ -5,9 +5,10 @@ import type { Book } from '../types';
 interface BookListItemProps {
   book: Book;
   onOpenDetails: (book: Book) => void;
+  onRead?: (book: Book) => void;
 }
 
-export const BookListItem: React.FC<BookListItemProps> = ({ book, onOpenDetails }) => {
+export const BookListItem: React.FC<BookListItemProps> = ({ book, onOpenDetails, onRead }) => {
 
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) return `${bytes} B`;
@@ -35,10 +36,18 @@ export const BookListItem: React.FC<BookListItemProps> = ({ book, onOpenDetails 
 
   const isCompleted = book.progress >= 100 || (book.currentPage >= book.totalPages && book.totalPages > 1);
 
+  const handleClick = () => {
+    if (onRead) {
+      onRead(book);
+    } else {
+      onOpenDetails(book);
+    }
+  };
+
   return (
     <div
-      onClick={() => onOpenDetails(book)}
-      className="flex items-center gap-3.5 p-3 rounded-2xl bg-white/80 dark:bg-[#18191c]/90 backdrop-blur-xs border border-rose-200/80 dark:border-zinc-800 hover:border-rose-400 dark:hover:border-zinc-700 transition-all cursor-pointer group shadow-2xs hover:shadow-md"
+      onClick={handleClick}
+      className="flex items-center gap-3.5 p-3 rounded-2xl bg-white/80 dark:bg-[#18191c]/90 backdrop-blur-xs border border-rose-200/80 dark:border-zinc-800 hover:border-rose-400 dark:hover:border-zinc-700 transition-all cursor-pointer group shadow-2xs hover:shadow-md active:scale-99"
     >
       {/* Thumbnail */}
       <div className="relative w-13 h-17 sm:w-14 sm:h-18 rounded-xl overflow-hidden bg-rose-50 dark:bg-zinc-800 shrink-0 border border-rose-200/60 dark:border-zinc-700">
@@ -50,7 +59,7 @@ export const BookListItem: React.FC<BookListItemProps> = ({ book, onOpenDetails 
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <BookOpen className="w-6 h-6 text-rose-300 dark:text-zinc-500" />
+            <BookOpen className="w-6 h-6 text-rose-300 dark:text-zinc-400" />
           </div>
         )}
       </div>

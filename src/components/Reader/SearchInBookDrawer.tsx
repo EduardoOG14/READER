@@ -173,12 +173,12 @@ export const SearchInBookDrawer: React.FC<SearchInBookDrawerProps> = ({
         {/* Results list */}
         <div className="flex-1 overflow-y-auto space-y-2.5 pr-1">
           {isSearching ? (
-            <div className="py-16 text-center text-xs text-slate-400 space-y-2">
+            <div className="py-16 text-center text-xs text-slate-500 dark:text-zinc-400 space-y-2">
               <Loader2 className="w-6 h-6 animate-spin mx-auto text-rose-500" />
               <p>Escaneando páginas del libro...</p>
             </div>
           ) : hasSearched && results.length === 0 ? (
-            <div className="py-16 text-center text-xs text-slate-400 space-y-2">
+            <div className="py-16 text-center text-xs text-slate-500 dark:text-zinc-400 space-y-2">
               <BookOpen className="w-8 h-8 mx-auto opacity-40" />
               <p>No se encontraron coincidencias para «{query}».</p>
             </div>
@@ -206,7 +206,7 @@ export const SearchInBookDrawer: React.FC<SearchInBookDrawerProps> = ({
 
         {/* Footer */}
         {results.length > 0 && (
-          <div className="pt-3 border-t border-rose-100 dark:border-zinc-800 text-[11px] text-slate-400 flex items-center justify-between shrink-0">
+          <div className="pt-3 border-t border-rose-100 dark:border-zinc-800 text-[11px] text-slate-500 dark:text-zinc-400 flex items-center justify-between shrink-0">
             <span>{results.length} coincidencias encontradas</span>
             <span className="text-[10px]">Toca una para saltar a la página</span>
           </div>

@@ -335,7 +335,7 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
                 </span>
               )}
             </h4>
-            <p className="text-[10px] text-slate-400 dark:text-zinc-400">
+            <p className="text-[10px] text-slate-400 dark:text-zinc-300">
               Página {currentPage} de {totalPages} • Frase {sentenceIndex + 1} de {sentences.length} ({progressPercent}%)
             </p>
           </div>
@@ -362,7 +362,7 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
               <span className="text-rose-400 dark:text-zinc-400 font-bold ml-1">”</span>
             </span>
           ) : (
-            <span className="text-slate-500 italic">Cargando texto de la página...</span>
+            <span className="text-slate-400 dark:text-zinc-300 italic">Cargando texto de la página...</span>
           )}
         </p>
       </div>

@@ -374,7 +374,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                   />
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-rose-300 dark:text-zinc-500">
+                  <div className="w-full h-full flex flex-col items-center justify-center text-rose-300 dark:text-zinc-400">
                     <BookOpen className="w-8 h-8 mb-1" />
                     <span className="text-[9px] font-semibold opacity-70">Sin Portada</span>
                   </div>
@@ -455,35 +455,35 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
           <button
             type="button"
             onClick={() => setActiveTab('episodes')}
-            className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
+            className={`flex-1 py-2.5 px-2 rounded-xl text-xs font-black transition-all text-center cursor-pointer ${
               activeTab === 'episodes'
-                ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
-                : 'text-slate-700 dark:text-zinc-200 hover:bg-rose-100/80 dark:hover:bg-zinc-800'
+                ? 'bg-rose-500 text-white dark:bg-zinc-100 dark:text-zinc-950 shadow-xs'
+                : 'text-slate-700 dark:text-zinc-300 hover:bg-rose-100/80 dark:hover:bg-zinc-800'
             }`}
           >
-            {isManga ? 'Episodios & Lectura' : 'Lectura & Progreso'}
+            {isManga ? '📑 Capítulos' : '📖 Progreso'}
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('synopsis')}
-            className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
+            className={`flex-1 py-2.5 px-2 rounded-xl text-xs font-black transition-all text-center cursor-pointer ${
               activeTab === 'synopsis'
-                ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
-                : 'text-slate-700 dark:text-zinc-200 hover:bg-rose-100/80 dark:hover:bg-zinc-800'
+                ? 'bg-rose-500 text-white dark:bg-zinc-100 dark:text-zinc-950 shadow-xs'
+                : 'text-slate-700 dark:text-zinc-300 hover:bg-rose-100/80 dark:hover:bg-zinc-800'
             }`}
           >
-            Sinopsis & Ficha
+            📝 Sinopsis
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('collection')}
-            className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
+            className={`flex-1 py-2.5 px-2 rounded-xl text-xs font-black transition-all text-center cursor-pointer ${
               activeTab === 'collection'
-                ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
-                : 'text-slate-700 dark:text-zinc-200 hover:bg-rose-100/80 dark:hover:bg-zinc-800'
+                ? 'bg-rose-500 text-white dark:bg-zinc-100 dark:text-zinc-950 shadow-xs'
+                : 'text-slate-700 dark:text-zinc-300 hover:bg-rose-100/80 dark:hover:bg-zinc-800'
             }`}
           >
-            Reseña & Colección
+            📁 Opciones
           </button>
         </div>
 

@@ -542,7 +542,7 @@ export const ReaderContainer: React.FC = () => {
       {/* Reader Content Area with active Filter Class */}
       <div className={`flex-1 relative overflow-hidden flex items-center justify-center ${filterClass}`}>
         {loadingFile ? (
-          <div className="flex flex-col items-center justify-center text-slate-400 gap-3">
+          <div className="flex flex-col items-center justify-center text-slate-400 dark:text-zinc-300 gap-3">
             <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
             <p className="text-sm font-medium">Cargando libro desde el almacenamiento...</p>
           </div>

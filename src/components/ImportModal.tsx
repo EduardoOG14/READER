@@ -69,23 +69,23 @@ export const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose }) => 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
       <div
-        className="relative w-full max-w-lg bg-[#fff0f5] dark:bg-[#0a2920] border border-[#fecdd9] dark:border-[#165b48] rounded-3xl p-6 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150"
+        className="relative w-full max-w-lg bg-[#fff0f5] dark:bg-[#18191c] border border-[#fecdd9] dark:border-zinc-800 rounded-3xl p-6 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-[#fecdd9]/70 dark:border-[#165b48]/70">
+        <div className="flex items-center justify-between pb-4 border-b border-[#fecdd9]/70 dark:border-zinc-800">
           <div>
-            <h2 className="text-lg font-bold text-[#4c0519] dark:text-[#ecfdf5]">
+            <h2 className="text-lg font-bold text-[#4c0519] dark:text-[#f3f4f6]">
               Importar Libros y Mangas
             </h2>
-            <p className="text-xs text-[#881337]/75 dark:text-[#a7f3d0]/75 mt-0.5">
+            <p className="text-xs text-[#881337]/75 dark:text-zinc-300 mt-0.5 font-medium">
               Se creará una copia local segura en el almacenamiento de la app.
             </p>
           </div>
           <button
             onClick={onClose}
             disabled={isProcessing}
-            className="p-1.5 rounded-full text-rose-400 hover:text-rose-700 dark:text-emerald-400 dark:hover:text-emerald-200 hover:bg-[#ffe4ec] dark:hover:bg-[#0f382c] transition-colors"
+            className="p-1.5 rounded-full text-rose-400 hover:text-rose-700 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-[#ffe4ec] dark:hover:bg-zinc-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -93,13 +93,13 @@ export const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose }) => 
 
         {/* Category assign selector */}
         <div className="my-4">
-          <label className="block text-xs font-semibold text-[#881337] dark:text-[#a7f3d0] mb-1.5">
+          <label className="block text-xs font-semibold text-[#881337] dark:text-zinc-200 mb-1.5">
             Asignar a categoría (Opcional):
           </label>
           <select
             value={selectedTargetCat}
             onChange={e => setSelectedTargetCat(e.target.value)}
-            className="w-full text-sm bg-white dark:bg-[#06241c] border border-[#fecdd9] dark:border-[#165b48] rounded-xl px-3 py-2 text-[#4c0519] dark:text-[#ecfdf5] outline-none focus:ring-2 focus:ring-rose-400 dark:focus:ring-emerald-400"
+            className="w-full text-sm bg-white dark:bg-zinc-900 border border-[#fecdd9] dark:border-zinc-700 rounded-xl px-3 py-2 text-[#4c0519] dark:text-[#f3f4f6] outline-none focus:ring-2 focus:ring-rose-400 dark:focus:ring-zinc-600"
           >
             <option value="">Automática (según tipo de archivo)</option>
             {categories
@@ -123,8 +123,8 @@ export const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose }) => 
           onClick={() => !isProcessing && fileInputRef.current?.click()}
           className={`border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all ${
             isDragging
-              ? 'border-rose-500 bg-rose-50 dark:border-emerald-400 dark:bg-emerald-950/20'
-              : 'border-[#fda4bb] dark:border-[#1a634e] hover:border-rose-400 dark:hover:border-emerald-400 bg-white/70 dark:bg-[#06241c]/60'
+              ? 'border-rose-500 bg-rose-50 dark:border-rose-400 dark:bg-zinc-800/60'
+              : 'border-[#fda4bb] dark:border-zinc-700 hover:border-rose-400 dark:hover:border-zinc-500 bg-white/70 dark:bg-zinc-900/60'
           }`}
         >
           <input

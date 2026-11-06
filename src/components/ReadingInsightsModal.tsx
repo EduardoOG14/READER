@@ -98,7 +98,7 @@ export const ReadingInsightsModal: React.FC<ReadingInsightsModalProps> = ({
               </span>
               <span className="text-xs font-semibold ml-1.5 text-slate-500 dark:text-zinc-400">días seguidos</span>
             </div>
-            <p className="text-[10px] text-slate-400 mt-1">Mejor racha: {stats?.bestStreak || 0} días</p>
+            <p className="text-[10px] text-slate-500 dark:text-zinc-400 mt-1">Mejor racha: {stats?.bestStreak || 0} días</p>
           </div>
 
           {/* Card 2: Tiempo Hoy */}
@@ -113,7 +113,7 @@ export const ReadingInsightsModal: React.FC<ReadingInsightsModalProps> = ({
               </span>
               <span className="text-xs font-semibold ml-1.5 text-slate-500 dark:text-zinc-400">minutos</span>
             </div>
-            <p className="text-[10px] text-slate-400 mt-1">Meta diaria: {goal} min</p>
+            <p className="text-[10px] text-slate-500 dark:text-zinc-400 mt-1">Meta diaria: {goal} min</p>
           </div>
 
           {/* Card 3: Páginas leídas */}
@@ -128,7 +128,7 @@ export const ReadingInsightsModal: React.FC<ReadingInsightsModalProps> = ({
               </span>
               <span className="text-xs font-semibold ml-1.5 text-slate-500 dark:text-zinc-400">páginas</span>
             </div>
-            <p className="text-[10px] text-slate-400 mt-1">En tus libros y mangas</p>
+            <p className="text-[10px] text-slate-500 dark:text-zinc-400 mt-1">En tus libros y mangas</p>
           </div>
 
           {/* Card 4: Obras en Biblioteca */}
@@ -143,7 +143,7 @@ export const ReadingInsightsModal: React.FC<ReadingInsightsModalProps> = ({
               </span>
               <span className="text-xs font-semibold ml-1.5 text-slate-500 dark:text-zinc-400">obras</span>
             </div>
-            <p className="text-[10px] text-slate-400 mt-1">Disponibles sin conexión</p>
+            <p className="text-[10px] text-slate-500 dark:text-zinc-400 mt-1">Disponibles sin conexión</p>
           </div>
         </div>
 

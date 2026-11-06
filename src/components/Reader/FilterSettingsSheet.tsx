@@ -539,7 +539,7 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
                   onChange={e => updateSettings({ brightness: Number(e.target.value) })}
                   className="w-full accent-rose-500 dark:accent-zinc-300 cursor-pointer"
                 />
-                <p className="text-[10px] text-slate-400 dark:text-zinc-500">
+                <p className="text-[10px] text-slate-500 dark:text-zinc-400 font-medium">
                   Tip: Desliza verticalmente por el borde izquierdo de la pantalla para ajustar el brillo rápidamente.
                 </p>
               </div>

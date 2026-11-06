@@ -31,7 +31,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ onOpenImport, onOpenExpl
           : 'Tu biblioteca está lista'}
       </h3>
 
-      <p className="text-sm text-[#881337]/75 dark:text-zinc-400 leading-relaxed mb-6">
+      <p className="text-sm text-[#881337]/75 dark:text-zinc-200 leading-relaxed mb-6">
         {isFiltering
           ? 'Prueba buscando con otro término o selecciona otra categoría en el menú superior.'
           : 'Puedes importar libros o mangas desde tu dispositivo o explorar las obras en español de la biblioteca pública.'}
@@ -66,8 +66,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ onOpenImport, onOpenExpl
           </div>
 
           {/* Supported format badges */}
-          <div className="w-full pt-6 border-t border-[#fecdd9]/70 dark:border-[#165b48]/70">
-            <span className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold block mb-3">
+          <div className="w-full pt-6 border-t border-[#fecdd9]/70 dark:border-zinc-800">
+            <span className="text-xs uppercase tracking-wider text-slate-500 dark:text-zinc-300 font-bold block mb-3">
               Formatos compatibles
             </span>
             <div className="flex flex-wrap justify-center gap-2 text-xs">

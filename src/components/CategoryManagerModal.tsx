@@ -105,7 +105,7 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({ isOp
 
           {/* Color swatches */}
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-slate-400 dark:text-slate-500">Color:</span>
+            <span className="text-[11px] text-slate-500 dark:text-zinc-300 font-semibold">Color:</span>
             <div className="flex items-center gap-1.5">
               {PRESET_COLORS.map(c => (
                 <button
@@ -124,7 +124,7 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({ isOp
 
         {/* Existing Categories list */}
         <div className="mt-4 max-h-64 overflow-y-auto space-y-2 pr-1">
-          <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">
+          <span className="text-xs font-bold text-slate-500 dark:text-zinc-300 uppercase tracking-wider block mb-1">
             Categorías existentes
           </span>
 
@@ -162,7 +162,7 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({ isOp
                       {cat.name}
                     </span>
                     {cat.isDefault && (
-                      <span className="text-[10px] text-slate-400 bg-slate-200/60 dark:bg-slate-800 px-1.5 py-0.2 rounded-md">
+                      <span className="text-[10px] text-slate-500 bg-slate-200/60 dark:bg-zinc-800 dark:text-zinc-300 font-bold px-2 py-0.5 rounded-md">
                         Sistema
                       </span>
                     )}

@@ -152,22 +152,22 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
         )}
 
         {/* Dialog Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-rose-100 dark:border-zinc-800 shrink-0">
+        <div className="flex items-center justify-between pb-3.5 border-b border-rose-100 dark:border-zinc-800 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-500 via-pink-500 to-rose-400 dark:from-zinc-700 dark:to-zinc-600 text-white flex items-center justify-center shadow-md">
-              <BookOpen className="w-5 h-5 stroke-[2.2]" />
+              <BookOpen className="w-5 h-5 stroke-[2.4]" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base sm:text-lg font-bold text-[#4c0519] dark:text-[#f3f4f6]">
-                  Biblioteca Pública de Obras
+                <h3 className="text-base sm:text-lg font-black text-[#4c0519] dark:text-[#f3f4f6]">
+                  Catálogo de Libros Gratis
                 </h3>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-500 text-white dark:bg-zinc-700 dark:text-zinc-200">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500 text-white shadow-2xs">
                   100% Español
                 </span>
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-700 dark:text-zinc-300 font-medium">
-                Libros, mangas y cómics listos para guardar y leer sin conexión
+              <p className="text-xs text-slate-600 dark:text-zinc-300 font-medium">
+                219 obras completas listas para descargar y leer sin internet
               </p>
             </div>
           </div>
@@ -175,11 +175,11 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsDownloadCenterOpen(true)}
-              className="relative py-1.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-rose-700 dark:text-zinc-200 border border-rose-200/80 dark:border-zinc-700 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
+              className="relative py-2 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-rose-700 dark:text-zinc-200 border border-rose-200/80 dark:border-zinc-700 font-extrabold text-xs flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
               title="Abrir Centro de Descargas"
             >
-              <Download className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-              <span className="hidden sm:inline">Centro de Descargas</span>
+              <Download className="w-4 h-4 text-rose-600 dark:text-rose-400 stroke-[2.3]" />
+              <span className="hidden sm:inline">Descargas</span>
               {(queueState.totalCount > 0 || queueState.activeItem) && (
                 <span className="w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center shrink-0">
                   {queueState.pendingItems.length + (queueState.activeItem ? 1 : 0)}
@@ -188,16 +188,16 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
             </button>
             <button
               onClick={onClose}
-              className="p-2 rounded-full hover:bg-rose-100 dark:hover:bg-zinc-800 text-rose-400 dark:text-zinc-400 transition-colors cursor-pointer"
-              title="Cerrar"
+              className="w-9 h-9 rounded-full bg-rose-50 dark:bg-zinc-800 flex items-center justify-center text-rose-500 dark:text-zinc-400 hover:bg-rose-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
+              title="Cerrar catálogo"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 stroke-[2.5]" />
             </button>
           </div>
         </div>
 
         {/* Filters and Instant Local Search Bar */}
-        <div className="pt-3 pb-2 space-y-3 shrink-0">
+        <div className="pt-3 pb-2 space-y-2.5 shrink-0">
           {/* Instant Search Bar */}
           <div className="relative">
             <Search className="w-4 h-4 text-rose-400 dark:text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -205,8 +205,8 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
               type="text"
               value={filterQuery}
               onChange={handleQueryChange}
-              placeholder="Filtrar por título, autor o género..."
-              className="w-full pl-10 pr-4 py-2 text-xs bg-rose-50/50 dark:bg-zinc-900/80 border border-rose-200/80 dark:border-zinc-700 rounded-2xl outline-none text-[#4c0519] dark:text-[#f3f4f6] placeholder-rose-400/60 dark:placeholder-zinc-500 focus:ring-2 focus:ring-rose-400/30 dark:focus:ring-zinc-600 transition-all"
+              placeholder="Buscar por nombre de libro, manga o autor..."
+              className="w-full pl-10 pr-4 py-2.5 text-xs bg-rose-50/60 dark:bg-zinc-900/80 border border-rose-200/80 dark:border-zinc-700 rounded-2xl outline-none text-[#4c0519] dark:text-[#f3f4f6] placeholder-rose-400/70 dark:placeholder-zinc-500 font-bold focus:ring-2 focus:ring-rose-400/30 dark:focus:ring-zinc-600 transition-all"
             />
             {filterQuery && (
               <button
@@ -216,7 +216,7 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
                 }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-rose-400 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-zinc-200"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-3.5 h-3.5 stroke-[2.5]" />
               </button>
             )}
           </div>
@@ -225,43 +225,43 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
             <button
               onClick={() => handleCategoryChange('todos')}
-              className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl font-black transition-all shrink-0 cursor-pointer ${
                 activeCategory === 'todos'
-                  ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
-                  : 'bg-rose-50 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 hover:bg-rose-100 dark:hover:bg-zinc-700'
+                  ? 'bg-rose-500 text-white dark:bg-zinc-100 dark:text-zinc-950 shadow-xs'
+                  : 'bg-rose-50 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 hover:bg-rose-100 dark:hover:bg-zinc-700 font-bold'
               }`}
             >
-              Todos ({categoryCounts.todos})
+              🌟 Todos ({categoryCounts.todos})
             </button>
             <button
               onClick={() => handleCategoryChange('libros')}
-              className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl font-black transition-all shrink-0 cursor-pointer ${
                 activeCategory === 'libros'
-                  ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
-                  : 'bg-rose-50 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 hover:bg-rose-100 dark:hover:bg-zinc-700'
+                  ? 'bg-rose-500 text-white dark:bg-zinc-100 dark:text-zinc-950 shadow-xs'
+                  : 'bg-rose-50 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 hover:bg-rose-100 dark:hover:bg-zinc-700 font-bold'
               }`}
             >
-              Libros y Novelas ({categoryCounts.libros})
+              📚 Libros ({categoryCounts.libros})
             </button>
             <button
               onClick={() => handleCategoryChange('manga')}
-              className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl font-black transition-all shrink-0 cursor-pointer ${
                 activeCategory === 'manga'
-                  ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
-                  : 'bg-rose-50 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 hover:bg-rose-100 dark:hover:bg-zinc-700'
+                  ? 'bg-rose-500 text-white dark:bg-zinc-100 dark:text-zinc-950 shadow-xs'
+                  : 'bg-rose-50 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 hover:bg-rose-100 dark:hover:bg-zinc-700 font-bold'
               }`}
             >
-              Mangas ({categoryCounts.manga})
+              ⛩️ Mangas ({categoryCounts.manga})
             </button>
             <button
               onClick={() => handleCategoryChange('manhwa')}
-              className={`px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl font-black transition-all shrink-0 cursor-pointer ${
                 activeCategory === 'manhwa'
-                  ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
-                  : 'bg-rose-50 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 hover:bg-rose-100 dark:hover:bg-zinc-700'
+                  ? 'bg-rose-500 text-white dark:bg-zinc-100 dark:text-zinc-950 shadow-xs'
+                  : 'bg-rose-50 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 hover:bg-rose-100 dark:hover:bg-zinc-700 font-bold'
               }`}
             >
-              Manhwas y Webtoons ({categoryCounts.manhwa})
+              🇰🇷 Manhwas ({categoryCounts.manhwa})
             </button>
           </div>
         </div>
@@ -270,8 +270,8 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
         <div className="py-2 overflow-y-auto flex-1 space-y-3.5 pr-1">
           {filteredCatalog.length === 0 ? (
             <div className="py-14 text-center space-y-2">
-              <Filter className="w-8 h-8 text-rose-300 dark:text-zinc-600 mx-auto" />
-              <p className="text-sm font-semibold text-[#881337] dark:text-zinc-400">
+              <Filter className="w-8 h-8 text-rose-300 dark:text-zinc-400 mx-auto" />
+              <p className="text-sm font-semibold text-[#881337] dark:text-zinc-300">
                 No se encontraron obras que coincidan con tu búsqueda.
               </p>
             </div>
