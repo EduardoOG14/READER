@@ -1,5 +1,5 @@
 import JSZip from 'jszip';
-import type { CatalogItem } from './catalogData';
+import { SPANISH_CATALOG, type CatalogItem } from './catalogData';
 import { importBookFile } from './bookImporter';
 import { subscribeDownloadProgress } from './catalog/generators';
 import { fetchOfficialCoverUrl, fetchCoverBlob } from './coverFetcher';
@@ -19,6 +19,7 @@ export interface QueueItem {
   totalChapters?: number;
   completedChapters?: number;
   addedAt: number;
+  completedAt?: number;
 }
 
 export interface QueueState {
@@ -33,22 +34,126 @@ export interface QueueState {
   lastCompletedItem?: CatalogItem;
 }
 
+export interface DownloadEvent {
+  type: 'enqueued' | 'completed' | 'error';
+  item: QueueItem;
+  title: string;
+  count?: number;
+}
+
 type QueueListener = (status: QueueState) => void;
+type DownloadEventListener = (event: DownloadEvent) => void;
 
 class DownloadQueueService {
   private queue: QueueItem[] = [];
   private isProcessing = false;
   private listeners: Set<QueueListener> = new Set();
+  private eventListeners: Set<DownloadEventListener> = new Set();
   private onLibraryRefreshNeeded?: () => Promise<any>;
   private isCancelledMap: Map<string, boolean> = new Map();
 
   constructor() {
+    this.loadFromStorage();
+
     subscribeDownloadProgress((_title, message, percent) => {
       const active = this.queue.find(q => q.status === 'downloading');
       if (active && (!active.selectedChapters || active.selectedChapters.length === 0)) {
         active.progressMessage = message;
         active.progressPercent = Math.max(active.progressPercent, percent);
+        this.saveToStorage();
         this.notify();
+      }
+    });
+
+    // Auto-resume pending downloads from storage after a short delay
+    setTimeout(() => {
+      if (this.queue.some(q => q.status === 'pending')) {
+        this.processNext();
+      }
+    }, 600);
+  }
+
+  private saveToStorage() {
+    try {
+      // Keep active/pending/errors and up to 50 recent completed items
+      const activeOrPending = this.queue.filter(q => q.status !== 'completed');
+      const completed = this.queue.filter(q => q.status === 'completed').slice(0, 50);
+      const toSave = [...activeOrPending, ...completed];
+
+      const serializable = toSave.map(q => ({
+        id: q.id,
+        item: {
+          id: q.item.id,
+          title: q.item.title,
+          author: q.item.author,
+          category: q.item.category,
+          genre: q.item.genre,
+          description: q.item.description,
+          format: q.item.format,
+          coverUrl: q.item.coverUrl,
+          coverGradient: q.item.coverGradient,
+          badgeText: q.item.badgeText,
+          totalPages: q.item.totalPages,
+        },
+        selectedChapters: q.selectedChapters,
+        status: q.status,
+        error: q.error,
+        progressPercent: q.progressPercent,
+        progressMessage: q.progressMessage,
+        totalChapters: q.totalChapters,
+        completedChapters: q.completedChapters,
+        addedAt: q.addedAt,
+        completedAt: q.completedAt,
+      }));
+      localStorage.setItem('reader_download_queue_v2', JSON.stringify(serializable));
+    } catch (e) {
+      console.warn('[DownloadQueue] saveToStorage error:', e);
+    }
+  }
+
+  private loadFromStorage() {
+    try {
+      const raw = localStorage.getItem('reader_download_queue_v2');
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return;
+
+      this.queue = parsed.map(q => {
+        const catItem = SPANISH_CATALOG.find(c => c.id === q.item?.id);
+        const restoredItem: CatalogItem = {
+          ...q.item,
+          createFile: catItem?.createFile,
+        };
+
+        const item: QueueItem = {
+          ...q,
+          item: restoredItem,
+          status: q.status === 'downloading' ? 'pending' : q.status,
+          progressMessage: q.status === 'downloading' ? 'Reanudando descarga...' : q.progressMessage,
+        };
+        return item;
+      });
+    } catch (e) {
+      console.warn('[DownloadQueue] loadFromStorage error:', e);
+    }
+  }
+
+  public onDownloadEvent(listener: DownloadEventListener): () => void {
+    this.eventListeners.add(listener);
+    return () => this.eventListeners.delete(listener);
+  }
+
+  private notifyEvent(type: 'enqueued' | 'completed' | 'error', item: QueueItem, count?: number) {
+    this.eventListeners.forEach(listener => {
+      try {
+        listener({
+          type,
+          item,
+          title: item.item.title,
+          count: count ?? item.selectedChapters?.length ?? 1,
+        });
+      } catch (e) {
+        console.error('[DownloadQueue] Event listener error:', e);
       }
     });
   }
@@ -77,7 +182,10 @@ class DownloadQueueService {
   public getState(): QueueState {
     const activeItem = this.queue.find(q => q.status === 'downloading') || null;
     const pendingItems = this.queue.filter(q => q.status === 'pending');
-    const completedItems = this.queue.filter(q => q.status === 'completed');
+    // Sort completed items by completedAt descending (newest first)
+    const completedItems = this.queue
+      .filter(q => q.status === 'completed')
+      .sort((a, b) => (b.completedAt || b.addedAt) - (a.completedAt || a.addedAt));
     const errorItems = this.queue.filter(q => q.status === 'error');
 
     return {
@@ -89,7 +197,7 @@ class DownloadQueueService {
       completedCount: completedItems.length,
       totalCount: this.queue.length,
       isProcessing: this.isProcessing,
-      lastCompletedItem: completedItems[completedItems.length - 1]?.item,
+      lastCompletedItem: completedItems[0]?.item,
     };
   }
 
@@ -107,6 +215,7 @@ class DownloadQueueService {
       if (selectedChapters && selectedChapters.length > 0) {
         existing.selectedChapters = selectedChapters;
         existing.totalChapters = selectedChapters.length;
+        this.saveToStorage();
         this.notify();
       }
       return existing.id;
@@ -115,7 +224,7 @@ class DownloadQueueService {
     const id = `${item.id}_${Date.now()}`;
     this.isCancelledMap.set(id, false);
 
-    this.queue.push({
+    const newItem: QueueItem = {
       id,
       item,
       selectedChapters,
@@ -124,9 +233,12 @@ class DownloadQueueService {
       totalChapters: selectedChapters?.length || 1,
       completedChapters: 0,
       addedAt: Date.now(),
-    });
+    };
 
+    this.queue.push(newItem);
+    this.saveToStorage();
     this.notify();
+    this.notifyEvent('enqueued', newItem, selectedChapters?.length);
     this.processNext();
     return id;
   }
@@ -142,6 +254,7 @@ class DownloadQueueService {
       item.status = 'error';
       item.error = 'Descarga cancelada por el usuario';
     }
+    this.saveToStorage();
     this.notify();
   }
 
@@ -153,17 +266,20 @@ class DownloadQueueService {
     item.error = undefined;
     item.progressPercent = 0;
     item.progressMessage = 'Reintentando...';
+    this.saveToStorage();
     this.notify();
     this.processNext();
   }
 
   public clearCompleted() {
     this.queue = this.queue.filter(q => q.status !== 'completed');
+    this.saveToStorage();
     this.notify();
   }
 
   public remove(id: string) {
     this.queue = this.queue.filter(q => q.id !== id);
+    this.saveToStorage();
     this.notify();
   }
 
@@ -271,7 +387,12 @@ class DownloadQueueService {
 
       next.progressPercent = 100;
       next.status = 'completed';
+      next.completedAt = Date.now();
       next.progressMessage = '¡Descarga completada con éxito!';
+
+      this.saveToStorage();
+      this.notify();
+      this.notifyEvent('completed', next);
 
       if (this.onLibraryRefreshNeeded) {
         await this.onLibraryRefreshNeeded();
@@ -281,6 +402,9 @@ class DownloadQueueService {
       next.status = 'error';
       next.error = err.message || 'Error en la descarga';
       next.progressMessage = `Error: ${next.error}`;
+      this.saveToStorage();
+      this.notify();
+      this.notifyEvent('error', next);
     } finally {
       this.isProcessing = false;
       this.notify();
