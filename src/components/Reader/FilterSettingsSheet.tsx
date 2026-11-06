@@ -19,6 +19,8 @@ import {
   Crop,
   Type,
   Palette,
+  Minus,
+  Plus,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useBackHandler } from '../../services/backButton';
@@ -268,6 +270,41 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
                   </button>
                 </div>
               </div>
+
+              {/* Quick Font Size for Books in main tab */}
+              {isTextBased && (
+                <div className="p-3 bg-slate-50 dark:bg-zinc-900/60 rounded-2xl border border-slate-200/80 dark:border-zinc-800 space-y-2">
+                  <div className="flex justify-between items-center text-xs font-bold text-slate-700 dark:text-zinc-200">
+                    <span className="flex items-center gap-1.5">
+                      <Type className="w-3.5 h-3.5 text-rose-500 dark:text-zinc-300" />
+                      <span>Tamaño de Letra</span>
+                    </span>
+                    <span className="font-mono text-rose-600 dark:text-zinc-200 bg-rose-50 dark:bg-zinc-800 px-2 py-0.5 rounded-lg border border-rose-200/60 dark:border-zinc-700 font-bold">
+                      {settings.fontSize || 18} px
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => updateSettings({ fontSize: Math.max(12, (settings.fontSize || 18) - 1) })}
+                      disabled={(settings.fontSize || 18) <= 12}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-zinc-100 font-bold active:scale-95 disabled:opacity-40 transition-all cursor-pointer shadow-xs"
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                      <span className="text-xs">A- Menor</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateSettings({ fontSize: Math.min(36, (settings.fontSize || 18) + 1) })}
+                      disabled={(settings.fontSize || 18) >= 36}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-zinc-100 font-bold active:scale-95 disabled:opacity-40 transition-all cursor-pointer shadow-xs"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span className="text-xs">A+ Mayor</span>
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Orientation Lock Segmented Pill */}
               <div className="p-3 bg-slate-50 dark:bg-zinc-900/60 rounded-2xl border border-slate-200/80 dark:border-zinc-800 space-y-2">
@@ -669,19 +706,68 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
               </div>
 
               {/* Font size */}
-              <div className="p-3 bg-slate-50 dark:bg-zinc-900/60 rounded-2xl border border-slate-200/80 dark:border-zinc-800 space-y-1.5">
+              <div className="p-3 bg-slate-50 dark:bg-zinc-900/60 rounded-2xl border border-slate-200/80 dark:border-zinc-800 space-y-2.5">
                 <div className="flex justify-between items-center text-xs font-bold text-slate-700 dark:text-zinc-200">
                   <span>Tamaño de Letra</span>
-                  <span className="font-mono">{settings.fontSize} px</span>
+                  <span className="font-mono bg-rose-50 dark:bg-zinc-800 text-rose-600 dark:text-zinc-200 px-2 py-0.5 rounded-lg border border-rose-200/60 dark:border-zinc-700 font-bold">
+                    {settings.fontSize || 18} px
+                  </span>
                 </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => updateSettings({ fontSize: Math.max(12, (settings.fontSize || 18) - 1) })}
+                    disabled={(settings.fontSize || 18) <= 12}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-zinc-100 font-bold active:scale-95 disabled:opacity-40 transition-all cursor-pointer shadow-xs"
+                    title="Reducir letra"
+                  >
+                    <Minus className="w-4 h-4 stroke-[2.5]" />
+                    <span className="text-xs font-bold">A- Menor</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => updateSettings({ fontSize: Math.min(36, (settings.fontSize || 18) + 1) })}
+                    disabled={(settings.fontSize || 18) >= 36}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-800 dark:text-zinc-100 font-bold active:scale-95 disabled:opacity-40 transition-all cursor-pointer shadow-xs"
+                    title="Aumentar letra"
+                  >
+                    <Plus className="w-4 h-4 stroke-[2.5]" />
+                    <span className="text-sm font-bold">A+ Mayor</span>
+                  </button>
+                </div>
+
                 <input
                   type="range"
-                  min="14"
-                  max="32"
-                  value={settings.fontSize}
+                  min="12"
+                  max="36"
+                  value={settings.fontSize || 18}
                   onChange={e => updateSettings({ fontSize: Number(e.target.value) })}
-                  className="w-full accent-rose-500 dark:accent-zinc-300 cursor-pointer"
+                  className="w-full accent-rose-500 dark:accent-zinc-300 cursor-pointer h-2"
                 />
+
+                <div className="grid grid-cols-4 gap-1.5 pt-0.5">
+                  {[
+                    { label: 'Chica', size: 14 },
+                    { label: 'Normal', size: 18 },
+                    { label: 'Grande', size: 22 },
+                    { label: 'Extra', size: 26 },
+                  ].map(p => (
+                    <button
+                      key={p.size}
+                      type="button"
+                      onClick={() => updateSettings({ fontSize: p.size })}
+                      className={`py-1.5 px-1 rounded-xl text-xs font-bold transition-all cursor-pointer text-center ${
+                        (settings.fontSize || 18) === p.size
+                          ? 'bg-rose-500 text-white dark:bg-zinc-200 dark:text-zinc-950 shadow-xs'
+                          : 'bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Line height */}

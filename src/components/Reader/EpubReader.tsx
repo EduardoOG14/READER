@@ -12,6 +12,91 @@ interface EpubReaderProps {
   isContinuousMode?: boolean;
 }
 
+// Helper to generate dynamic Moon+ Reader typography CSS
+function getTypographyCss(settings: any) {
+  let bgColor = '#f7f4ed';
+  let textColor = '#1e293b';
+
+  const preset = settings.readingThemePreset || (settings.theme === 'dark' ? 'emerald' : 'day');
+  if (preset === 'emerald') {
+    bgColor = '#18191c';
+    textColor = '#e4e4e7';
+  } else if (preset === 'oled') {
+    bgColor = '#000000';
+    textColor = '#f1f5f9';
+  } else if (preset === 'sepia') {
+    bgColor = '#ece4d0';
+    textColor = '#2c2214';
+  } else if (preset === 'sakura') {
+    bgColor = '#fdf2f4';
+    textColor = '#4c1d2c';
+  } else if (preset === 'day') {
+    bgColor = '#f7f4ed';
+    textColor = '#1e293b';
+  }
+
+  let fontFamily = 'Georgia, "Times New Roman", serif';
+  if (settings.fontFamily === 'sans') fontFamily = 'system-ui, -apple-system, sans-serif';
+  if (settings.fontFamily === 'mono') fontFamily = 'ui-monospace, monospace';
+  if (settings.fontFamily === 'opendyslexic') fontFamily = 'OpenDyslexic, sans-serif';
+
+  const fontSize = settings.fontSize || 18;
+  const lineHeight = settings.lineHeight || 1.75;
+  const textAlign = settings.textAlign || 'justify';
+
+  return `
+    html, body {
+      margin: 0 !important;
+      padding: 24px 28px 90px 24px !important;
+      box-sizing: border-box !important;
+      background-color: ${bgColor} !important;
+      color: ${textColor} !important;
+      font-family: ${fontFamily} !important;
+      font-size: ${fontSize}px !important;
+      line-height: ${lineHeight} !important;
+      text-align: ${textAlign} !important;
+      text-justify: inter-word !important;
+      -webkit-hyphens: none !important;
+      -moz-hyphens: none !important;
+      -ms-hyphens: none !important;
+      hyphens: none !important;
+      word-break: normal !important;
+      overflow-wrap: break-word !important;
+      word-wrap: break-word !important;
+    }
+    p {
+      margin: 0 0 0.9em 0 !important;
+      text-indent: 1.25em !important;
+      text-align: ${textAlign} !important;
+      line-height: ${lineHeight} !important;
+      font-size: ${fontSize}px !important;
+      padding-right: 8px !important;
+      -webkit-hyphens: none !important;
+      -moz-hyphens: none !important;
+      -ms-hyphens: none !important;
+      hyphens: none !important;
+      word-break: normal !important;
+      overflow-wrap: break-word !important;
+    }
+    h1, h2, h3, h4 {
+      text-align: center !important;
+      font-weight: bold !important;
+      color: ${textColor} !important;
+      margin-top: 1.2em !important;
+      margin-bottom: 0.8em !important;
+      line-height: 1.3 !important;
+      -webkit-hyphens: none !important;
+      hyphens: none !important;
+    }
+    img {
+      max-width: 100% !important;
+      height: auto !important;
+      display: block !important;
+      margin: 1em auto !important;
+    }
+  `;
+}
+
 export const EpubReader: React.FC<EpubReaderProps> = ({
   buffer,
   currentPage,
@@ -36,7 +121,8 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
       if (iframes && iframes.length > 0) {
         iframes.forEach(iframe => {
           try {
-            const bodyText = iframe.contentDocument?.body?.innerText;
+            const body = iframe.contentDocument?.body;
+            const bodyText = body?.innerText || body?.textContent;
             if (bodyText) extracted += (extracted ? '\n\n' : '') + bodyText;
           } catch {}
         });
@@ -45,7 +131,8 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
       if (!extracted && renditionRef.current?.getContents) {
         const contents = renditionRef.current.getContents() || [];
         contents.forEach((c: any) => {
-          const t = c.document?.body?.innerText || c.content?.innerText;
+          const body = c.document?.body;
+          const t = body?.innerText || body?.textContent || c.content?.innerText || c.content?.textContent;
           if (t) extracted += (extracted ? '\n\n' : '') + t;
         });
       }
@@ -65,32 +152,6 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
     const book = ePub(buffer.slice(0));
     bookRef.current = book;
 
-    // Theme colors
-    let bgColor = '#f7f4ed';
-    let textColor = '#1e293b';
-
-    const preset = settings.readingThemePreset || (settings.theme === 'dark' ? 'emerald' : 'day');
-    if (preset === 'emerald') {
-      bgColor = '#18191c';
-      textColor = '#e4e4e7';
-    } else if (preset === 'oled') {
-      bgColor = '#000000';
-      textColor = '#f1f5f9';
-    } else if (preset === 'sepia') {
-      bgColor = '#ece4d0';
-      textColor = '#2c2214';
-    } else if (preset === 'sakura') {
-      bgColor = '#fdf2f4';
-      textColor = '#4c1d2c';
-    } else if (preset === 'day') {
-      bgColor = '#f7f4ed';
-      textColor = '#1e293b';
-    }
-
-    let fontFamily = 'Georgia, "Times New Roman", serif';
-    if (settings.fontFamily === 'sans') fontFamily = 'system-ui, -apple-system, sans-serif';
-    if (settings.fontFamily === 'mono') fontFamily = 'ui-monospace, monospace';
-
     const rendition = book.renderTo(viewerRef.current, {
       width: '100%',
       height: '100%',
@@ -104,60 +165,20 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
     // Inject Moon+ Reader style typography hooks (Justified text, indented paragraphs, full width adaptation)
     rendition.hooks.content.register((contents: any) => {
       const doc = contents.document;
-      if (!doc) return;
-      const head = doc.head;
-      const style = doc.createElement('style');
-      style.innerHTML = `
-        html, body {
-          margin: 0 !important;
-          padding: 24px 28px 90px 24px !important;
-          box-sizing: border-box !important;
-          background-color: ${bgColor} !important;
-          color: ${textColor} !important;
-          font-family: ${fontFamily} !important;
-          font-size: ${settings.fontSize}px !important;
-          line-height: ${settings.lineHeight || 1.75} !important;
-          text-align: ${settings.textAlign || 'justify'} !important;
-          text-justify: inter-word !important;
-          -webkit-hyphens: none !important;
-          -moz-hyphens: none !important;
-          -ms-hyphens: none !important;
-          hyphens: none !important;
-          word-break: normal !important;
-          overflow-wrap: break-word !important;
-          word-wrap: break-word !important;
-        }
-        p {
-          margin: 0 0 0.9em 0 !important;
-          text-indent: 1.25em !important;
-          text-align: ${settings.textAlign || 'justify'} !important;
-          line-height: ${settings.lineHeight || 1.75} !important;
-          padding-right: 8px !important;
-          -webkit-hyphens: none !important;
-          -moz-hyphens: none !important;
-          -ms-hyphens: none !important;
-          hyphens: none !important;
-          word-break: normal !important;
-          overflow-wrap: break-word !important;
-        }
-        h1, h2, h3, h4 {
-          text-align: center !important;
-          font-weight: bold !important;
-          color: ${textColor} !important;
-          margin-top: 1.2em !important;
-          margin-bottom: 0.8em !important;
-          line-height: 1.3 !important;
-          -webkit-hyphens: none !important;
-          hyphens: none !important;
-        }
-        img {
-          max-width: 100% !important;
-          height: auto !important;
-          display: block !important;
-          margin: 1em auto !important;
-        }
-      `;
-      head.appendChild(style);
+      if (!doc || !doc.head) return;
+      let style = doc.getElementById('reader-typography-style') as HTMLStyleElement;
+      if (!style) {
+        const newStyle = doc.createElement('style');
+        newStyle.id = 'reader-typography-style';
+        doc.head.appendChild(newStyle);
+        style = newStyle;
+      }
+      style.innerHTML = getTypographyCss(settings);
+      setTimeout(extractCurrentText, 200);
+    });
+
+    rendition.on('rendered', () => {
+      setTimeout(extractCurrentText, 150);
     });
 
     const initialSavedPage = currentPage || 1;
@@ -261,7 +282,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
     return () => {
       book.destroy();
     };
-  }, [buffer, isContinuousMode, settings.readingThemePreset, settings.theme, settings.fontSize, settings.fontFamily]);
+  }, [buffer, isContinuousMode]);
 
   // Synchronize external page change (from bottom buttons or slider)
   useEffect(() => {
@@ -297,38 +318,41 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
     }
   }, [currentPage, totalPages]);
 
-  // Apply font size and styling dynamically on changes
+  // Apply font size and styling dynamically on changes without destroying the book
   useEffect(() => {
     if (!renditionRef.current) return;
     try {
-      renditionRef.current.themes.fontSize(`${settings.fontSize}px`);
+      const css = getTypographyCss(settings);
+      renditionRef.current.themes.fontSize(`${settings.fontSize || 18}px`);
 
-      let bgColor = '#f7f4ed';
-      let textColor = '#1e293b';
-      const preset = settings.readingThemePreset || (settings.theme === 'dark' ? 'emerald' : 'day');
-      if (preset === 'emerald') {
-        bgColor = '#18191c';
-        textColor = '#e4e4e7';
-      } else if (preset === 'oled') {
-        bgColor = '#000000';
-        textColor = '#f1f5f9';
-      } else if (preset === 'sepia') {
-        bgColor = '#ece4d0';
-        textColor = '#2c2214';
-      } else if (preset === 'sakura') {
-        bgColor = '#fdf2f4';
-        textColor = '#4c1d2c';
-      } else if (preset === 'day') {
-        bgColor = '#f7f4ed';
-        textColor = '#1e293b';
-      }
-
-      renditionRef.current.themes.override('color', textColor);
-      renditionRef.current.themes.override('background', bgColor);
+      // Update all active iframe documents directly
+      const contentsList = renditionRef.current.getContents?.() || [];
+      contentsList.forEach((contents: any) => {
+        const doc = contents?.document;
+        if (!doc || !doc.head) return;
+        let styleEl = doc.getElementById('reader-typography-style') as HTMLStyleElement;
+        if (!styleEl) {
+          const newStyle = doc.createElement('style');
+          newStyle.id = 'reader-typography-style';
+          doc.head.appendChild(newStyle);
+          styleEl = newStyle;
+        }
+        styleEl.innerHTML = css;
+        if (doc.body) {
+          doc.body.style.fontSize = `${settings.fontSize || 18}px`;
+        }
+      });
     } catch (e) {
       console.warn('Could not apply epub styles:', e);
     }
-  }, [settings.fontSize, settings.theme, settings.readingThemePreset]);
+  }, [
+    settings.fontSize,
+    settings.fontFamily,
+    settings.lineHeight,
+    settings.textAlign,
+    settings.theme,
+    settings.readingThemePreset,
+  ]);
 
   // Outer container color based on preset
   let containerBg = '#f7f4ed';

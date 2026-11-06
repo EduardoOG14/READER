@@ -8,6 +8,7 @@ import {
   Bookmark as BookmarkIcon,
   Search,
   BookOpen,
+  Type,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { getBookFile } from '../../services/storage';
@@ -17,6 +18,7 @@ import { MangaReader } from './MangaReader';
 import { EpubReader } from './EpubReader';
 import { TextReader } from './TextReader';
 import { FilterSettingsSheet } from './FilterSettingsSheet';
+import { FontSizeModal } from './FontSizeModal';
 import { MoonStatusBar } from './MoonStatusBar';
 import { BookmarksDrawer } from './BookmarksDrawer';
 import { AutoScrollControl } from './AutoScrollControl';
@@ -33,6 +35,7 @@ export const ReaderContainer: React.FC = () => {
   const [loadingFile, setLoadingFile] = useState(true);
   const [showControls, setShowControls] = useState(true);
   const [showSettingsSheet, setShowSettingsSheet] = useState(false);
+  const [showFontSizeModal, setShowFontSizeModal] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Advanced features state
@@ -505,6 +508,17 @@ export const ReaderContainer: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Quick Font Size & Typography Button for Books */}
+          {isTextBased && (
+            <button
+              onClick={() => setShowFontSizeModal(true)}
+              className="p-2 sm:p-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-zinc-800 transition-all active:scale-90 cursor-pointer flex items-center justify-center font-bold"
+              title="Ajustar tamaño de letra y tipografía"
+            >
+              <Type className="w-5 h-5 stroke-[2.2]" />
+            </button>
+          )}
+
           {/* 1. Quick Search Button */}
           <button
             onClick={() => setShowSearchDrawer(true)}
@@ -725,6 +739,14 @@ export const ReaderContainer: React.FC = () => {
           if (!activeBook) return;
           removeBookmark(activeBook.id, bmId);
         }}
+      />
+
+      {/* Dedicated Quick Font Size & Typography Modal */}
+      <FontSizeModal
+        isOpen={showFontSizeModal}
+        onClose={() => setShowFontSizeModal(false)}
+        settings={settings}
+        updateSettings={updateSettings}
       />
 
       {/* Settings & Controls Bottom Sheet (MoonReader Themes, Tools & Ergonomic Controls) */}
