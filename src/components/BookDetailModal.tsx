@@ -24,6 +24,7 @@ import type { Book } from '../types';
 import { useApp } from '../context/AppContext';
 import { createOptimizedThumbnail } from '../utils/thumbnail';
 import { useBackHandler } from '../services/backButton';
+import { useSwipeDownToClose } from '../hooks/useSwipeDownToClose';
 import { fetchOfficialCoverUrl } from '../services/coverFetcher';
 import { EpisodeSelectorModal } from './EpisodeSelectorModal';
 import {
@@ -76,6 +77,8 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
     }
     return false;
   }, 100, isOpen);
+
+  const { dragHandleProps, modalStyle } = useSwipeDownToClose({ onClose });
 
   useEffect(() => {
     if (book) {
@@ -316,6 +319,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/65 backdrop-blur-xs animate-in fade-in duration-200">
       <div
+        style={modalStyle}
         className="relative w-full max-w-xl bg-white dark:bg-[#18191c] border-t sm:border border-rose-200 dark:border-zinc-700/80 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom sm:zoom-in-95 duration-200 max-h-[92vh] flex flex-col text-[#4c0519] dark:text-[#f3f4f6]"
         onClick={e => e.stopPropagation()}
       >
@@ -335,10 +339,13 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
           </div>
         )}
 
-        {/* Modal Top Bar */}
-        <div className="px-4 py-3 sm:px-5 sm:py-3.5 border-b border-rose-100 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-[#fff5f8]/80 dark:bg-zinc-900/80">
+        {/* Modal Top Bar (Swipe down to dismiss) */}
+        <div
+          {...dragHandleProps}
+          className="px-4 pt-4 pb-3 sm:px-5 sm:py-3.5 border-b border-rose-100 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-[#fff5f8]/80 dark:bg-zinc-900/80 cursor-grab active:cursor-grabbing relative"
+        >
           {/* Mobile drag handle */}
-          <div className="sm:hidden w-12 h-1 bg-rose-200 dark:bg-zinc-700 rounded-full mx-auto absolute top-2 left-1/2 -translate-x-1/2" />
+          <div className="sm:hidden w-12 h-1.5 bg-rose-300/80 dark:bg-zinc-600 hover:bg-rose-400 dark:hover:bg-zinc-500 rounded-full mx-auto absolute top-1.5 left-1/2 -translate-x-1/2 transition-colors pointer-events-none" />
           <div className="flex items-center gap-2 min-w-0">
             <span
               className={`text-[9.5px] font-black px-2.5 py-0.5 rounded-md uppercase tracking-wider shadow-2xs ${getFormatBadge(

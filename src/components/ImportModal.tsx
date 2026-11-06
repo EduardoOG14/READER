@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { X, UploadCloud, FileCheck, AlertCircle, Loader2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useSwipeDownToClose } from '../hooks/useSwipeDownToClose';
 
 interface ImportModalProps {
   isOpen: boolean;
@@ -22,6 +23,8 @@ export const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose }) => 
     type: 'success' | 'error';
     text: string;
   } | null>(null);
+
+  const { dragHandleProps, modalStyle } = useSwipeDownToClose({ onClose });
 
   if (!isOpen) return null;
 
@@ -69,11 +72,15 @@ export const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose }) => 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
       <div
+        style={modalStyle}
         className="relative w-full max-w-lg bg-[#fff0f5] dark:bg-[#18191c] border border-[#fecdd9] dark:border-zinc-800 rounded-3xl p-6 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150"
         onClick={e => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-[#fecdd9]/70 dark:border-zinc-800">
+        {/* Header (Swipe down to dismiss) */}
+        <div
+          {...dragHandleProps}
+          className="flex items-center justify-between pb-4 border-b border-[#fecdd9]/70 dark:border-zinc-800 cursor-grab active:cursor-grabbing"
+        >
           <div>
             <h2 className="text-lg font-bold text-[#4c0519] dark:text-[#f3f4f6]">
               Importar Libros y Mangas

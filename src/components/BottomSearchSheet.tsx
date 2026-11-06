@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useBackHandler } from '../services/backButton';
+import { useSwipeDownToClose } from '../hooks/useSwipeDownToClose';
 import type { Book } from '../types';
 
 interface BottomSearchSheetProps {
@@ -31,6 +32,7 @@ export const BottomSearchSheet: React.FC<BottomSearchSheetProps> = ({
   const [localQuery, setLocalQuery] = useState('');
   const [formatFilter, setFormatFilter] = useState<FormatFilter>('todos');
   const inputRef = useRef<HTMLInputElement>(null);
+  const { dragHandleProps, modalStyle } = useSwipeDownToClose({ onClose });
 
   // Auto-focus when sheet opens
   useEffect(() => {
@@ -90,10 +92,17 @@ export const BottomSearchSheet: React.FC<BottomSearchSheetProps> = ({
       />
 
       {/* Bottom Sheet */}
-      <div className="relative w-full max-w-xl mx-auto bg-white dark:bg-[#18191c] border-t border-rose-200/90 dark:border-zinc-800 rounded-t-3xl shadow-2xl p-4 sm:p-5 z-10 animate-in slide-in-from-bottom duration-250 text-[#4c0519] dark:text-[#f3f4f6] max-h-[85vh] flex flex-col pb-[max(env(safe-area-inset-bottom,20px),20px)]">
-        
-        {/* Native Pull / Drag Indicator */}
-        <div className="w-12 h-1.5 bg-rose-200 dark:bg-zinc-700 rounded-full mx-auto shrink-0 mb-3" />
+      <div
+        style={modalStyle}
+        className="relative w-full max-w-xl mx-auto bg-white dark:bg-[#18191c] border-t border-rose-200/90 dark:border-zinc-800 rounded-t-3xl shadow-2xl p-4 sm:p-5 z-10 animate-in slide-in-from-bottom duration-250 text-[#4c0519] dark:text-[#f3f4f6] max-h-[85vh] flex flex-col pb-[max(env(safe-area-inset-bottom,20px),20px)]"
+      >
+        {/* Native Pull / Drag Indicator (Swipe down to dismiss) */}
+        <div
+          className="w-full flex items-center justify-center pt-1 pb-2.5 -mt-1 cursor-grab active:cursor-grabbing touch-none select-none shrink-0"
+          {...dragHandleProps}
+        >
+          <div className="w-12 h-1.5 bg-rose-300/80 dark:bg-zinc-600 hover:bg-rose-400 dark:hover:bg-zinc-500 rounded-full transition-colors" />
+        </div>
 
         {/* Search Bar Input (Thumb reachable) */}
         <div className="relative shrink-0">

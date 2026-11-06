@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useBackHandler } from '../../services/backButton';
+import { useSwipeDownToClose } from '../../hooks/useSwipeDownToClose';
 import type { EyeFilterMode, ReadingThemePreset } from '../../types';
 
 interface FilterSettingsSheetProps {
@@ -78,6 +79,8 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
     }
     return false;
   }, 105, isOpen);
+
+  const { dragHandleProps, modalStyle } = useSwipeDownToClose({ onClose });
 
   if (!isOpen) return null;
 
@@ -141,14 +144,23 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/65 backdrop-blur-xs animate-in fade-in duration-150">
       <div
+        style={modalStyle}
         className="relative w-full max-w-lg bg-white dark:bg-[#18191c] border-t sm:border border-slate-200 dark:border-zinc-700/80 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom sm:zoom-in-95 duration-200 max-h-[88vh] flex flex-col text-slate-800 dark:text-zinc-100 pb-[env(safe-area-inset-bottom,0px)]"
         onClick={e => e.stopPropagation()}
       >
-        {/* Handle bar for bottom sheet indication */}
-        <div className="sm:hidden w-12 h-1 bg-slate-300 dark:bg-zinc-700 rounded-full mx-auto mt-2.5 shrink-0" />
+        {/* Handle bar for bottom sheet indication (Swipe down to dismiss) */}
+        <div
+          className="w-full flex items-center justify-center pt-1 pb-2 cursor-grab active:cursor-grabbing touch-none select-none shrink-0 sm:hidden"
+          {...dragHandleProps}
+        >
+          <div className="w-12 h-1.5 bg-rose-300/80 dark:bg-zinc-600 rounded-full" />
+        </div>
 
         {/* Header */}
-        <div className="px-5 py-3 border-b border-slate-100 dark:border-zinc-800/80 flex items-center justify-between shrink-0 bg-slate-50/60 dark:bg-zinc-900/60">
+        <div
+          {...dragHandleProps}
+          className="px-5 py-3 border-b border-slate-100 dark:border-zinc-800/80 flex items-center justify-between shrink-0 bg-slate-50/60 dark:bg-zinc-900/60 cursor-grab active:cursor-grabbing"
+        >
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-600 dark:bg-zinc-800 dark:text-zinc-300 flex items-center justify-center">
               <Sliders className="w-4 h-4 stroke-[2.2]" />

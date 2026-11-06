@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Flame, Clock, BookOpen, Target, CheckCircle2, X } from 'lucide-react';
 import { useBackHandler } from '../services/backButton';
+import { useSwipeDownToClose } from '../hooks/useSwipeDownToClose';
 import { getReadingStats, setDailyGoal } from '../services/readingStats';
 import type { ReadingStats } from '../types';
 
@@ -18,6 +19,7 @@ export const ReadingInsightsModal: React.FC<ReadingInsightsModalProps> = ({
   const [stats, setStats] = useState<ReadingStats | null>(null);
   const [goal, setGoal] = useState<number>(20);
   const [isSavedGoal, setIsSavedGoal] = useState(false);
+  const { dragHandleProps, modalStyle } = useSwipeDownToClose({ onClose });
 
   useBackHandler(() => {
     if (isOpen) {
@@ -59,10 +61,23 @@ export const ReadingInsightsModal: React.FC<ReadingInsightsModalProps> = ({
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-lg bg-white dark:bg-[#18191c] border border-rose-200 dark:border-zinc-700/80 rounded-3xl shadow-2xl p-4 sm:p-6 z-10 animate-in zoom-in-95 duration-200 text-[#4c0519] dark:text-[#f3f4f6] flex flex-col gap-4 max-h-[92vh] overflow-y-auto">
-        
-        {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-rose-100 dark:border-zinc-800">
+      <div
+        style={modalStyle}
+        className="relative w-full max-w-lg bg-white dark:bg-[#18191c] border border-rose-200 dark:border-zinc-700/80 rounded-3xl shadow-2xl p-4 sm:p-6 z-10 animate-in zoom-in-95 duration-200 text-[#4c0519] dark:text-[#f3f4f6] flex flex-col gap-4 max-h-[92vh] overflow-y-auto"
+      >
+        {/* Native Pull Handle on mobile */}
+        <div
+          className="w-full flex items-center justify-center pt-0 pb-1 -mt-1 cursor-grab active:cursor-grabbing touch-none select-none shrink-0 sm:hidden"
+          {...dragHandleProps}
+        >
+          <div className="w-12 h-1.5 bg-rose-300/80 dark:bg-zinc-600 rounded-full" />
+        </div>
+
+        {/* Header (Swipe down to dismiss) */}
+        <div
+          {...dragHandleProps}
+          className="flex items-center justify-between pb-3 border-b border-rose-100 dark:border-zinc-800 cursor-grab active:cursor-grabbing"
+        >
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center shadow-md">
               <Flame className="w-5 h-5 fill-white" />

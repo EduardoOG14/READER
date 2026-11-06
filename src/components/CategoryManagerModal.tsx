@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Plus, Trash2, Edit2, Check, Tag } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useBackHandler } from '../services/backButton';
+import { useSwipeDownToClose } from '../hooks/useSwipeDownToClose';
 import type { Category } from '../types';
 
 interface CategoryManagerModalProps {
@@ -28,6 +29,7 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({ isOp
   const [selectedColor, setSelectedColor] = useState(PRESET_COLORS[0]);
   const [editingCatId, setEditingCatId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
+  const { dragHandleProps, modalStyle } = useSwipeDownToClose({ onClose });
 
   useBackHandler(() => {
     if (isOpen) {
@@ -60,11 +62,15 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({ isOp
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
       <div
+        style={modalStyle}
         className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150"
         onClick={e => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        {/* Header (Swipe down to dismiss) */}
+        <div
+          {...dragHandleProps}
+          className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 cursor-grab active:cursor-grabbing"
+        >
           <div className="flex items-center gap-2">
             <Tag className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">

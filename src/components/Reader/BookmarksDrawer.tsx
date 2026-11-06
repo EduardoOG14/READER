@@ -1,6 +1,7 @@
 import React from 'react';
 import { Bookmark as BookmarkIcon, Trash2, X, Plus, ChevronRight, Clock } from 'lucide-react';
 import type { Bookmark } from '../../types';
+import { useSwipeDownToClose } from '../../hooks/useSwipeDownToClose';
 
 interface BookmarksDrawerProps {
   isOpen: boolean;
@@ -21,6 +22,8 @@ export const BookmarksDrawer: React.FC<BookmarksDrawerProps> = ({
   onAddCurrentPage,
   onRemoveBookmark,
 }) => {
+  const { dragHandleProps, modalStyle } = useSwipeDownToClose({ onClose });
+
   if (!isOpen) return null;
 
   const isCurrentPageBookmarked = bookmarks.some(b => b.page === currentPage);
@@ -28,11 +31,23 @@ export const BookmarksDrawer: React.FC<BookmarksDrawerProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
       <div
+        style={modalStyle}
         className="relative w-full max-w-md bg-white dark:bg-slate-900 border-t sm:border border-slate-200 dark:border-slate-800 rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col max-h-[85vh] animate-in slide-in-from-bottom sm:zoom-in-95 duration-200"
         onClick={e => e.stopPropagation()}
       >
+        {/* Native Pull Handle on mobile */}
+        <div
+          className="w-full flex items-center justify-center pt-0 pb-2.5 -mt-2 cursor-grab active:cursor-grabbing touch-none select-none shrink-0 sm:hidden"
+          {...dragHandleProps}
+        >
+          <div className="w-12 h-1.5 bg-slate-300 dark:bg-zinc-700 rounded-full" />
+        </div>
+
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
+        <div
+          {...dragHandleProps}
+          className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 shrink-0 cursor-grab active:cursor-grabbing"
+        >
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500 dark:bg-amber-500/20">
               <BookmarkIcon className="w-5 h-5 fill-amber-500/30" />

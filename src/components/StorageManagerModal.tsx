@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { HardDrive, Trash2, CheckCircle2, Sparkles, X, FileText } from 'lucide-react';
 import { useBackHandler } from '../services/backButton';
+import { useSwipeDownToClose } from '../hooks/useSwipeDownToClose';
 import type { Book } from '../types';
 
 interface StorageManagerModalProps {
@@ -22,6 +23,7 @@ export const StorageManagerModal: React.FC<StorageManagerModalProps> = ({
     percent: 0,
   });
   const [cleanedToast, setCleanedToast] = useState<string | null>(null);
+  const { dragHandleProps, modalStyle } = useSwipeDownToClose({ onClose });
 
   useBackHandler(() => {
     if (isOpen) {
@@ -80,8 +82,18 @@ export const StorageManagerModal: React.FC<StorageManagerModalProps> = ({
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-lg bg-white dark:bg-[#18191c] border border-rose-200 dark:border-zinc-700/80 rounded-3xl shadow-2xl p-4 sm:p-6 z-10 animate-in zoom-in-95 duration-200 text-[#4c0519] dark:text-[#f3f4f6] flex flex-col gap-4 max-h-[90vh]">
-        
+      <div
+        style={modalStyle}
+        className="relative w-full max-w-lg bg-white dark:bg-[#18191c] border border-rose-200 dark:border-zinc-700/80 rounded-3xl shadow-2xl p-4 sm:p-6 z-10 animate-in zoom-in-95 duration-200 text-[#4c0519] dark:text-[#f3f4f6] flex flex-col gap-4 max-h-[90vh]"
+      >
+        {/* Native Pull Handle on mobile */}
+        <div
+          className="w-full flex items-center justify-center pt-0 pb-1 -mt-1 cursor-grab active:cursor-grabbing touch-none select-none shrink-0 sm:hidden"
+          {...dragHandleProps}
+        >
+          <div className="w-12 h-1.5 bg-rose-300/80 dark:bg-zinc-600 rounded-full" />
+        </div>
+
         {/* Floating Toast */}
         {cleanedToast && (
           <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-emerald-400 border border-emerald-500/40 rounded-2xl px-4 py-2 text-xs font-semibold shadow-xl flex items-center gap-2">
@@ -90,8 +102,11 @@ export const StorageManagerModal: React.FC<StorageManagerModalProps> = ({
           </div>
         )}
 
-        {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-rose-100 dark:border-zinc-800 shrink-0">
+        {/* Header (Swipe down to dismiss) */}
+        <div
+          {...dragHandleProps}
+          className="flex items-center justify-between pb-3 border-b border-rose-100 dark:border-zinc-800 shrink-0 cursor-grab active:cursor-grabbing"
+        >
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 text-white flex items-center justify-center shadow-md">
               <HardDrive className="w-5 h-5 stroke-[2.2]" />

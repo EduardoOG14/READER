@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useBackHandler } from '../services/backButton';
+import { useSwipeDownToClose } from '../hooks/useSwipeDownToClose';
 import { CURRENT_APP_VERSION } from '../services/updater';
 import { exportBackupFile, restoreBackupFromJson } from '../services/backupRestore';
 import { UpdateModal } from './UpdateModal';
@@ -45,6 +46,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     }
     return false;
   }, 100, isOpen);
+
+  const { dragHandleProps, modalStyle } = useSwipeDownToClose({ onClose });
 
   if (!isOpen) return null;
 
@@ -102,8 +105,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-lg bg-white dark:bg-[#18191c] border border-rose-200 dark:border-zinc-700/80 rounded-3xl shadow-2xl p-5 sm:p-6 z-10 animate-in zoom-in-95 duration-200 text-[#4c0519] dark:text-[#f3f4f6] max-h-[92vh] flex flex-col">
-        
+      <div
+        style={modalStyle}
+        className="relative w-full max-w-lg bg-white dark:bg-[#18191c] border border-rose-200 dark:border-zinc-700/80 rounded-3xl shadow-2xl p-5 sm:p-6 z-10 animate-in zoom-in-95 duration-200 text-[#4c0519] dark:text-[#f3f4f6] max-h-[92vh] flex flex-col"
+      >
+        {/* Native Pull Handle on mobile */}
+        <div
+          className="w-full flex items-center justify-center pt-0 pb-2.5 -mt-2 cursor-grab active:cursor-grabbing touch-none select-none shrink-0 sm:hidden"
+          {...dragHandleProps}
+        >
+          <div className="w-12 h-1.5 bg-rose-300/80 dark:bg-zinc-600 rounded-full" />
+        </div>
+
         {/* Floating Toast Notification */}
         {toastMessage && (
           <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white border border-rose-400/50 dark:border-zinc-600 rounded-2xl px-4 py-2 text-xs font-semibold shadow-2xl flex items-center gap-2 pointer-events-none">
@@ -113,7 +126,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         )}
 
         {/* Header */}
-        <div className="flex items-center justify-between pb-3.5 border-b border-rose-100 dark:border-zinc-800 shrink-0">
+        <div
+          {...dragHandleProps}
+          className="flex items-center justify-between pb-3.5 border-b border-rose-100 dark:border-zinc-800 shrink-0 cursor-grab active:cursor-grabbing"
+        >
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-rose-500 to-pink-500 dark:from-zinc-700 dark:to-zinc-600 text-white flex items-center justify-center shadow-xs">
               <Sliders className="w-4 h-4 stroke-[2.2]" />

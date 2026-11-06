@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useBackHandler } from '../services/backButton';
+import { useSwipeDownToClose } from '../hooks/useSwipeDownToClose';
 import { SPANISH_CATALOG, type CatalogItem } from '../services/catalogData';
 import { downloadQueue, type QueueState } from '../services/downloadQueue';
 import { CatalogCoverImage } from './CatalogCoverImage';
@@ -41,6 +42,8 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
     downloadQueue.setRefreshHandler(refreshLibrary);
     return downloadQueue.subscribe(state => setQueueState(state));
   }, [refreshLibrary]);
+
+  const { dragHandleProps, modalStyle } = useSwipeDownToClose({ onClose });
 
   // Android Back Button handler (Priority 110)
   useBackHandler(() => {
@@ -139,9 +142,17 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
       />
 
       {/* Main Catalog Dialog */}
-      <div className="relative w-full max-w-4xl bg-white dark:bg-[#18191c] border-t sm:border border-rose-200 dark:border-zinc-700/80 rounded-t-3xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 z-10 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200 text-[#4c0519] dark:text-[#f3f4f6] flex flex-col max-h-[92vh] pb-[max(env(safe-area-inset-bottom,16px),16px)]">
-        {/* Native Pull / Drag Indicator on mobile */}
-        <div className="sm:hidden w-12 h-1 bg-rose-200 dark:bg-zinc-700 rounded-full mx-auto mb-2 shrink-0" />
+      <div
+        style={modalStyle}
+        className="relative w-full max-w-4xl bg-white dark:bg-[#18191c] border-t sm:border border-rose-200 dark:border-zinc-700/80 rounded-t-3xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 z-10 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200 text-[#4c0519] dark:text-[#f3f4f6] flex flex-col max-h-[92vh] pb-[max(env(safe-area-inset-bottom,16px),16px)]"
+      >
+        {/* Native Pull / Drag Indicator on mobile (Swipe down to dismiss) */}
+        <div
+          className="w-full flex items-center justify-center pt-1 pb-2.5 -mt-1 cursor-grab active:cursor-grabbing touch-none select-none shrink-0"
+          {...dragHandleProps}
+        >
+          <div className="w-12 h-1.5 bg-rose-300/80 dark:bg-zinc-600 hover:bg-rose-400 dark:hover:bg-zinc-500 rounded-full transition-colors" />
+        </div>
         
         {/* Floating Toast notification */}
         {toastMessage && (
@@ -152,7 +163,10 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
         )}
 
         {/* Dialog Header */}
-        <div className="flex items-center justify-between pb-3.5 border-b border-rose-100 dark:border-zinc-800 shrink-0">
+        <div
+          {...dragHandleProps}
+          className="flex items-center justify-between pb-3.5 border-b border-rose-100 dark:border-zinc-800 shrink-0 cursor-grab active:cursor-grabbing"
+        >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-500 via-pink-500 to-rose-400 dark:from-zinc-700 dark:to-zinc-600 text-white flex items-center justify-center shadow-md">
               <BookOpen className="w-5 h-5 stroke-[2.4]" />

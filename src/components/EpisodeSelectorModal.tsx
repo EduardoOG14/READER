@@ -15,6 +15,7 @@ import type { ChapterInfo } from '../services/mangaUpdateService';
 import { downloadQueue } from '../services/downloadQueue';
 import { CatalogCoverImage } from './CatalogCoverImage';
 import { useBackHandler } from '../services/backButton';
+import { useSwipeDownToClose } from '../hooks/useSwipeDownToClose';
 
 interface EpisodeSelectorModalProps {
   item: CatalogItem | null;
@@ -34,6 +35,7 @@ export const EpisodeSelectorModal: React.FC<EpisodeSelectorModalProps> = ({
   const [selectedNums, setSelectedNums] = useState<Set<number>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const { dragHandleProps, modalStyle } = useSwipeDownToClose({ onClose });
 
   // Intercept back button when open (Priority 150)
   useBackHandler(() => {
@@ -173,12 +175,23 @@ export const EpisodeSelectorModal: React.FC<EpisodeSelectorModalProps> = ({
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-xl bg-white dark:bg-[#18191c] border-t sm:border border-rose-200 dark:border-zinc-700/80 rounded-t-3xl sm:rounded-3xl shadow-2xl p-4 sm:p-5 z-10 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200 text-[#4c0519] dark:text-[#f3f4f6] flex flex-col max-h-[92vh] pb-[max(env(safe-area-inset-bottom,16px),16px)]">
-        {/* Native Pull / Drag Indicator on mobile */}
-        <div className="sm:hidden w-12 h-1 bg-rose-200 dark:bg-zinc-700 rounded-full mx-auto mb-2 shrink-0" />
+      <div
+        style={modalStyle}
+        className="relative w-full max-w-xl bg-white dark:bg-[#18191c] border-t sm:border border-rose-200 dark:border-zinc-700/80 rounded-t-3xl sm:rounded-3xl shadow-2xl p-4 sm:p-5 z-10 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200 text-[#4c0519] dark:text-[#f3f4f6] flex flex-col max-h-[92vh] pb-[max(env(safe-area-inset-bottom,16px),16px)]"
+      >
+        {/* Native Pull / Drag Indicator (Swipe down to dismiss) */}
+        <div
+          className="w-full flex items-center justify-center pt-1 pb-2.5 -mt-1 cursor-grab active:cursor-grabbing touch-none select-none shrink-0"
+          {...dragHandleProps}
+        >
+          <div className="w-12 h-1.5 bg-rose-300/80 dark:bg-zinc-600 hover:bg-rose-400 dark:hover:bg-zinc-500 rounded-full transition-colors" />
+        </div>
         
         {/* Header */}
-        <div className="flex items-start justify-between pb-3 border-b border-rose-100 dark:border-zinc-800 shrink-0">
+        <div
+          {...dragHandleProps}
+          className="flex items-start justify-between pb-3 border-b border-rose-100 dark:border-zinc-800 shrink-0 cursor-grab active:cursor-grabbing"
+        >
           <div className="flex gap-3 min-w-0 pr-2">
             <div className="w-14 sm:w-16 aspect-[3/4.2] rounded-xl overflow-hidden shrink-0 shadow-md border border-rose-200/60 dark:border-zinc-700/60 bg-slate-900/10">
               <CatalogCoverImage item={item} />
