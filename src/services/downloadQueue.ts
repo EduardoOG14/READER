@@ -120,9 +120,31 @@ class DownloadQueueService {
 
       this.queue = parsed.map(q => {
         const catItem = SPANISH_CATALOG.find(c => c.id === q.item?.id);
+        const gutId = q.item?.id?.startsWith('cat-gut-')
+          ? parseInt(q.item.id.replace('cat-gut-', ''), 10)
+          : null;
+
         const restoredItem: CatalogItem = {
           ...q.item,
-          createFile: catItem?.createFile,
+          createFile:
+            catItem?.createFile ||
+            (gutId
+              ? async onProgress => {
+                  onProgress?.('Descargando libro íntegro (EPUB)...', 40);
+                  const epubUrl = `https://www.gutenberg.org/ebooks/${gutId}.epub3.images`;
+                  let blob: Blob | null = null;
+                  try {
+                    blob = await httpGetBlob(epubUrl, { timeoutMs: 30000 });
+                  } catch {
+                    const fallbackUrl = `https://www.gutenberg.org/ebooks/${gutId}.epub.noimages`;
+                    blob = await httpGetBlob(fallbackUrl, { timeoutMs: 30000 });
+                  }
+                  if (!blob || blob.size < 1000) {
+                    throw new Error('Error al descargar EPUB de Project Gutenberg.');
+                  }
+                  return new File([blob], `${q.item.title}.epub`, { type: 'application/epub+zip' });
+                }
+              : undefined),
         };
 
         const item: QueueItem = {

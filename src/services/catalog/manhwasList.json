@@ -1,35 +1,5 @@
 [
   {
-    "id": "cat-tower-of-god",
-    "title": "Tower of God (Torre de Dios)",
-    "author": "SIU",
-    "year": 2010,
-    "pages": 10,
-    "genre": "Webtoon / Fantasía Épica / Misterio & Shinsu",
-    "desc": "Bam entra como un irregular a la colosal Torre para seguir a su amiga Rachel, descubriendo que en la cima aguarda todo cuanto un ser humano pueda desear.",
-    "spanishChapters": 12
-  },
-  {
-    "id": "cat-tbate",
-    "title": "The Beginning After the End",
-    "author": "TurtleMe & Fuyuki23",
-    "year": 2018,
-    "pages": 10,
-    "genre": "Manhwa / Isekai / Magia & Dragones",
-    "desc": "El rey Grey, invicto en combate pero solitario en su trono, reencarna como el niño Arthur Leywin en un mundo de bestias mágicas y hechicería.",
-    "spanishChapters": 1
-  },
-  {
-    "id": "cat-the-boxer",
-    "title": "The Boxer",
-    "author": "JH",
-    "year": 2020,
-    "pages": 10,
-    "genre": "Manhwa / Deportes / Boxeo Psicológico",
-    "desc": "K, el entrenador de campeones mundiales, descubre a Yu, un huérfano con ojos vacíos pero con una percepción y reflejos divinos para el cuadrilátero.",
-    "spanishChapters": 97
-  },
-  {
     "id": "cat-bastard",
     "title": "Bastard",
     "author": "Carnby Kim & Youngchan Hwang",
@@ -38,26 +8,6 @@
     "genre": "Manhwa / Thriller / Suspenso Psicológico",
     "desc": "Jin Seon vive bajo el terror de su padre, un respetado hombre de negocios que es un asesino en serie. Cuando elige a la chica que le gusta como víctima, Jin se rebela.",
     "spanishChapters": 15
-  },
-  {
-    "id": "cat-god-of-highschool",
-    "title": "The God of High School",
-    "author": "Yongje Park",
-    "year": 2011,
-    "pages": 10,
-    "genre": "Webtoon / Artes Marciales / Dioses & Mitología",
-    "desc": "Jin Mori participa en un torneo nacional de artes marciales mixtas donde el ganador verá cumplido cualquier deseo, descubriendo su origen divino como el Rey Mono.",
-    "spanishChapters": 12
-  },
-  {
-    "id": "cat-sweet-home",
-    "title": "Sweet Home",
-    "author": "Carnby Kim & Youngchan Hwang",
-    "year": 2017,
-    "pages": 10,
-    "genre": "Manhwa / Terror / Monstruos de los Deseos",
-    "desc": "Cha Hyun-soo, un estudiante recluido tras perder a su familia, se atrinchera en su edificio de departamentos cuando los humanos comienzan a convertirse en monstruos.",
-    "spanishChapters": 8
   },
   {
     "id": "cat-eleceed",
@@ -70,66 +20,6 @@
     "spanishChapters": 482
   },
   {
-    "id": "cat-wind-breaker",
-    "title": "Wind Breaker",
-    "author": "Yongseok Jo",
-    "year": 2013,
-    "pages": 10,
-    "genre": "Webtoon / Deportes / Ciclismo Callejero & Amistad",
-    "desc": "Jay Jo, el perfecto presidente estudiantil, es un virtuoso ciclista que se une a la tripulación Hummingbird para competir en el torneo callejero League of Street.",
-    "spanishChapters": 25
-  },
-  {
-    "id": "cat-suicide-hunter",
-    "title": "SSS-Class Suicide Hunter",
-    "author": "Shin Noah",
-    "year": 2020,
-    "pages": 10,
-    "genre": "Manhwa / Mazmorras / Regresión por Muerte",
-    "desc": "Kim Gong-ja obtiene la habilidad de copiar las técnicas de quien lo asesine al costo de morir, retrocediendo un día en el tiempo cada vez que pierde la vida.",
-    "spanishChapters": 42
-  },
-  {
-    "id": "cat-villains-destined",
-    "title": "Villains Are Destined to Die",
-    "author": "Gwon Gyeoeul & SUOL",
-    "year": 2020,
-    "pages": 10,
-    "genre": "Manhwa / Otome Isekai / Romance & Supervivencia",
-    "desc": "Una chica reencarna como Penélope Eckhart, la villana adoptada de un juego otome de dificultad extrema donde cada mala respuesta termina en su muerte inmediata.",
-    "spanishChapters": 44
-  },
-  {
-    "id": "cat-who-made-me-princess",
-    "title": "Who Made Me a Princess",
-    "author": "Plutus & Spoon",
-    "year": 2017,
-    "pages": 10,
-    "genre": "Manhwa / Reencarnación / Lazos de Familia",
-    "desc": "Athanasia reencarna como la princesa desdichada que será ejecutada por su propio padre, el tiránico emperador Claude, ideando un plan para sobrevivir ganándose su cariño.",
-    "spanishChapters": 126
-  },
-  {
-    "id": "cat-dice",
-    "title": "DICE: El Cubo que lo Cambia Todo",
-    "author": "Yun Hyunseok",
-    "year": 2013,
-    "pages": 10,
-    "genre": "Webtoon / Sobrenatural / Dados Mágicos",
-    "desc": "Dongtae es un perdedor integral hasta que obtiene un dado azul que le permite alterar sus atributos físicos e intelectuales como si la vida real fuera un juego de rol.",
-    "spanishChapters": 235
-  },
-  {
-    "id": "cat-manager-kim",
-    "title": "Manager Kim",
-    "author": "Taejun Pak & Jeong Gwang-sik",
-    "year": 2021,
-    "pages": 10,
-    "genre": "Manhwa / Acción / Fuerzas Especiales & Paternidad",
-    "desc": "El aparentemente ordinario oficinista Kim esconde un pasado como agente secreto de élite militar. Cuando su hija Minji desaparece secuestrada, desata una cacería implacable.",
-    "spanishChapters": 4
-  },
-  {
     "id": "cat-leviathan",
     "title": "Leviathan (Deep Water)",
     "author": "Lee Gyuntak",
@@ -138,16 +28,6 @@
     "genre": "Manhwa / Postapocalíptico Marino / Monstruos Acuáticos",
     "desc": "La Tierra se ha inundado por completo y la humanidad vive en barcos oxidados acechados por colosales bestias marinas. Bota y su hermana empuñan arpones para sobrevivir.",
     "spanishChapters": 22
-  },
-  {
-    "id": "cat-damn-reincarnation",
-    "title": "Damn Reincarnation",
-    "author": "Mogins",
-    "year": 2022,
-    "pages": 10,
-    "genre": "Manhwa / Reencarnación / El Guerrero Eugene",
-    "desc": "Hamel cayó en la guarida de los reyes demonio protegiendo a su amigo Vermouth. Trescientos años después, reencarna como descendiente de su propio camarada.",
-    "spanishChapters": 18
   },
   {
     "id": "cat-the-breaker",
@@ -170,66 +50,6 @@
     "spanishChapters": 200
   },
   {
-    "id": "cat-cheese-in-the-trap",
-    "title": "Cheese in the Trap",
-    "author": "Soonkki",
-    "year": 2010,
-    "pages": 10,
-    "genre": "Webtoon / Misterio Romántico / Vida Universitaria",
-    "desc": "Hong Seol regresa a la universidad tras un receso y se cruza con Yoo Jung, el estudiante modelo perfecto cuya amable sonrisa parece esconder intenciones siniestras.",
-    "spanishChapters": 27
-  },
-  {
-    "id": "cat-unordinary",
-    "title": "unOrdinary",
-    "author": "uru-chan",
-    "year": 2016,
-    "pages": 10,
-    "genre": "Webtoon / Superpoderes / Jerarquía y Venganza",
-    "desc": "En una escuela donde el estatus social se decide por el nivel de poder, John finge ser un chico sin habilidades (\"Cripple\"), guardando un secreto oscuro y temible.",
-    "spanishChapters": 8
-  },
-  {
-    "id": "cat-castle-swimmer",
-    "title": "Castle Swimmer",
-    "author": "Wendy Lian Martin",
-    "year": 2019,
-    "pages": 10,
-    "genre": "Webtoon / Fantasía Submarina / Profecía de Amor",
-    "desc": "Kappa es el Faro destinado a guiar a las criaturas del mar hacia su salvación; Siren es el príncipe tiburón cuya profecía le exige sacrificar al Faro para liberar a su clan.",
-    "spanishChapters": 39
-  },
-  {
-    "id": "cat-the-gamer",
-    "title": "The Gamer",
-    "author": "Sung Sang-Young",
-    "year": 2013,
-    "pages": 10,
-    "genre": "Webtoon / Habilidades RPG en la Vida Real",
-    "desc": "Han Jee-Han descubre que el mundo real tiene propiedades de videojuego donde él puede subir de nivel sus habilidades durmiendo o estudiando matemáticas.",
-    "spanishChapters": 59
-  },
-  {
-    "id": "cat-hooky",
-    "title": "Hooky",
-    "author": "Míriam Bonastre Tur",
-    "year": 2015,
-    "pages": 10,
-    "genre": "Webtoon / Brujería / Hermandad & Aventura",
-    "desc": "Dani y Dorian pierden el autobús escolar hacia la academia de magia, desatando una encantadora y peligrosa aventura que los confrontará con una profecía siniestra.",
-    "spanishChapters": 20
-  },
-  {
-    "id": "cat-school-bus-graveyard",
-    "title": "School Bus Graveyard",
-    "author": "lilredbeany",
-    "year": 2021,
-    "pages": 10,
-    "genre": "Webtoon / Terror / Dimensión Fantasma Nocturna",
-    "desc": "Un grupo de estudiantes de secundaria en Savannah queda maldito tras una excursión escolar: cada medianoche son transportados a una dimensión donde monstruos los cazan.",
-    "spanishChapters": 5
-  },
-  {
     "id": "cat-get-schooled",
     "title": "Get Schooled (True Education)",
     "author": "Chae Yong-taek & Han Ga-ram",
@@ -238,66 +58,6 @@
     "genre": "Webtoon / Acción / Ministerio de Educación",
     "desc": "Tras el colapso de la autoridad en las aulas, el gobierno crea la Oficina de Protección de Derechos Docentes con inspectores autorizados a utilizar fuerza correctiva.",
     "spanishChapters": 126
-  },
-  {
-    "id": "cat-questism",
-    "title": "Questism (Quest Supremacy)",
-    "author": "YuNuni & PTJ",
-    "year": 2021,
-    "pages": 10,
-    "genre": "Webtoon / Sistema RPG / Pandillas de Gangbuk",
-    "desc": "Suhyeon Kim es un estudiante debilucho que recibe una ventana de sistema que le otorga cartas de habilidades y misiones para conquistar las escuelas de Seúl.",
-    "spanishChapters": 82
-  },
-  {
-    "id": "cat-study-group",
-    "title": "Study Group",
-    "author": "Shin Hyung-wook & Ryu Seung-yeon",
-    "year": 2019,
-    "pages": 10,
-    "genre": "Webtoon / Artes Marciales / Bruce Lee Escolar",
-    "desc": "Gamin Yoon solo quiere ingresar a la universidad, pero asiste a la peor preparatoria del país. Para defender su grupo de estudio, emplea el temible Jeet Kune Do.",
-    "spanishChapters": 3
-  },
-  {
-    "id": "cat-to-not-die",
-    "title": "To Not Die",
-    "author": "Parae & Lim Jin-hwan",
-    "year": 2021,
-    "pages": 10,
-    "genre": "Webtoon / Acción Urbana / Jóvenes Fugitivos",
-    "desc": "Dajun Im decide poner fin a su sufrimiento tras meses de acoso, pero en el último momento jura vivir para destruirlos a todos, uniéndose a una familia de chicos de la calle.",
-    "spanishChapters": 7
-  },
-  {
-    "id": "cat-martial-peak",
-    "title": "Martial Peak",
-    "author": "Momo",
-    "year": 2018,
-    "pages": 10,
-    "genre": "Manhua / Cultivación / El Libro Negro",
-    "desc": "Yang Kai era un humilde limpiador en la Secta Lingxiao hasta que encuentra el misterioso Libro Negro Sin Letras que despierta su físico marcial divino.",
-    "spanishChapters": 3820
-  },
-  {
-    "id": "cat-tales-demons-gods",
-    "title": "Tales of Demons and Gods",
-    "author": "Mad Snail",
-    "year": 2015,
-    "pages": 10,
-    "genre": "Manhua / Cultivación / El Libro del Espíritu Demoníaco",
-    "desc": "Nie Li, el espiritista demoníaco más poderoso, muere en combate contra el Sabio Emperador y reencarna a sus 13 años en la Ciudad de la Gloria con todos sus recuerdos.",
-    "spanishChapters": 1307
-  },
-  {
-    "id": "cat-apotheosis",
-    "title": "Apotheosis: Ascensión a Dios",
-    "author": "Ranzhi",
-    "year": 2015,
-    "pages": 10,
-    "genre": "Manhua / Acción / El Cuerpo de Arma Divina",
-    "desc": "Luo Zheng pasa de ser el heredero traicionado a esclavo de entrenamiento, hasta que desbloquea una técnica prohibida que convierte los golpes de sus enemigos en poder puro.",
-    "spanishChapters": 845
   },
   {
     "id": "cat-battle-through-heavens",
@@ -310,26 +70,6 @@
     "spanishChapters": 3
   },
   {
-    "id": "cat-magic-emperor",
-    "title": "Magic Emperor (The Servant is the Demon King)",
-    "author": "Wuer Manhua",
-    "year": 2019,
-    "pages": 10,
-    "genre": "Manhua / Estrategia / El Emperador Demonio Zhuo Yifan",
-    "desc": "Zhuo Yifan, el Emperador Demonio traicionado por su discípulo, reencarna en el débil sirviente de la familia Luo y utiliza su fría astucia para gobernar el imperio.",
-    "spanishChapters": 576
-  },
-  {
-    "id": "cat-release-that-witch",
-    "title": "Release That Witch",
-    "author": "Er Mu",
-    "year": 2019,
-    "pages": 10,
-    "genre": "Manhua / Isekai / Tecnología y Brujería Industrial",
-    "desc": "Chen Yan reencarna como Roland Wimbledon, un príncipe desterrado a una frontera nevada, y decide salvar a las brujas perseguidas para impulsar una revolución industrial mágica.",
-    "spanishChapters": 706
-  },
-  {
     "id": "cat-i-am-fated-villain",
     "title": "I Am the Fated Villain",
     "author": "Tian Fu",
@@ -340,36 +80,6 @@
     "spanishChapters": 175
   },
   {
-    "id": "cat-soul-land",
-    "title": "Soul Land (Douluo Dalu)",
-    "author": "Tang Jia San Shao",
-    "year": 2011,
-    "pages": 10,
-    "genre": "Manhua / Espíritus Marciales / Hierba Azul Plateada",
-    "desc": "Tang San, discípulo expulsado de la secta Tang que dominaba los venenos, renace en Douluo Dalu despertando el espíritu marcial de la Hierba Azul Plateada y el Martillo昊天.",
-    "spanishChapters": 422
-  },
-  {
-    "id": "cat-versatile-mage",
-    "title": "Versatile Mage (Quanzhi Fashi)",
-    "author": "Chaos",
-    "year": 2015,
-    "pages": 10,
-    "genre": "Manhua / Magia Urbana / Mago Dual",
-    "desc": "Mo Fan despierta en un mundo idéntico al suyo pero donde la ciencia ha sido reemplazada por la magia elemental, despertando los elementos Fuego y Rayo desde su primer examen.",
-    "spanishChapters": 705
-  },
-  {
-    "id": "cat-star-martial-god",
-    "title": "Star Martial God Technique",
-    "author": "Mad Snail",
-    "year": 2016,
-    "pages": 10,
-    "genre": "Manhua / Artes Marciales Astrales / El Clan Qingyu",
-    "desc": "En un mundo de tres artes marciales, Ye Xinghe hereda la casi extinta Técnica Marcial de las Estrellas para salvar a su familia del exterminio a manos de la aristocracia.",
-    "spanishChapters": 503
-  },
-  {
     "id": "cat-chronicles-heavenly-demon",
     "title": "Chronicles of Heavenly Demon",
     "author": "Il-Hwang",
@@ -378,16 +88,6 @@
     "genre": "Manhwa / Murim / Lanza del Demonio Celestial",
     "desc": "Woon-seong es ejecutado falsamente y reencarna como un niño novato en la Cueva de los Demonios, empuñando la lanza para vengar la muerte de su maestro del Monte Hua.",
     "spanishChapters": 31
-  },
-  {
-    "id": "cat-reincarnated-assassin",
-    "title": "Reincarnated as an Assassin",
-    "author": "Geul Jangi",
-    "year": 2022,
-    "pages": 10,
-    "genre": "Manhwa / Acción / El Heredero de la Espada",
-    "desc": "El perro de caza de la casa imperial es traicionado y asesinado tras completar su última misión, despertando como el hijo menor de la familia de asesinos más letal del continente.",
-    "spanishChapters": 1
   },
   {
     "id": "cat-the-live",

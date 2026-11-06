@@ -13,6 +13,8 @@ import { useApp } from '../context/AppContext';
 import { useBackHandler } from '../services/backButton';
 import { useSwipeDownToClose } from '../hooks/useSwipeDownToClose';
 import { SPANISH_CATALOG, type CatalogItem } from '../services/catalogData';
+import { gutenbergService } from '../services/gutenbergService';
+import { mergeAndDeduplicateCatalog, isBookOwned } from '../services/catalogDeduplication';
 import { downloadQueue, type QueueState } from '../services/downloadQueue';
 import { CatalogCoverImage } from './CatalogCoverImage';
 import { EpisodeSelectorModal } from './EpisodeSelectorModal';
@@ -37,11 +39,46 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
   const [queueState, setQueueState] = useState<QueueState>(downloadQueue.getState());
   const [isDownloadCenterOpen, setIsDownloadCenterOpen] = useState(false);
   const [selectedMangaForEpisodes, setSelectedMangaForEpisodes] = useState<CatalogItem | null>(null);
+  const [gutenbergBooks, setGutenbergBooks] = useState<CatalogItem[]>([]);
+  const [isGutenbergSearching, setIsGutenbergSearching] = useState(false);
 
   useEffect(() => {
     downloadQueue.setRefreshHandler(refreshLibrary);
     return downloadQueue.subscribe(state => setQueueState(state));
   }, [refreshLibrary]);
+
+  // Load top Project Gutenberg Spanish books when opening explore
+  useEffect(() => {
+    if (!isOpen) return;
+    gutenbergService.getTopSpanishBooks().then(res => {
+      if (res.books && res.books.length > 0) {
+        setGutenbergBooks(res.books);
+      }
+    });
+  }, [isOpen]);
+
+  // Live Gutenberg search when typing >= 3 chars
+  useEffect(() => {
+    if (!isOpen || !filterQuery.trim() || filterQuery.trim().length < 3) return;
+    const timer = setTimeout(async () => {
+      setIsGutenbergSearching(true);
+      try {
+        const results = await gutenbergService.searchSpanishBooks(filterQuery);
+        if (results && results.length > 0) {
+          setGutenbergBooks(prev => {
+            const map = new Map<string, CatalogItem>();
+            prev.forEach(b => map.set(b.id, b));
+            results.forEach(b => map.set(b.id, b));
+            return Array.from(map.values());
+          });
+        }
+      } finally {
+        setIsGutenbergSearching(false);
+      }
+    }, 450);
+
+    return () => clearTimeout(timer);
+  }, [filterQuery, isOpen]);
 
   const { dragHandleProps, modalStyle } = useSwipeDownToClose({ onClose });
 
@@ -60,36 +97,29 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // Pre-normalize owned books for O(1)/O(N) high performance lookup
-  const cleanOwnedBooks = useMemo(() => {
-    return books.map(b => ({
-      book: b,
-      cleanTitle: b.title.toLowerCase().replace(/[^a-z0-9]/g, ''),
-    }));
-  }, [books]);
+  // Full unified catalog (Pre-curated + Project Gutenberg) deduplicated with 100% precision
+  const fullCatalog = useMemo(() => {
+    return mergeAndDeduplicateCatalog(SPANISH_CATALOG, gutenbergBooks);
+  }, [gutenbergBooks]);
 
   // Check if a catalog item is already saved in the user's personal library
   const getOwnedBook = (item: CatalogItem): Book | undefined => {
-    const cleanCatalogTitle = item.title.toLowerCase().replace(/[^a-z0-9]/g, '');
-    const found = cleanOwnedBooks.find(
-      cb => cb.cleanTitle.includes(cleanCatalogTitle) || cleanCatalogTitle.includes(cb.cleanTitle)
-    );
-    return found?.book;
+    return isBookOwned(item, books);
   };
 
   // Category counts
   const categoryCounts = useMemo(() => {
     return {
-      todos: SPANISH_CATALOG.length,
-      libros: SPANISH_CATALOG.filter(i => i.category === 'libros').length,
-      manga: SPANISH_CATALOG.filter(i => i.category === 'manga').length,
-      manhwa: SPANISH_CATALOG.filter(i => i.category === 'manhwa').length,
+      todos: fullCatalog.length,
+      libros: fullCatalog.filter(i => i.category === 'libros').length,
+      manga: fullCatalog.filter(i => i.category === 'manga').length,
+      manhwa: fullCatalog.filter(i => i.category === 'manhwa').length,
     };
-  }, []);
+  }, [fullCatalog]);
 
   // Filter catalog items by category and local search query
   const filteredCatalog = useMemo(() => {
-    return SPANISH_CATALOG.filter(item => {
+    return fullCatalog.filter(item => {
       if (activeCategory !== 'todos' && item.category !== activeCategory) {
         return false;
       }
@@ -102,7 +132,7 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
         item.description.toLowerCase().includes(q)
       );
     });
-  }, [activeCategory, filterQuery]);
+  }, [fullCatalog, activeCategory, filterQuery]);
 
   // Sliced items for progressive 60fps rendering
   const visibleItems = useMemo(() => {
@@ -181,7 +211,7 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
                 </span>
               </div>
               <p className="text-xs text-slate-600 dark:text-zinc-300 font-medium">
-                219 obras completas listas para descargar y leer sin internet
+                {SPANISH_CATALOG.length} obras 100% en español listas para descargar
               </p>
             </div>
           </div>
@@ -222,6 +252,12 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
               placeholder="Buscar por nombre de libro, manga o autor..."
               className="w-full pl-10 pr-4 py-2.5 text-xs bg-rose-50/60 dark:bg-zinc-900/80 border border-rose-200/80 dark:border-zinc-700 rounded-2xl outline-none text-[#4c0519] dark:text-[#f3f4f6] placeholder-rose-400/70 dark:placeholder-zinc-500 font-bold focus:ring-2 focus:ring-rose-400/30 dark:focus:ring-zinc-600 transition-all"
             />
+            {isGutenbergSearching && (
+              <div className={`absolute ${filterQuery ? 'right-9' : 'right-3'} top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] text-rose-500 dark:text-zinc-400 font-semibold pointer-events-none`}>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span className="hidden sm:inline">Gutenberg...</span>
+              </div>
+            )}
             {filterQuery && (
               <button
                 onClick={() => {

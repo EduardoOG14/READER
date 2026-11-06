@@ -1,45 +1,5 @@
 [
   {
-    "id": "cat-one-piece",
-    "title": "One Piece",
-    "author": "Eiichiro Oda",
-    "year": 1997,
-    "pages": 10,
-    "genre": "Manga / Shonen / Aventura Pirata",
-    "desc": "Monkey D. Luffy y los Piratas de Sombrero de Paja navegan por el traicionero Grand Line en busca del legendario tesoro One Piece para convertirse en el Rey de los Piratas.",
-    "spanishChapters": 33
-  },
-  {
-    "id": "cat-dragon-ball",
-    "title": "Dragon Ball",
-    "author": "Akira Toriyama",
-    "year": 1984,
-    "pages": 10,
-    "genre": "Manga / Shonen / Artes Marciales",
-    "desc": "Son Goku, un niño ingenuo con cola de mono y fuerza sobrehumana, emprende la búsqueda de las siete Esferas del Dragón capaces de conceder cualquier deseo.",
-    "spanishChapters": 1
-  },
-  {
-    "id": "cat-naruto",
-    "title": "Naruto",
-    "author": "Masashi Kishimoto",
-    "year": 1999,
-    "pages": 10,
-    "genre": "Manga / Shonen / Ninjas & Superación",
-    "desc": "Naruto Uzumaki, un joven ninja marginado que alberga en su interior al temido Zorro de Nueve Colas, sueña con ganarse el respeto de todos y convertirse en Hokage.",
-    "spanishChapters": 1
-  },
-  {
-    "id": "cat-bleach",
-    "title": "Bleach",
-    "author": "Tite Kubo",
-    "year": 2001,
-    "pages": 10,
-    "genre": "Manga / Shonen / Shinigamis & Espadas",
-    "desc": "Ichigo Kurosaki, un adolescente capaz de ver espíritus, recibe los poderes de una Segadora de Almas para proteger a su ciudad de los monstruosos Hollows.",
-    "spanishChapters": 707
-  },
-  {
     "id": "cat-hunter-x-hunter",
     "title": "Hunter x Hunter",
     "author": "Yoshihiro Togashi",
@@ -60,206 +20,6 @@
     "spanishChapters": 912
   },
   {
-    "id": "cat-death-note",
-    "title": "Death Note",
-    "author": "Tsugumi Ohba & Takeshi Obata",
-    "year": 2003,
-    "pages": 10,
-    "genre": "Manga / Thriller Psicológico / Sobrenatural",
-    "desc": "Light Yagami encuentra un cuaderno de muerte de un Shinigami y decide purgar el mundo de criminales bajo el alias Kira, desatando un duelo de intelectos contra L.",
-    "spanishChapters": 10
-  },
-  {
-    "id": "cat-kimetsu",
-    "title": "Kimetsu no Yaiba: Demon Slayer",
-    "author": "Koyoharu Gotouge",
-    "year": 2016,
-    "pages": 10,
-    "genre": "Manga / Shonen / Cazadores de Demonios",
-    "desc": "Tanjiro Kamado se une al Cuerpo de Cazadores de Demonios para encontrar una cura para su hermana Nezuko, convertida en demonio tras la masacre de su familia.",
-    "spanishChapters": 369
-  },
-  {
-    "id": "cat-jujutsu-kaisen",
-    "title": "Jujutsu Kaisen",
-    "author": "Gege Akutami",
-    "year": 2018,
-    "pages": 10,
-    "genre": "Manga / Shonen / Hechicería & Maldiciones",
-    "desc": "Yuji Itadori se traga un dedo maldito del Rey de las Maldiciones, Ryomen Sukuna, ingresando a la Escuela Técnica de Hechicería de Tokio.",
-    "spanishChapters": 3
-  },
-  {
-    "id": "cat-chainsaw-man",
-    "title": "Chainsaw Man",
-    "author": "Tatsuki Fujimoto",
-    "year": 2018,
-    "pages": 10,
-    "genre": "Manga / Acción / Fantasía Oscura & Gore",
-    "desc": "Denji vive en la miseria cazando demonios junto a su perro motosierra Pochita. Tras una traición, renace como el Demonio Motosierra al servicio de Seguridad Pública.",
-    "spanishChapters": 25
-  },
-  {
-    "id": "cat-tokyo-ghoul",
-    "title": "Tokyo Ghoul",
-    "author": "Sui Ishida",
-    "year": 2011,
-    "pages": 10,
-    "genre": "Manga / Fantasía Oscura / Seinen",
-    "desc": "En Tokio acechan los ghouls, seres que subsisten de carne humana. Ken Kaneki sufre un trasplante que lo transforma en el primer ghoul de un solo ojo.",
-    "spanishChapters": 191
-  },
-  {
-    "id": "cat-fullmetal",
-    "title": "Fullmetal Alchemist",
-    "author": "Hiromu Arakawa",
-    "year": 2001,
-    "pages": 10,
-    "genre": "Manga / Shonen / Aventura & Alquimia",
-    "desc": "La regla del Intercambio Equivalente guía a los hermanos Edward y Alphonse Elric en la búsqueda de la legendaria Piedra Filosofal para restaurar sus cuerpos.",
-    "spanishChapters": 2
-  },
-  {
-    "id": "cat-vagabond",
-    "title": "Vagabond",
-    "author": "Takehiko Inoue",
-    "year": 1998,
-    "pages": 10,
-    "genre": "Manga / Histórico / Samurái & Filosofía",
-    "desc": "Basado en la vida de Miyamoto Musashi. El viaje espiritual y sangriento de un guerrero que busca convertirse en invencible bajo el cielo.",
-    "spanishChapters": 327
-  },
-  {
-    "id": "cat-vinland",
-    "title": "Vinland Saga",
-    "author": "Makoto Yukimura",
-    "year": 2005,
-    "pages": 10,
-    "genre": "Manga / Histórico / Vikingos & Drama",
-    "desc": "Thorfinn, hijo del guerrero más temido de Islandia, crece en el campo de batalla jurando venganza contra Askeladd, mientras sueña con la pacífica tierra de Vinland.",
-    "spanishChapters": 3
-  },
-  {
-    "id": "cat-spy-family",
-    "title": "Spy x Family",
-    "author": "Tatsuya Endo",
-    "year": 2019,
-    "pages": 10,
-    "genre": "Manga / Comedia / Espías & Acción",
-    "desc": "Un espía de élite, una asesina letal y una niña telépata forman una divertida familia falsa sin conocer sus verdaderas identidades para salvar la paz mundial.",
-    "spanishChapters": 35
-  },
-  {
-    "id": "cat-monster",
-    "title": "Monster",
-    "author": "Naoki Urasawa",
-    "year": 1994,
-    "pages": 10,
-    "genre": "Manga / Seinen / Thriller Psicológico",
-    "desc": "El cirujano Kenzō Tenma salva la vida de un niño huérfano que resulta ser un carismático y despiadado sociópata. Años después, Tenma viaja por Alemania para cazarlo.",
-    "spanishChapters": 2
-  },
-  {
-    "id": "cat-20th-century-boys",
-    "title": "20th Century Boys",
-    "author": "Naoki Urasawa",
-    "year": 1999,
-    "pages": 10,
-    "genre": "Manga / Misterio / Ciencia Ficción & Conspiración",
-    "desc": "Kenji y sus amigos de la infancia descubren que una peligrosa secta liderada por \"Amigo\" está cumpliendo al pie de la letra un libro de profecías que ellos inventaron de niños.",
-    "spanishChapters": 8
-  },
-  {
-    "id": "cat-jojo-phantom",
-    "title": "JoJo's Bizarre Adventure: Phantom Blood",
-    "author": "Hirohiko Araki",
-    "year": 1987,
-    "pages": 10,
-    "genre": "Manga / Sobrenatural / Vampiros & Hamon",
-    "desc": "Jonathan Joestar se enfrenta a su ambicioso hermano adoptivo Dio Brando, quien utiliza una misteriosa máscara de piedra azteca para transformarse en vampiro.",
-    "spanishChapters": 38
-  },
-  {
-    "id": "cat-jojo-stardust",
-    "title": "JoJo's Bizarre Adventure: Stardust Crusaders",
-    "author": "Hirohiko Araki",
-    "year": 1989,
-    "pages": 10,
-    "genre": "Manga / Shonen / Stands & Aventura Épica",
-    "desc": "Jotaro Kujo y su abuelo Joseph viajan de Japón a Egipto combatiendo usuarios de Stands enemigos para derrotar a DIO y salvar la vida de su madre.",
-    "spanishChapters": 10
-  },
-  {
-    "id": "cat-my-hero-academia",
-    "title": "My Hero Academia (Boku no Hero Academia)",
-    "author": "Kohei Horikoshi",
-    "year": 2014,
-    "pages": 10,
-    "genre": "Manga / Shonen / Superhéroes & Escolar",
-    "desc": "En un mundo donde el 80% posee superpoderes, Izuku Midoriya nace sin dones pero hereda el One For All del legendario héroe All Might.",
-    "spanishChapters": 41
-  },
-  {
-    "id": "cat-slam-dunk",
-    "title": "Slam Dunk",
-    "author": "Takehiko Inoue",
-    "year": 1990,
-    "pages": 10,
-    "genre": "Manga / Deportes / Baloncesto & Pasión",
-    "desc": "El delincuente pelirrojo Hanamichi Sakuragi se une al equipo de baloncesto de la preparatoria Shohoku para impresionar a una chica, descubriendo su verdadera vocación.",
-    "spanishChapters": 306
-  },
-  {
-    "id": "cat-haikyuu",
-    "title": "Haikyuu!!",
-    "author": "Haruichi Furudate",
-    "year": 2012,
-    "pages": 10,
-    "genre": "Manga / Deportes / Voleibol & Superación",
-    "desc": "Shoyo Hinata, a pesar de su corta estatura, salta más alto que nadie y forja una dupla imparable con el talentoso colocador Tobio Kageyama en Karasuno.",
-    "spanishChapters": 2
-  },
-  {
-    "id": "cat-one-punch-man",
-    "title": "One Punch Man",
-    "author": "ONE & Yusuke Murata",
-    "year": 2012,
-    "pages": 10,
-    "genre": "Manga / Parodia / Superhéroes & Acción Épica",
-    "desc": "Saitama entrenó tan duro que se quedó calvo y ahora es capaz de derrotar a cualquier enemigo monstruoso de un solo puñetazo, aburriéndose de la falta de desafíos.",
-    "spanishChapters": 337
-  },
-  {
-    "id": "cat-mob-psycho",
-    "title": "Mob Psycho 100",
-    "author": "ONE",
-    "year": 2012,
-    "pages": 10,
-    "genre": "Manga / Comedia Sobrenatural / Psíquicos",
-    "desc": "Shigeo Kageyama, apodado Mob, es un tímido estudiante de secundaria con inmensos poderes psíquicos que intenta reprimir sus emociones para no perder el control al 100%.",
-    "spanishChapters": 6
-  },
-  {
-    "id": "cat-black-clover",
-    "title": "Black Clover",
-    "author": "Yūki Tabata",
-    "year": 2015,
-    "pages": 10,
-    "genre": "Manga / Shonen / Magia & Antimagia",
-    "desc": "En el Reino del Trébol donde todos tienen magia, Asta nace sin una gota de poder, pero obtiene un grimorio de cinco hojas que alberga una espada de pura antimagia.",
-    "spanishChapters": 9
-  },
-  {
-    "id": "cat-fairy-tail",
-    "title": "Fairy Tail",
-    "author": "Hiro Mashima",
-    "year": 2006,
-    "pages": 10,
-    "genre": "Manga / Shonen / Magia & Amistad",
-    "desc": "Natsu Dragneel, un mago Dragon Slayer de fuego, y Lucy Heartfilia se unen al alborotado y cálido gremio de magos Fairy Tail para cumplir peligrosas misiones.",
-    "spanishChapters": 30
-  },
-  {
     "id": "cat-gintama",
     "title": "Gintama",
     "author": "Hideaki Sorachi",
@@ -268,96 +28,6 @@
     "genre": "Manga / Comedia / Samuráis & Alienígenas",
     "desc": "En un Japón feudal colonizado por extraterrestres Amanto, el samurái perezoso Gintoki Sakata dirige la agencia Todoterreno junto a Shinpachi y Kagura.",
     "spanishChapters": 740
-  },
-  {
-    "id": "cat-blue-lock",
-    "title": "Blue Lock",
-    "author": "Muneyuki Kaneshiro & Yūsuke Nomura",
-    "year": 2018,
-    "pages": 10,
-    "genre": "Manga / Deportes / Fútbol & Egoísmo Puro",
-    "desc": "Para ganar la Copa del Mundo, Japón encierra a 300 delanteros de secundaria en una prisión deportiva extrema donde solo el egoísta más implacable sobrevivirá.",
-    "spanishChapters": 127
-  },
-  {
-    "id": "cat-evangelion",
-    "title": "Neon Genesis Evangelion",
-    "author": "Yoshiyuki Sadamoto",
-    "year": 1994,
-    "pages": 10,
-    "genre": "Manga / Mecha / Psicológico & Ángeles",
-    "desc": "Shinji Ikari es reclutado por su frío padre para pilotar el biomecánico Evangelion Unidad 01 y defender a Neo Tokio-3 de los enigmáticos Ángeles invasores.",
-    "spanishChapters": 1
-  },
-  {
-    "id": "cat-akira",
-    "title": "Akira",
-    "author": "Katsuhiro Otomo",
-    "year": 1982,
-    "pages": 10,
-    "genre": "Manga / Cyberpunk / Obra Maestra del Cómic",
-    "desc": "En la caótica Neo-Tokio tras la Tercera Guerra Mundial, Kaneda intenta salvar a su amigo Tetsuo, cuyos poderes telequinéticos recién despertados amenazan con destruir la ciudad.",
-    "spanishChapters": 123
-  },
-  {
-    "id": "cat-ghost-in-the-shell",
-    "title": "Ghost in the Shell (Patrulla Especial Ghost)",
-    "author": "Masamune Shirow",
-    "year": 1989,
-    "pages": 10,
-    "genre": "Manga / Cyberpunk / Conciencia & Cyborgs",
-    "desc": "La Mayor Motoko Kusanagi y la Sección 9 de Seguridad Pública persiguen al esquivo Titiritero en un futuro donde las almas humanas habitan cuerpos cibernéticos.",
-    "spanishChapters": 14
-  },
-  {
-    "id": "cat-steins-gate",
-    "title": "Steins;Gate",
-    "author": "Yomi Sarachi & 5pb.",
-    "year": 2009,
-    "pages": 10,
-    "genre": "Manga / Ciencia Ficción / Líneas Temporales",
-    "desc": "El científico loco autoproclamado Rintaro Okabe inventa por accidente un microondas que envía mensajes de texto al pasado, alterando el destino del mundo.",
-    "spanishChapters": 4
-  },
-  {
-    "id": "cat-claymore",
-    "title": "Claymore",
-    "author": "Norihiro Yagi",
-    "year": 2001,
-    "pages": 10,
-    "genre": "Manga / Fantasía Oscura / Guerreras Yoma",
-    "desc": "Clare, una guerrera de ojos plateados mitad humana y mitad demonio, empuña su espada Claymore para cazar monstruos mientras busca vengar a su salvadora Teresa.",
-    "spanishChapters": 10
-  },
-  {
-    "id": "cat-hellsing",
-    "title": "Hellsing",
-    "author": "Kouta Hirano",
-    "year": 1997,
-    "pages": 10,
-    "genre": "Manga / Acción Sobrenatural / Vampiros & Gore",
-    "desc": "La Orden de Caballeros Protestantes Reales Hellsing despliega a su arma suprema, el vampiro original Alucard, para destruir una conspiración nazi de no-muertos.",
-    "spanishChapters": 30
-  },
-  {
-    "id": "cat-yu-yu-hakusho",
-    "title": "Yu Yu Hakusho",
-    "author": "Yoshihiro Togashi",
-    "year": 1990,
-    "pages": 10,
-    "genre": "Manga / Shonen / Detectives Espirituales",
-    "desc": "Yusuke Urameshi muere al salvar a un niño de un atropello y resucita como Detective Espiritual del Mundo de los Espíritus para combatir demonios.",
-    "spanishChapters": 1
-  },
-  {
-    "id": "cat-initial-d",
-    "title": "Initial D",
-    "author": "Shuichi Shigeno",
-    "year": 1995,
-    "pages": 10,
-    "genre": "Manga / Automovilismo / Drift en las Montañas",
-    "desc": "Takumi Fujiwara conduce cada madrugada un viejo Toyota Sprinter Trueno AE86 para repartir tofu en el monte Akina, convirtiéndose en el rey imbatible del derrape.",
-    "spanishChapters": 25
   },
   {
     "id": "cat-gantz",
@@ -370,16 +40,6 @@
     "spanishChapters": 57
   },
   {
-    "id": "cat-blame",
-    "title": "Blame!",
-    "author": "Tsutomu Nihei",
-    "year": 1997,
-    "pages": 10,
-    "genre": "Manga / Cyberpunk / Megaestructura Solitaria",
-    "desc": "Killy vaga por los colosales niveles de una ciberestructura infinita de metal y hormigón armado con una pistola de radiación gravitacional en busca de genes puros.",
-    "spanishChapters": 231
-  },
-  {
     "id": "cat-made-in-abyss",
     "title": "Made in Abyss",
     "author": "Akihito Tsukushi",
@@ -388,26 +48,6 @@
     "genre": "Manga / Aventura Oscura / Exploración del Abismo",
     "desc": "Riko, una huérfana de Orth, desciende junto al robot Reg a las profundidades inexploradas del Abismo, un foso vertical colosal repleto de reliquias y maldiciones.",
     "spanishChapters": 104
-  },
-  {
-    "id": "cat-fire-force",
-    "title": "Fire Force (Enen no Shouboutai)",
-    "author": "Atsushi Ohkubo",
-    "year": 2015,
-    "pages": 10,
-    "genre": "Manga / Acción / Bomberos Piroquinéticos",
-    "desc": "Shinra Kusakabe, un joven con pies llameantes apodado Huellas del Diablo, se une a la 8ª Brigada Especial de Bomberos para erradicar el misterio de la combustión humana.",
-    "spanishChapters": 16
-  },
-  {
-    "id": "cat-dr-stone",
-    "title": "Dr. Stone",
-    "author": "Riichiro Inagaki & Boichi",
-    "year": 2017,
-    "pages": 10,
-    "genre": "Manga / Shonen / Ciencia & Supervivencia",
-    "desc": "Toda la humanidad queda petrificada en piedra durante 3700 años. El prodigioso científico Senku Ishigami despierta y jura reconstruir la civilización desde cero con ciencia.",
-    "spanishChapters": 3
   },
   {
     "id": "cat-promised-neverland",
@@ -420,46 +60,6 @@
     "spanishChapters": 200
   },
   {
-    "id": "cat-assassination-classroom",
-    "title": "Assassination Classroom (Ansatsu Kyoushitsu)",
-    "author": "Yūsei Matsui",
-    "year": 2012,
-    "pages": 10,
-    "genre": "Manga / Comedia / Acción Escolar",
-    "desc": "Un misterioso ser con tentáculos destruye el 70% de la luna y se convierte en maestro de la clase 3-E, entrenando a sus propios alumnos para que lo asesinen antes de graduarse.",
-    "spanishChapters": 10
-  },
-  {
-    "id": "cat-food-wars",
-    "title": "Shokugeki no Soma: Food Wars",
-    "author": "Yūto Tsukuda & Shun Saeki",
-    "year": 2012,
-    "pages": 10,
-    "genre": "Manga / Gastronomía / Duelos Culinarios",
-    "desc": "Soma Yukihira entra a la prestigiosa Academia Culinaria Totsuki donde solo el 10% logra graduarse, compitiendo en intensos combates de cocina llamados Shokugeki.",
-    "spanishChapters": 38
-  },
-  {
-    "id": "cat-hokuto-no-ken",
-    "title": "El Puño de la Estrella del Norte",
-    "author": "Buronson & Tetsuo Hara",
-    "year": 1983,
-    "pages": 10,
-    "genre": "Manga / Postapocalíptico / Hokuto Shinken",
-    "desc": "En un desierto postnuclear gobernado por la ley del más fuerte, Kenshiro utiliza el arte marcial mortal de los puntos de presión para proteger a los desvalidos.",
-    "spanishChapters": 245
-  },
-  {
-    "id": "cat-parasyte",
-    "title": "Parasyte (Kiseijuu)",
-    "author": "Hitoshi Iwaaki",
-    "year": 1988,
-    "pages": 10,
-    "genre": "Manga / Ciencia Ficción / Parásitos & Terror",
-    "desc": "Gusanos alienígenas invaden cerebros humanos para devorar a su especie. Shinichi Izumi logra frenar al parásito en su mano derecha, formando una alianza forzosa con Migi.",
-    "spanishChapters": 1
-  },
-  {
     "id": "cat-solanin",
     "title": "Solanin",
     "author": "Inio Asano",
@@ -468,56 +68,6 @@
     "genre": "Manga / Slice of Life / Música & Juventud",
     "desc": "Meiko renuncia a su aburrido trabajo de oficina para apoyar a su novio Taneda y a su banda de rock indie en Tokio en busca de un futuro que no los marchite.",
     "spanishChapters": 29
-  },
-  {
-    "id": "cat-dorohedoro",
-    "title": "Dorohedoro",
-    "author": "Q Hayashida",
-    "year": 2000,
-    "pages": 10,
-    "genre": "Manga / Fantasía Oscura / Magia & Caimanes",
-    "desc": "Caiman, un hombre con cabeza de reptil y amnesia, busca al hechicero que lo maldijo en la decadente ciudad de Hole con la ayuda de Nikaido y sus cuchillos de cocina.",
-    "spanishChapters": 45
-  },
-  {
-    "id": "cat-kingdom",
-    "title": "Kingdom",
-    "author": "Yasuhisa Hara",
-    "year": 2006,
-    "pages": 10,
-    "genre": "Manga / Histórico / China Antigua & Guerra",
-    "desc": "En el turbulento Periodo de los Reinos Combatientes, el huérfano de guerra Shin sueña con convertirse en el Gran General bajo el Cielo junto al joven rey Ei Sei.",
-    "spanishChapters": 2
-  },
-  {
-    "id": "cat-mushishi",
-    "title": "Mushishi",
-    "author": "Yuki Urushibara",
-    "year": 1999,
-    "pages": 10,
-    "genre": "Manga / Sobrenatural / Naturaleza & Poesía",
-    "desc": "Ginko es un maestro de Mushi que viaja por el Japón tradicional sanando a personas afectadas por estas primitivas y silenciosas formas de vida espiritual.",
-    "spanishChapters": 1
-  },
-  {
-    "id": "cat-bakuman",
-    "title": "Bakuman",
-    "author": "Tsugumi Ohba & Takeshi Obata",
-    "year": 2008,
-    "pages": 10,
-    "genre": "Manga / Shonen / Mangakas & Industria",
-    "desc": "El dibujante Moritaka Mashiro y el guionista Akito Takagi unen fuerzas para publicar en la Shonen Jump y lograr una adaptación al anime antes de que Mashiro se case.",
-    "spanishChapters": 10
-  },
-  {
-    "id": "cat-kaguya-sama",
-    "title": "Kaguya-sama: Love is War",
-    "author": "Aka Akasaka",
-    "year": 2015,
-    "pages": 10,
-    "genre": "Manga / Comedia Romántica / Estrategia Mental",
-    "desc": "Miyuki Shirogane y Kaguya Shinomiya son dos genios del consejo estudiantil enamorados el uno del otro, pero su orgullo desata una guerra psicológica para que el otro confiese primero.",
-    "spanishChapters": 35
   },
   {
     "id": "cat-oshi-no-ko",
@@ -530,106 +80,6 @@
     "spanishChapters": 3
   },
   {
-    "id": "cat-frieren",
-    "title": "Frieren: Más allá del final del viaje",
-    "author": "Kanehito Yamada & Tsukasa Abe",
-    "year": 2020,
-    "pages": 10,
-    "genre": "Manga / Fantasía Melancólica / Paso del Tiempo",
-    "desc": "Tras derrotar al Rey Demonio, la elfa casi inmortal Frieren sobrevive a sus compañeros humanos y emprende un viaje para comprender las efímeras vidas de los mortales.",
-    "spanishChapters": 1
-  },
-  {
-    "id": "cat-dandadan",
-    "title": "Dandadan",
-    "author": "Yukinobu Tatsu",
-    "year": 2021,
-    "pages": 10,
-    "genre": "Manga / Acción / Fantasmas & Alienígenas",
-    "desc": "Momo cree en los fantasmas pero rechaza a los extraterrestres; Okarun cree en aliens pero no en espíritus. Al aceptar un desafío mutuo, desatan un caos de poderes sobrenaturales.",
-    "spanishChapters": 21
-  },
-  {
-    "id": "cat-kaiju-no-8",
-    "title": "Kaiju No. 8",
-    "author": "Naoya Matsumoto",
-    "year": 2020,
-    "pages": 10,
-    "genre": "Manga / Shonen / Monstruos Gigantes",
-    "desc": "Kafka Hibino, un limpiador de cadáveres de kaijus de 32 años, absorbe un pequeño monstruo que le permite transformarse en el legendario Kaiju No. 8.",
-    "spanishChapters": 1
-  },
-  {
-    "id": "cat-sakamoto-days",
-    "title": "Sakamoto Days",
-    "author": "Yuto Suzuki",
-    "year": 2020,
-    "pages": 10,
-    "genre": "Manga / Comedia de Acción / Asesinos a Sueldo",
-    "desc": "Taro Sakamoto, el sicario legendario más temido, se retiró tras enamorarse, engordó y ahora atiende una tienda de barrio mientras protege a su familia de cazarrecompensas.",
-    "spanishChapters": 27
-  },
-  {
-    "id": "cat-jigokuraku",
-    "title": "Hell's Paradise: Jigokuraku",
-    "author": "Yuji Kaku",
-    "year": 2018,
-    "pages": 10,
-    "genre": "Manga / Shonen Oscuro / Ninjas en la Isla Prohibida",
-    "desc": "El ninja inmortal Gabimaru es enviado a una misteriosa isla habitada por deidades monstruosas para encontrar el Elixir de la Vida y conseguir el indulto del shogunato.",
-    "spanishChapters": 10
-  },
-  {
-    "id": "cat-mashle",
-    "title": "Mashle: Magic and Muscles",
-    "author": "Hajime Kōmoto",
-    "year": 2020,
-    "pages": 10,
-    "genre": "Manga / Parodia / Músculos vs Magia",
-    "desc": "En un mundo de magia donde los que carecen de ella son ejecutados, Mash Burnedead compensa su falta de poderes mágicos con músculos hipertrofiados y bollos de crema.",
-    "spanishChapters": 3
-  },
-  {
-    "id": "cat-undead-unluck",
-    "title": "Undead Unluck",
-    "author": "Yoshifumi Tozuka",
-    "year": 2020,
-    "pages": 10,
-    "genre": "Manga / Shonen / Habilidades de Negación",
-    "desc": "Fuko atrae mala suerte mortal a quien la toca; Andy es un zombi inmortal que desea morir. Juntos enfrentan a la Unión y a las reglas que rigen el cosmos.",
-    "spanishChapters": 3
-  },
-  {
-    "id": "cat-blue-exorcist",
-    "title": "Blue Exorcist (Ao no Exorcist)",
-    "author": "Kazue Kato",
-    "year": 2009,
-    "pages": 10,
-    "genre": "Manga / Shonen / Demonios & Exorcismo",
-    "desc": "Rin Okumura descubre que es hijo de Satanás cuando sus llamas azules despiertan, ingresando a la Academia Vera Cruz para convertirse en exorcista y derrotar a su propio padre.",
-    "spanishChapters": 13
-  },
-  {
-    "id": "cat-devilman",
-    "title": "Devilman",
-    "author": "Go Nagai",
-    "year": 1972,
-    "pages": 10,
-    "genre": "Manga / Terror / Clásico de Demonios",
-    "desc": "Akira Fudo se fusiona con el demonio Amon para combatir la invasión infernal que pretende erradicar a la humanidad en una de las obras más influyentes de la historia.",
-    "spanishChapters": 4
-  },
-  {
-    "id": "cat-mazinger-z",
-    "title": "Mazinger Z",
-    "author": "Go Nagai",
-    "year": 1972,
-    "pages": 10,
-    "genre": "Manga / Mecha / El Padre de los Robots Gigantes",
-    "desc": "Koji Kabuto pilotea el robot de aleación Z Mazinger para defender al mundo de las bestias mecánicas del malvado Dr. Infierno y el Barón Ashura.",
-    "spanishChapters": 1
-  },
-  {
     "id": "cat-trigun",
     "title": "Trigun",
     "author": "Yasuhiro Nightow",
@@ -638,56 +88,6 @@
     "genre": "Manga / Space Western / El Tifón Humanoide",
     "desc": "Vash la Estampida tiene una recompensa de 60 mil millones de doblones dobles sobre su cabeza, pero en realidad es un pacifista que empuña su revólver para salvar vidas.",
     "spanishChapters": 142
-  },
-  {
-    "id": "cat-gantz-e",
-    "title": "Elfen Lied",
-    "author": "Lynn Okamoto",
-    "year": 2002,
-    "pages": 10,
-    "genre": "Manga / Terror / Diclonius & Vectores",
-    "desc": "Lucy, una mutante con cuernos y brazos invisibles mortales, escapa del laboratorio con amnesia adoptando una personalidad infantil junto al inocente Kouta.",
-    "spanishChapters": 1
-  },
-  {
-    "id": "cat-bungo-stray-dogs",
-    "title": "Bungo Stray Dogs",
-    "author": "Kafka Asagiri & Sango Harukawa",
-    "year": 2012,
-    "pages": 10,
-    "genre": "Manga / Acción Sobrenatural / Detectives Literarios",
-    "desc": "Atsushi Nakajima se une a la Agencia Armada de Detectives en Yokohama, cuyos miembros poseen habilidades basadas en célebres autores de la literatura universal.",
-    "spanishChapters": 206
-  },
-  {
-    "id": "cat-aku-no-hana",
-    "title": "Las Flores del Mal (Aku no Hana)",
-    "author": "Shuzo Oshimi",
-    "year": 2009,
-    "pages": 10,
-    "genre": "Manga / Drama Psicológico / Rebeldía Adolescente",
-    "desc": "Kasuga roba impulsivamente la ropa de gimnasia de la chica que le gusta. Sawa Nakamura lo descubre y lo chantajea para arrastrarlo a una espiral de transgresión pura.",
-    "spanishChapters": 12
-  },
-  {
-    "id": "cat-choujin-x",
-    "title": "Choujin X",
-    "author": "Sui Ishida",
-    "year": 2021,
-    "pages": 10,
-    "genre": "Manga / Seinen / Superhumanos Oscuros",
-    "desc": "Tokio Kurohara y su talentoso amigo Azuma deciden inyectarse una jeringa misteriosa que los transforma en Choujin, seres con poderes monstruosos y deformes.",
-    "spanishChapters": 132
-  },
-  {
-    "id": "cat-komi-san",
-    "title": "Komi-san no puede comunicarse",
-    "author": "Tomohito Oda",
-    "year": 2016,
-    "pages": 10,
-    "genre": "Manga / Comedia / Amistad Escolar",
-    "desc": "Shouko Komi es la chica más bella de la escuela, pero padece de una ansiedad social paralizante. Su compañero Tadano jura ayudarla a conseguir cien amigos.",
-    "spanishChapters": 1
   },
   {
     "id": "cat-horimiya",
@@ -700,16 +100,6 @@
     "spanishChapters": 133
   },
   {
-    "id": "cat-sono-bisque-doll",
-    "title": "My Dress-Up Darling (Sono Bisque Doll)",
-    "author": "Shinichi Fukuda",
-    "year": 2018,
-    "pages": 10,
-    "genre": "Manga / Romance / Cosplay & Muñecas Tradicionales",
-    "desc": "Wakana Gojo sueña con ser artesano de muñecas Hina; Marin Kitagawa ama el anime y el cosplay. Ambos unen sus talentos para confeccionar trajes espectaculares.",
-    "spanishChapters": 19
-  },
-  {
     "id": "cat-xxxholic",
     "title": "xxxHOLiC",
     "author": "CLAMP",
@@ -718,36 +108,6 @@
     "genre": "Manga / Sobrenatural / Destino & Consecuencias",
     "desc": "Kimihiro Watanuki, atormentado por espíritus, trabaja como sirviente en la tienda de deseos de la enigmática bruja dimensional Yūko Ichihara para librarse de su don.",
     "spanishChapters": 56
-  },
-  {
-    "id": "cat-shaman-king",
-    "title": "Shaman King",
-    "author": "Hiroyuki Takei",
-    "year": 1998,
-    "pages": 10,
-    "genre": "Manga / Shonen / Chamanes & Espíritus",
-    "desc": "Yoh Asakura, acompañado por el espíritu samurái Amidamaru, participa en el Gran Torneo de Chamanes que se celebra cada 500 años para coronarse como el Shaman King.",
-    "spanishChapters": 16
-  },
-  {
-    "id": "cat-toriko",
-    "title": "Toriko",
-    "author": "Mitsutoshi Shimabukuro",
-    "year": 2008,
-    "pages": 10,
-    "genre": "Manga / Shonen / Caza de Ingredientes Legendarios",
-    "desc": "En la Era Gourmet donde el sabor lo es todo, el Cazador Gourmet Toriko viaja por ecosistemas salvajes para capturar ingredientes extraordinarios y completar su Menú de Vida.",
-    "spanishChapters": 2
-  },
-  {
-    "id": "cat-seraph-of-the-end",
-    "title": "Seraph of the End (Owari no Seraph)",
-    "author": "Takaya Kagami & Yamato Yamamoto",
-    "year": 2012,
-    "pages": 10,
-    "genre": "Manga / Fantasía Oscura / Vampiros & Armas Malditas",
-    "desc": "Un virus aniquila a los adultos y los vampiros esclavizan a los niños como ganado de sangre. Yuichiro escapa y se une al Ejército Demonio Japonés para rescatar a Mikaela.",
-    "spanishChapters": 16
   },
   {
     "id": "cat-drifters",
@@ -770,13 +130,133 @@
     "spanishChapters": 446
   },
   {
-    "id": "cat-urusei-yatsura",
-    "title": "Urusei Yatsura: Lamu",
-    "author": "Rumiko Takahashi",
-    "year": 1978,
+    "id": "cat-kimetsu-no-yaiba",
+    "title": "Demon Slayer: Kimetsu no Yaiba",
+    "author": "Koyoharu Gotouge",
+    "year": 2016,
     "pages": 10,
-    "genre": "Manga / Comedia de Ciencia Ficción",
-    "desc": "El mujeriego Ataru Moroboshi gana por accidente un duelo por la Tierra contra Lum, la hermosa princesa alienígena del planeta Oni que se enamora perdidamente de él.",
-    "spanishChapters": 366
+    "genre": "Manga / Shonen / Cazadores de Demonios & Espadas",
+    "desc": "Tanjiro Kamado se une al Cuerpo de Exterminio de Demonios para devolverle la humanidad a su hermana Nezuko y vengar a su familia masacrada.",
+    "spanishChapters": 203
+  },
+  {
+    "id": "cat-tokyo-ghoul-re",
+    "title": "Tokyo Ghoul:re",
+    "author": "Sui Ishida",
+    "year": 2014,
+    "pages": 10,
+    "genre": "Manga / Seinen / Ghouls & Misterio Psicológico",
+    "desc": "Dos años después de los eventos de Anteiku, Haise Sasaki lidera el escuadrón Quinx del CCG mientras lucha por descubrir quién fue en su vida pasada.",
+    "spanishChapters": 179
+  },
+  {
+    "id": "cat-sun-ken-rock",
+    "title": "Sun-Ken Rock",
+    "author": "Boichi",
+    "year": 2006,
+    "pages": 10,
+    "genre": "Manga / Seinen / Acción & Mafia Coreana",
+    "desc": "Ken viaja a Seúl siguiendo a la chica que ama y, tras una serie de incidentes callejeros, termina convirtiéndose en el líder de una poderosa banda mafiosa.",
+    "spanishChapters": 171
+  },
+  {
+    "id": "cat-beelzebub",
+    "title": "Beelzebub",
+    "author": "Ryuhei Tamura",
+    "year": 2009,
+    "pages": 10,
+    "genre": "Manga / Shonen / Comedia & Delincuentes",
+    "desc": "Tatsumi Oga, el matón más temido del Instituto Ishiyama, es elegido para criar al hijo recién nacido del mismísimo Rey Demonio que destruirá la Tierra.",
+    "spanishChapters": 246
+  },
+  {
+    "id": "cat-shounen-no-abyss",
+    "title": "Shounen no Abyss",
+    "author": "Ryo Minenami",
+    "year": 2020,
+    "pages": 10,
+    "genre": "Manga / Seinen / Drama Psicológico & Misterio",
+    "desc": "Reiji Kurose vive atrapado en un pueblo rural asfixiante y sin futuro, hasta que un encuentro fortuito con una famosa idol cambia su destino para siempre.",
+    "spanishChapters": 183
+  },
+  {
+    "id": "cat-relife",
+    "title": "ReLIFE",
+    "author": "Yayoiso",
+    "year": 2014,
+    "pages": 10,
+    "genre": "Manga / Webcomic / Romance & Segunda Oportunidad",
+    "desc": "Arata Kaizaki, un desempleado de 27 años, acepta participar en un experimento que le devuelve la apariencia de un joven de 17 para revivir su época de instituto.",
+    "spanishChapters": 222
+  },
+  {
+    "id": "cat-youjo-senki",
+    "title": "Youjo Senki (Saga of Tanya the Evil)",
+    "author": "Carlo Zen / Chika Toujou",
+    "year": 2016,
+    "pages": 10,
+    "genre": "Manga / Seinen / Estrategia Militar & Fantasía Oscura",
+    "desc": "Un cínico hombre de negocios reencarna como Tanya Degurechaff, una niña soldado prodigio que asciende en las fuerzas armadas de un imperio en guerra mágica.",
+    "spanishChapters": 122
+  },
+  {
+    "id": "cat-kimi-ni-todoke",
+    "title": "Kimi ni Todoke",
+    "author": "Karuho Shiina",
+    "year": 2005,
+    "pages": 10,
+    "genre": "Manga / Shojo / Romance Escolar & Crecimiento",
+    "desc": "Sawako Kuronuma, incomprendida por sus compañeros, ve su vida cambiar gracias a la cercanía de Kazehaya, el chico más amable y popular del aula.",
+    "spanishChapters": 123
+  },
+  {
+    "id": "cat-kimagure-orange-road",
+    "title": "Kimagure Orange Road",
+    "author": "Izumi Matsumoto",
+    "year": 1984,
+    "pages": 10,
+    "genre": "Manga / Shonen / Romance Clásico & Telequinesis",
+    "desc": "Kyosuke Kasuga y su familia con poderes sobrenaturales se mudan a una nueva ciudad, donde vivirá un legendario triángulo amoroso con Madoka y Hikaru.",
+    "spanishChapters": 156
+  },
+  {
+    "id": "cat-chobits",
+    "title": "Chobits",
+    "author": "CLAMP",
+    "year": 2000,
+    "pages": 10,
+    "genre": "Manga / Seinen / Ciencia Ficción & Romance",
+    "desc": "Hideki encuentra abandonada en la basura a una computadora con forma de mujer llamada Chi, descubriendo un misterio que desafía la relación entre humanos e inteligencia artificial.",
+    "spanishChapters": 88
+  },
+  {
+    "id": "cat-arifureta",
+    "title": "Arifureta Shokugyou de Sekai Saikyou",
+    "author": "Ryo Shirakome",
+    "year": 2016,
+    "pages": 10,
+    "genre": "Manga / Shonen / Isekai & Superación Oscura",
+    "desc": "Traicionado y arrojado a las profundidades de un calabozo letal, Hajime Nagumo devora criaturas monstruosas y renace con una fuerza y armamento imparables.",
+    "spanishChapters": 83
+  },
+  {
+    "id": "cat-tsuki-ga-michibiku",
+    "title": "Tsuki ga Michibiku Isekai Douchuu",
+    "author": "Kei Azumi",
+    "year": 2015,
+    "pages": 10,
+    "genre": "Manga / Shonen / Fantasía & Construcción de Reino",
+    "desc": "Invocado por una diosa que lo desprecia por su aspecto, Makoto Misumi es desterrado a una tierra baldía donde une fuerzas con dragones y monstruos para forjar su propia civilización.",
+    "spanishChapters": 73
+  },
+  {
+    "id": "cat-all-you-need-is-kill",
+    "title": "All You Need Is Kill",
+    "author": "Hiroshi Sakurazaka / Takeshi Obata",
+    "year": 2014,
+    "pages": 10,
+    "genre": "Manga / Seinen / Ciencia Ficción & Bucle Temporal",
+    "desc": "Keiji Kiriya muere en su primera batalla contra invasores alienígenas, pero despierta atrapado en un bucle temporal que lo hace repetir el mismo día una y otra vez.",
+    "spanishChapters": 17
   }
 ]
