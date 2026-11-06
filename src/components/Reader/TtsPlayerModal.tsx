@@ -11,6 +11,7 @@ import {
   SkipBack,
   SkipForward,
   Sparkles,
+  Loader2,
 } from 'lucide-react';
 import {
   parseAudiobookSegments,
@@ -49,97 +50,103 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
   const [segmentIndex, setSegmentIndex] = useState<number>(0);
   const [useNativeTts, setUseNativeTts] = useState<boolean>(false);
 
+  // References to keep event listeners and asynchronous timers fully synchronized
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
-  const keepAliveTimerRef = useRef<any>(null);
   const pauseTimerRef = useRef<any>(null);
+  const activeUtteranceIdRef = useRef<string | null>(null);
   const isPlayingRef = useRef<boolean>(false);
+  const segmentIndexRef = useRef<number>(0);
+  const currentPageRef = useRef<number>(currentPage);
+  const totalPagesRef = useRef<number>(totalPages);
   const onNextPageRef = useRef(onNextPage);
   const onPrevPageRef = useRef(onPrevPage);
+  const isAwaitingNewPageRef = useRef<boolean>(false);
+  const prevPageRef = useRef<number>(currentPage);
 
   useLayoutEffect(() => {
     isPlayingRef.current = isPlaying;
+    segmentIndexRef.current = segmentIndex;
+    currentPageRef.current = currentPage;
+    totalPagesRef.current = totalPages;
     onNextPageRef.current = onNextPage;
     onPrevPageRef.current = onPrevPage;
   });
 
-  // Extract fallback text directly from active reader if currentText was empty
+  // Extract text from prop or fallback to active reader iframes/containers
   const effectiveText = useMemo(() => {
     if (currentText && currentText.trim().length > 15) {
-      return currentText;
+      return currentText.trim();
     }
 
-    // Try extracting from active iframe in DOM
     if (typeof document !== 'undefined') {
       const iframes = document.querySelectorAll('iframe');
       for (let i = 0; i < iframes.length; i++) {
         try {
           const bodyText = iframes[i].contentDocument?.body?.innerText;
-          if (bodyText && bodyText.trim().length > 20) {
+          if (bodyText && bodyText.trim().length > 15) {
             return bodyText.trim();
           }
         } catch {}
       }
 
-      // Try text reader container
       const textContainer = document.querySelector('.whitespace-pre-wrap');
-      if (textContainer && (textContainer as HTMLElement).innerText?.trim().length > 20) {
+      if (textContainer && (textContainer as HTMLElement).innerText?.trim().length > 15) {
         return (textContainer as HTMLElement).innerText.trim();
       }
     }
 
-    return currentText || '';
+    return currentText ? currentText.trim() : '';
   }, [currentText, currentPage, isOpen]);
 
-  // Parse text using Master Audiobook Narrator guidelines
+  // Parse text using Master Audiobook Narrator guidelines (returns [] if text is still loading)
   const segments: AudiobookSegment[] = useMemo(() => {
-    if (!effectiveText || !effectiveText.trim()) {
-      return [
-        {
-          text: `${bookTitle}, página ${currentPage}.`,
-          fullPhrase: `${bookTitle}, página ${currentPage}.`,
-          role: 'narrator',
-          pitch: 0.98,
-          rateMultiplier: 1.0,
-          pauseBeforeMs: 300,
-          moodLabel: '🎙️ Narrador',
-        },
-      ];
+    if (!effectiveText || effectiveText.trim().length < 10) {
+      return [];
     }
-
-    const parsed = parseAudiobookSegments(effectiveText);
-    if (parsed.length > 0) return parsed;
-
-    return [
-      {
-        text: effectiveText.trim(),
-        fullPhrase: effectiveText.trim(),
-        role: 'narrator',
-        pitch: 0.98,
-        rateMultiplier: 1.0,
-        pauseBeforeMs: 300,
-        moodLabel: '🎙️ Narrador',
-      },
-    ];
-  }, [effectiveText, bookTitle, currentPage]);
+    return parseAudiobookSegments(effectiveText);
+  }, [effectiveText]);
 
   const segmentsRef = useRef<AudiobookSegment[]>(segments);
   segmentsRef.current = segments;
 
-  const isAwaitingNewPageRef = useRef<boolean>(false);
-  const prevPageRef = useRef<number>(currentPage);
-
-  // Track page transitions
+  // Track page changes cleanly
   useEffect(() => {
     if (prevPageRef.current !== currentPage) {
       prevPageRef.current = currentPage;
       setSegmentIndex(0);
+      segmentIndexRef.current = 0;
+
+      if (pauseTimerRef.current) {
+        clearTimeout(pauseTimerRef.current);
+        pauseTimerRef.current = null;
+      }
+
       if (isPlayingRef.current) {
+        // Stop current speech so old audio does not leak into the new page
+        if (useNativeTts) {
+          NativeTts.stop();
+        } else if (typeof window !== 'undefined' && window.speechSynthesis) {
+          window.speechSynthesis.cancel();
+        }
         isAwaitingNewPageRef.current = true;
       }
     }
-  }, [currentPage]);
+  }, [currentPage, useNativeTts]);
 
-  // Initialize TTS Engine (Native Android vs Web Speech API) and load Spanish voices
+  // When new page text is parsed into segments, resume narration seamlessly
+  useEffect(() => {
+    if (segments.length > 0 && isAwaitingNewPageRef.current && isPlayingRef.current) {
+      isAwaitingNewPageRef.current = false;
+      const timer = setTimeout(() => {
+        if (isPlayingRef.current) {
+          speakSegment(0);
+        }
+      }, 250);
+      return () => clearTimeout(timer);
+    }
+  }, [segments]);
+
+  // Initialize TTS Engine (Native Android TTS vs Web Speech API fallback)
   useEffect(() => {
     let isMounted = true;
 
@@ -160,12 +167,21 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
 
           if (voiceList.length > 0 && isMounted) {
             setVoices(voiceList);
-            // Prioritize neural voice, then es-ES, then first available
             const preferred =
               voiceList.find(v => v.isNeural && v.lang.startsWith('es')) ||
               voiceList.find(v => v.lang.startsWith('es')) ||
               voiceList[0];
             setSelectedVoice(preferred);
+          } else if (isMounted) {
+            // Default Spanish system voice fallback
+            const fallbackVoice: TtsVoiceOption = {
+              name: 'Voz del Sistema (Español)',
+              lang: 'es-ES',
+              isNeural: true,
+              isNative: true,
+            };
+            setVoices([fallbackVoice]);
+            setSelectedVoice(fallbackVoice);
           }
         } catch (e) {
           console.warn('[TTS] Error loading native voices:', e);
@@ -210,6 +226,44 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
     };
   }, []);
 
+  // Handler when a sentence completes reading
+  const handleSegmentDone = (completedIndex: number) => {
+    if (!isPlayingRef.current) return;
+
+    const list = segmentsRef.current;
+    const next = completedIndex + 1;
+
+    if (next < list.length) {
+      setSegmentIndex(next);
+      segmentIndexRef.current = next;
+
+      // Guideline 2: Natural breathing micropause between phrases
+      const nextSeg = list[next];
+      const pauseDuration = Math.max(120, Math.min(600, nextSeg?.pauseBeforeMs || 250));
+
+      pauseTimerRef.current = setTimeout(() => {
+        if (isPlayingRef.current) {
+          speakSegment(next);
+        }
+      }, pauseDuration);
+    } else {
+      // Reached the end of the current page!
+      if (currentPageRef.current < totalPagesRef.current) {
+        isAwaitingNewPageRef.current = true;
+        // Breathes for 350ms before turning page
+        pauseTimerRef.current = setTimeout(() => {
+          if (isPlayingRef.current) {
+            onNextPageRef.current();
+          }
+        }, 350);
+      } else {
+        // End of the entire book
+        setIsPlaying(false);
+        setIsPaused(false);
+      }
+    }
+  };
+
   // Listen to native Android TTS playback events
   useEffect(() => {
     if (!useNativeTts) return;
@@ -218,38 +272,24 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
     let onDoneHandle: PluginListenerHandle | null = null;
     let onErrorHandle: PluginListenerHandle | null = null;
 
-    NativeTts.addListener('onStart', () => {
+    NativeTts.addListener('onStart', data => {
+      if (!data || data.utteranceId !== activeUtteranceIdRef.current) return;
       setIsPlaying(true);
       setIsPaused(false);
     }).then(h => (onStartHandle = h));
 
-    NativeTts.addListener('onDone', () => {
-      // Advance to next segment
-      setSegmentIndex(prev => {
-        const next = prev + 1;
-        const currentList = segmentsRef.current;
-        if (next < currentList.length) {
-          setTimeout(() => {
-            if (isPlayingRef.current) {
-              speakSegment(next);
-            }
-          }, 80);
-          return next;
-        } else {
-          // Finished current page
-          if (currentPage < totalPages) {
-            isAwaitingNewPageRef.current = true;
-            onNextPageRef.current();
-          } else {
-            setIsPlaying(false);
-            setIsPaused(false);
-          }
-          return 0;
-        }
-      });
+    NativeTts.addListener('onDone', data => {
+      // STRICT FILTER: Only proceed if utteranceId strictly matches the active utterance
+      if (!data || data.utteranceId !== activeUtteranceIdRef.current) {
+        return;
+      }
+      activeUtteranceIdRef.current = null;
+      handleSegmentDone(segmentIndexRef.current);
     }).then(h => (onDoneHandle = h));
 
-    NativeTts.addListener('onError', () => {
+    NativeTts.addListener('onError', data => {
+      if (!data || data.utteranceId !== activeUtteranceIdRef.current) return;
+      activeUtteranceIdRef.current = null;
       setIsPlaying(false);
       setIsPaused(false);
     }).then(h => (onErrorHandle = h));
@@ -259,7 +299,7 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
       onDoneHandle?.remove();
       onErrorHandle?.remove();
     };
-  }, [useNativeTts, currentPage, totalPages]);
+  }, [useNativeTts]);
 
   // Stop speech when modal is closed
   useEffect(() => {
@@ -268,31 +308,18 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
     }
   }, [isOpen]);
 
-  // Web Speech API Keepalive for mobile Android WebView
-  useEffect(() => {
-    if (!useNativeTts && isPlaying && !isPaused) {
-      keepAliveTimerRef.current = setInterval(() => {
-        if (typeof window !== 'undefined' && window.speechSynthesis && window.speechSynthesis.speaking) {
-          window.speechSynthesis.pause();
-          window.speechSynthesis.resume();
-        }
-      }, 10000);
-    } else {
-      if (keepAliveTimerRef.current) {
-        clearInterval(keepAliveTimerRef.current);
-      }
-    }
-
-    return () => {
-      if (keepAliveTimerRef.current) clearInterval(keepAliveTimerRef.current);
-    };
-  }, [isPlaying, isPaused, useNativeTts]);
-
   // Speak a specific segment by index applying all 5 Narrator Guidelines
   const speakSegment = async (index: number) => {
+    if (pauseTimerRef.current) {
+      clearTimeout(pauseTimerRef.current);
+      pauseTimerRef.current = null;
+    }
+
     const list = segmentsRef.current;
+    if (!list || list.length === 0) return;
+
     if (index >= list.length) {
-      if (currentPage < totalPages) {
+      if (currentPageRef.current < totalPagesRef.current) {
         isAwaitingNewPageRef.current = true;
         onNextPageRef.current();
       } else {
@@ -303,22 +330,37 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
     }
 
     const seg = list[index];
-    if (!seg || !seg.text) return;
+    if (!seg || !seg.text || !seg.text.trim()) {
+      handleSegmentDone(index);
+      return;
+    }
 
-    // Guideline 1 & 4: Calculate final prosody
-    const finalRate = Math.max(0.6, Math.min(2.5, speed * seg.rateMultiplier));
-    const finalPitch = Math.max(0.7, Math.min(1.4, seg.pitch));
+    setSegmentIndex(index);
+    segmentIndexRef.current = index;
+
+    // Guideline 1 & 4: Master Audiobook Narrator prosody (Pacing, Cadence & Pitch)
+    const finalRate = Math.max(0.65, Math.min(1.8, speed * seg.rateMultiplier));
+    const finalPitch = Math.max(0.75, Math.min(1.3, seg.pitch));
 
     // NATIVE ANDROID TTS PATH
     if (useNativeTts) {
       try {
-        await NativeTts.speak({
+        const generatedId = 'utt_' + Date.now();
+        activeUtteranceIdRef.current = generatedId;
+
+        const res = await NativeTts.speak({
           text: seg.text,
           rate: finalRate,
           pitch: finalPitch,
-          voiceName: selectedVoice?.name,
-          pauseBeforeMs: seg.pauseBeforeMs,
+          voiceName: selectedVoice?.name && selectedVoice.name !== 'Voz del Sistema (Español)' ? selectedVoice.name : undefined,
         });
+
+        if (res && res.utteranceId) {
+          activeUtteranceIdRef.current = res.utteranceId;
+        }
+
+        setIsPlaying(true);
+        setIsPaused(false);
       } catch (err) {
         console.warn('[NativeTts] speak notice:', err);
       }
@@ -329,74 +371,47 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
     if (typeof window === 'undefined' || !window.speechSynthesis) return;
 
     window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(seg.text);
 
-    // Guideline 2: Natural breathing micropause before speaking
-    pauseTimerRef.current = setTimeout(() => {
-      const utterance = new SpeechSynthesisUtterance(seg.text);
-
-      // Match voice
-      if (selectedVoice) {
-        const matchingWebVoice = window.speechSynthesis.getVoices().find(v => v.name === selectedVoice.name);
-        if (matchingWebVoice) {
-          utterance.voice = matchingWebVoice;
-        }
+    if (selectedVoice) {
+      const matchingWebVoice = window.speechSynthesis.getVoices().find(v => v.name === selectedVoice.name);
+      if (matchingWebVoice) {
+        utterance.voice = matchingWebVoice;
       }
-      utterance.lang = selectedVoice?.lang || 'es-ES';
-      utterance.rate = finalRate;
-      utterance.pitch = finalPitch;
+    }
 
-      utterance.onstart = () => {
-        setIsPlaying(true);
-        setIsPaused(false);
-      };
+    utterance.lang = selectedVoice?.lang || 'es-ES';
+    utterance.rate = finalRate;
+    utterance.pitch = finalPitch;
 
-      utterance.onend = () => {
-        setSegmentIndex(prev => {
-          const next = prev + 1;
-          const currentList = segmentsRef.current;
-          if (next < currentList.length) {
-            setTimeout(() => {
-              if (isPlayingRef.current) {
-                speakSegment(next);
-              }
-            }, 60);
-            return next;
-          } else {
-            if (currentPage < totalPages) {
-              isAwaitingNewPageRef.current = true;
-              onNextPageRef.current();
-            } else {
-              setIsPlaying(false);
-              setIsPaused(false);
-            }
-            return 0;
-          }
-        });
-      };
+    utterance.onstart = () => {
+      setIsPlaying(true);
+      setIsPaused(false);
+    };
 
-      utterance.onerror = e => {
-        if (e.error !== 'interrupted' && e.error !== 'canceled') {
-          console.warn('[WebSpeech] utterance notice:', e.error);
-        }
-      };
+    utterance.onend = () => {
+      if (!isPlayingRef.current) return;
+      handleSegmentDone(index);
+    };
 
-      utteranceRef.current = utterance;
-      window.speechSynthesis.speak(utterance);
-    }, Math.min(250, seg.pauseBeforeMs));
+    utterance.onerror = e => {
+      if (e.error !== 'interrupted' && e.error !== 'canceled') {
+        console.warn('[WebSpeech] utterance notice:', e.error);
+      }
+    };
+
+    utteranceRef.current = utterance;
+    window.speechSynthesis.speak(utterance);
   };
 
   // Play / Resume
   const handlePlay = () => {
-    if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
-
-    if (isPaused) {
-      if (!useNativeTts && typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.resume();
-      }
-      setIsPlaying(true);
-      setIsPaused(false);
-      return;
+    if (pauseTimerRef.current) {
+      clearTimeout(pauseTimerRef.current);
+      pauseTimerRef.current = null;
     }
+
+    if (segments.length === 0) return;
 
     setIsPlaying(true);
     setIsPaused(false);
@@ -405,12 +420,17 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
 
   // Pause
   const handlePause = () => {
-    if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
+    if (pauseTimerRef.current) {
+      clearTimeout(pauseTimerRef.current);
+      pauseTimerRef.current = null;
+    }
+
+    activeUtteranceIdRef.current = null;
 
     if (useNativeTts) {
       NativeTts.stop();
     } else if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.pause();
+      window.speechSynthesis.cancel();
     }
     setIsPlaying(false);
     setIsPaused(true);
@@ -418,7 +438,12 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
 
   // Stop
   const handleStop = () => {
-    if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
+    if (pauseTimerRef.current) {
+      clearTimeout(pauseTimerRef.current);
+      pauseTimerRef.current = null;
+    }
+
+    activeUtteranceIdRef.current = null;
 
     if (useNativeTts) {
       NativeTts.stop();
@@ -428,18 +453,8 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
     setIsPlaying(false);
     setIsPaused(false);
     setSegmentIndex(0);
+    segmentIndexRef.current = 0;
   };
-
-  // Automatically continue narration when new page text is delivered
-  useEffect(() => {
-    if (isAwaitingNewPageRef.current && isPlaying && !isPaused) {
-      isAwaitingNewPageRef.current = false;
-      const timer = setTimeout(() => {
-        speakSegment(0);
-      }, 150);
-      return () => clearTimeout(timer);
-    }
-  }, [effectiveText]);
 
   // Adjust speed on the fly
   const handleSpeedChange = (newSpeed: number) => {
@@ -448,7 +463,7 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
       handleStop();
       setTimeout(() => {
         setIsPlaying(true);
-        speakSegment(segmentIndex);
+        speakSegment(segmentIndexRef.current);
       }, 120);
     }
   };
@@ -458,6 +473,7 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
     if (segmentIndex + 1 < segments.length) {
       const next = segmentIndex + 1;
       setSegmentIndex(next);
+      segmentIndexRef.current = next;
       if (isPlaying) speakSegment(next);
     } else if (currentPage < totalPages) {
       onNextPageRef.current();
@@ -469,6 +485,7 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
     if (segmentIndex > 0) {
       const prev = segmentIndex - 1;
       setSegmentIndex(prev);
+      segmentIndexRef.current = prev;
       if (isPlaying) speakSegment(prev);
     } else if (currentPage > 1) {
       onPrevPageRef.current();
@@ -479,6 +496,7 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
 
   const activeSegment = segments[segmentIndex] || segments[0];
   const progressPercent = segments.length > 0 ? Math.round(((segmentIndex + 1) / segments.length) * 100) : 0;
+  const isTextLoading = segments.length === 0;
 
   return (
     <div className="fixed bottom-14 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-lg bg-slate-900/95 dark:bg-[#18191c]/95 text-white backdrop-blur-md border border-slate-700/80 dark:border-zinc-700/80 rounded-3xl shadow-2xl p-4 animate-in slide-in-from-bottom duration-150">
@@ -496,11 +514,11 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
               {/* Dynamic Mood Badge following guidelines */}
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 dark:bg-zinc-800 border border-slate-700 dark:border-zinc-700 text-rose-300 dark:text-zinc-200 flex items-center gap-1">
                 <Sparkles className="w-2.5 h-2.5 text-amber-400" />
-                {activeSegment?.moodLabel || '🎙️ Narrador'}
+                {isTextLoading ? '📖 Preparando...' : (isPaused ? '⏸️ En pausa' : activeSegment?.moodLabel || '🎙️ Narrador Cálido')}
               </span>
             </div>
             <p className="text-[10px] text-slate-400 dark:text-zinc-400">
-              Pág. {currentPage} de {totalPages} • Frase {segmentIndex + 1} de {segments.length} ({progressPercent}%)
+              Pág. {currentPage} de {totalPages} • {isTextLoading ? 'Extrayendo texto...' : `Frase ${segmentIndex + 1} de ${segments.length} (${progressPercent}%)`}
             </p>
           </div>
         </div>
@@ -520,19 +538,26 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
 
       {/* Spoken Text Preview Card with Audio Waves */}
       <div className="my-2.5 p-3.5 rounded-2xl bg-black/40 border border-slate-800/80 dark:border-zinc-800/60 max-h-24 overflow-y-auto relative">
-        <p className="text-xs text-slate-200 dark:text-zinc-200 font-sans leading-relaxed">
-          {activeSegment?.fullPhrase ? (
-            <span>
-              <span className="text-rose-400 dark:text-zinc-400 font-bold mr-1">“</span>
-              {activeSegment.fullPhrase}
-              <span className="text-rose-400 dark:text-zinc-400 font-bold ml-1">”</span>
-            </span>
-          ) : (
-            <span className="text-slate-400 dark:text-zinc-400 italic">Preparando narración de la página...</span>
-          )}
-        </p>
+        {isTextLoading ? (
+          <div className="flex items-center justify-center gap-2 py-2 text-slate-400 dark:text-zinc-400 text-xs">
+            <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-400" />
+            <span>Extrayendo texto de «{bookTitle}»...</span>
+          </div>
+        ) : (
+          <p className="text-xs text-slate-200 dark:text-zinc-200 font-sans leading-relaxed">
+            {activeSegment?.fullPhrase ? (
+              <span>
+                <span className="text-rose-400 dark:text-zinc-400 font-bold mr-1">“</span>
+                {activeSegment.fullPhrase}
+                <span className="text-rose-400 dark:text-zinc-400 font-bold ml-1">”</span>
+              </span>
+            ) : (
+              <span className="text-slate-400 dark:text-zinc-400 italic">Listo para narrar.</span>
+            )}
+          </p>
+        )}
 
-        {isPlaying && (
+        {isPlaying && !isTextLoading && (
           <div className="absolute top-2 right-2 flex items-end gap-0.5 h-3">
             <span className="w-0.5 h-3 bg-rose-400 dark:bg-zinc-300 animate-pulse" />
             <span className="w-0.5 h-2 bg-rose-400 dark:bg-zinc-300 animate-ping" />
@@ -573,7 +598,8 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
           <button
             type="button"
             onClick={handlePrevSegment}
-            className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            disabled={isTextLoading}
+            className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
             title="Frase anterior"
           >
             <SkipBack className="w-4 h-4" />
@@ -582,7 +608,8 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
           <button
             type="button"
             onClick={isPlaying ? handlePause : handlePlay}
-            className="p-3 rounded-2xl bg-rose-500 hover:bg-rose-600 dark:bg-zinc-200 dark:hover:bg-white text-white dark:text-zinc-950 shadow-lg transition-transform active:scale-95 cursor-pointer"
+            disabled={isTextLoading}
+            className="p-3 rounded-2xl bg-rose-500 hover:bg-rose-600 dark:bg-zinc-200 dark:hover:bg-white text-white dark:text-zinc-950 disabled:opacity-40 shadow-lg transition-transform active:scale-95 cursor-pointer"
             title={isPlaying ? 'Pausar narración' : 'Iniciar narración humana'}
           >
             {isPlaying ? (
@@ -604,7 +631,8 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
           <button
             type="button"
             onClick={handleNextSegment}
-            className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            disabled={isTextLoading}
+            className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
             title="Siguiente frase"
           >
             <SkipForward className="w-4 h-4" />
@@ -625,7 +653,7 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
                     handleStop();
                     setTimeout(() => {
                       setIsPlaying(true);
-                      speakSegment(segmentIndex);
+                      speakSegment(segmentIndexRef.current);
                     }, 120);
                   }
                 }

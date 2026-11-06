@@ -19,7 +19,7 @@ import java.util.Set;
 public class NativeTtsPlugin extends Plugin implements TextToSpeech.OnInitListener {
     private TextToSpeech tts;
     private boolean isInitialized = false;
-    private String currentUtteranceId = null;
+    private volatile String currentUtteranceId = null;
 
     @Override
     public void load() {
@@ -27,7 +27,7 @@ public class NativeTtsPlugin extends Plugin implements TextToSpeech.OnInitListen
         initTts();
     }
 
-    private void initTts() {
+    private synchronized void initTts() {
         if (tts == null) {
             tts = new TextToSpeech(getContext(), this);
         }
@@ -37,33 +37,54 @@ public class NativeTtsPlugin extends Plugin implements TextToSpeech.OnInitListen
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS) {
             isInitialized = true;
-            Locale esLocale = new Locale("es", "ES");
-            int result = tts.setLanguage(esLocale);
-            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                tts.setLanguage(new Locale("es"));
-            }
+            try {
+                Locale esLocale = new Locale("es", "ES");
+                int result = tts.setLanguage(esLocale);
+                if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    tts.setLanguage(new Locale("es"));
+                }
+            } catch (Exception ignored) {}
 
             tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                 @Override
                 public void onStart(String utteranceId) {
-                    JSObject data = new JSObject();
-                    data.put("utteranceId", utteranceId);
-                    notifyListeners("onStart", data);
+                    // Only notify if this matches the currently active utterance
+                    if (utteranceId != null && utteranceId.equals(currentUtteranceId)) {
+                        JSObject data = new JSObject();
+                        data.put("utteranceId", utteranceId);
+                        notifyListeners("onStart", data);
+                    }
                 }
 
                 @Override
                 public void onDone(String utteranceId) {
-                    JSObject data = new JSObject();
-                    data.put("utteranceId", utteranceId);
-                    notifyListeners("onDone", data);
+                    // Strictly filter by current utterance ID to prevent phantom or silent pause callbacks
+                    if (utteranceId != null && utteranceId.equals(currentUtteranceId)) {
+                        JSObject data = new JSObject();
+                        data.put("utteranceId", utteranceId);
+                        notifyListeners("onDone", data);
+                    }
                 }
 
                 @Override
                 public void onError(String utteranceId) {
-                    JSObject data = new JSObject();
-                    data.put("utteranceId", utteranceId);
-                    data.put("error", "Error in utterance " + utteranceId);
-                    notifyListeners("onError", data);
+                    if (utteranceId != null && utteranceId.equals(currentUtteranceId)) {
+                        JSObject data = new JSObject();
+                        data.put("utteranceId", utteranceId);
+                        data.put("error", "Error in utterance " + utteranceId);
+                        notifyListeners("onError", data);
+                    }
+                }
+
+                @Override
+                public void onError(String utteranceId, int errorCode) {
+                    if (utteranceId != null && utteranceId.equals(currentUtteranceId)) {
+                        JSObject data = new JSObject();
+                        data.put("utteranceId", utteranceId);
+                        data.put("errorCode", errorCode);
+                        data.put("error", "Error " + errorCode + " in utterance " + utteranceId);
+                        notifyListeners("onError", data);
+                    }
                 }
             });
         } else {
@@ -96,9 +117,7 @@ public class NativeTtsPlugin extends Plugin implements TextToSpeech.OnInitListen
                         }
                     }
                 }
-            } catch (Exception e) {
-                // Ignore voice enumeration errors
-            }
+            } catch (Exception ignored) {}
         }
         JSObject ret = new JSObject();
         ret.put("voices", voicesArray);
@@ -119,47 +138,48 @@ public class NativeTtsPlugin extends Plugin implements TextToSpeech.OnInitListen
             return;
         }
 
+        // Clamp rate to safe, natural bounds (0.6x to 2.0x)
         Double rateD = call.getDouble("rate", 1.0);
         float rate = rateD != null ? rateD.floatValue() : 1.0f;
+        rate = Math.max(0.6f, Math.min(2.0f, rate));
 
+        // Clamp pitch to safe, natural bounds (0.75x to 1.35x)
         Double pitchD = call.getDouble("pitch", 1.0);
         float pitch = pitchD != null ? pitchD.floatValue() : 1.0f;
+        pitch = Math.max(0.75f, Math.min(1.35f, pitch));
 
         String voiceName = call.getString("voiceName", null);
-        Integer pauseObj = call.getInt("pauseBeforeMs", 0);
-        int pauseBeforeMs = pauseObj != null ? pauseObj : 0;
-
-        if (pauseBeforeMs > 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            tts.playSilentUtterance((long) pauseBeforeMs, TextToSpeech.QUEUE_FLUSH, "silence_pause");
-        }
 
         tts.setSpeechRate(rate);
         tts.setPitch(pitch);
 
+        // Apply voice if selected
         if (voiceName != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Set<Voice> voices = tts.getVoices();
-            if (voices != null) {
-                for (Voice v : voices) {
-                    if (v.getName().equals(voiceName)) {
-                        tts.setVoice(v);
-                        break;
+            try {
+                Set<Voice> voices = tts.getVoices();
+                if (voices != null) {
+                    for (Voice v : voices) {
+                        if (v.getName().equals(voiceName)) {
+                            tts.setVoice(v);
+                            break;
+                        }
                     }
                 }
-            }
+            } catch (Exception ignored) {}
         }
 
+        // Generate unique utterance id for this speech fragment
         currentUtteranceId = "utt_" + System.currentTimeMillis();
-        int queueMode = pauseBeforeMs > 0 ? TextToSpeech.QUEUE_ADD : TextToSpeech.QUEUE_FLUSH;
 
         int res;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Bundle params = new Bundle();
             params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, currentUtteranceId);
-            res = tts.speak(text, queueMode, params, currentUtteranceId);
+            res = tts.speak(text, TextToSpeech.QUEUE_FLUSH, params, currentUtteranceId);
         } else {
             java.util.HashMap<String, String> params = new java.util.HashMap<>();
             params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, currentUtteranceId);
-            res = tts.speak(text, queueMode, params);
+            res = tts.speak(text, TextToSpeech.QUEUE_FLUSH, params);
         }
 
         if (res == TextToSpeech.SUCCESS) {
@@ -167,14 +187,17 @@ public class NativeTtsPlugin extends Plugin implements TextToSpeech.OnInitListen
             ret.put("utteranceId", currentUtteranceId);
             call.resolve(ret);
         } else {
-            call.reject("Error al iniciar reproducción en el motor de voz de Android.");
+            call.reject("Error al iniciar reproducción en el motor de voz de Android (" + res + ").");
         }
     }
 
     @PluginMethod
     public void stop(PluginCall call) {
+        currentUtteranceId = null;
         if (tts != null) {
-            tts.stop();
+            try {
+                tts.stop();
+            } catch (Exception ignored) {}
         }
         call.resolve();
     }

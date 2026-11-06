@@ -1,13 +1,13 @@
 import { registerPlugin, type PluginListenerHandle } from '@capacitor/core';
 
 export interface AudiobookSegment {
-  text: string;
-  fullPhrase: string;
+  text: string;           // Cleaned phonetic text strictly for the TTS engine
+  fullPhrase: string;     // Formatted text including quotes and punctuation for the UI card
   role: 'narrator' | 'dialogue' | 'action' | 'suspense';
-  pitch: number;
-  rateMultiplier: number;
-  pauseBeforeMs: number;
-  moodLabel: string;
+  pitch: number;          // Guideline 3 & 4: Natural human pitch modulation
+  rateMultiplier: number; // Guideline 1: Dynamic pacing and cadence
+  pauseBeforeMs: number;  // Guideline 2: Subtle breathing micropause before speaking
+  moodLabel: string;      // Visual feedback of emotional tone in UI
 }
 
 export interface TtsVoiceOption {
@@ -25,45 +25,56 @@ interface NativeTtsPluginInterface {
     rate?: number;
     pitch?: number;
     voiceName?: string;
-    pauseBeforeMs?: number;
   }): Promise<{ utteranceId: string }>;
   stop(): Promise<void>;
   addListener(eventName: 'onStart', listenerFunc: (data: { utteranceId: string }) => void): Promise<PluginListenerHandle>;
   addListener(eventName: 'onDone', listenerFunc: (data: { utteranceId: string }) => void): Promise<PluginListenerHandle>;
-  addListener(eventName: 'onError', listenerFunc: (data: { utteranceId: string; error: string }) => void): Promise<PluginListenerHandle>;
+  addListener(eventName: 'onError', listenerFunc: (data: { utteranceId: string; error?: string; errorCode?: number }) => void): Promise<PluginListenerHandle>;
 }
 
 export const NativeTts = registerPlugin<NativeTtsPluginInterface>('NativeTts');
 
 /**
  * Guideline 5: Relaxed Spanish Diction & Phonetic Cleanliness
- * Cleans punctuation noise, footnote markers, and expands abbreviations.
+ * Removes typographic artifacts, bracketed footnote citations, and expands abbreviations.
  */
 export function cleanPhonetics(raw: string): string {
   let text = (raw || '')
-    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .replace(/[\u200B-\u200D\uFEFF]/g, '') // Zero-width characters
     .replace(/\s+/g, ' ')
     .trim();
 
-  // Remove bracketed citations like [1], [12], *, etc.
+  // Strip footnote numbers and bracketed references (e.g. [1], [23], (1), ¹, ², etc.)
   text = text.replace(/\[\d+\]/g, '');
-  text = text.replace(/\s*[*†‡§]\s*/g, ' ');
+  text = text.replace(/\(\d+\)/g, '');
+  text = text.replace(/[¹²³⁴⁵⁶⁷⁸⁹⁰]/g, '');
+  text = text.replace(/\s*[*†‡§¶#_~^\\\/|]\s*/g, ' ');
 
-  // Abbreviation phonetic expansion into natural spoken Spanish
+  // Spanish abbreviation phonetic expansions into natural spoken words
   const abbrevs: Array<[RegExp, string]> = [
     [/\bSr\./g, 'Señor'],
     [/\bSra\./g, 'Señora'],
     [/\bSrta\./g, 'Señorita'],
     [/\bDon\./g, 'Don'],
+    [/\bD\./g, 'Don'],
     [/\bDña\./g, 'Doña'],
     [/\bDr\./g, 'Doctor'],
     [/\bDra\./g, 'Doctora'],
+    [/\bProf\./g, 'Profesor'],
+    [/\bProfa\./g, 'Profesora'],
+    [/\bUd\./g, 'Usted'],
+    [/\bUds\./g, 'Ustedes'],
     [/\bcap\./gi, 'capítulo'],
+    [/\bcaps\./gi, 'capítulos'],
     [/\bpág\./gi, 'página'],
     [/\bpágs\./gi, 'páginas'],
     [/\bvol\./gi, 'volumen'],
+    [/\bart\./gi, 'artículo'],
+    [/\bed\./gi, 'edición'],
     [/\betc\./gi, 'etcétera'],
     [/\bej\./gi, 'ejemplo'],
+    [/\bn[°º]\.?/gi, 'número '],
+    [/\bnúm\./gi, 'número '],
   ];
 
   for (const [pattern, replacement] of abbrevs) {
@@ -81,7 +92,8 @@ export function parseAudiobookSegments(fullText: string): AudiobookSegment[] {
   if (!fullText || !fullText.trim()) return [];
 
   const cleaned = cleanPhonetics(fullText);
-  const paragraphs = cleaned.split(/\n+/).filter(Boolean);
+  // Split into paragraphs to respect natural chapter and narrative pacing
+  const paragraphs = cleaned.split(/\n+/).map(p => p.trim()).filter(Boolean);
   const segments: AudiobookSegment[] = [];
 
   let isAlternateCharacter = false;
@@ -89,8 +101,9 @@ export function parseAudiobookSegments(fullText: string): AudiobookSegment[] {
   for (let pIdx = 0; pIdx < paragraphs.length; pIdx++) {
     const para = paragraphs[pIdx];
 
-    // Split paragraph by sentence delimiters (. ! ? ; or dialogue chunks)
-    const rawPhrases = (para.match(/[^.!?;\n]+[.!?;\n]+|[^.!?;\n]+$/g) || [para])
+    // Split paragraph by natural speech boundaries:
+    // Sentence enders (. ! ? ;), dialogue dashes, or ellipsis
+    const rawPhrases = (para.match(/[^.!?;\n]+(?:[.!?;\n]+["'»”]?|["'»”]+)|[^.!?;\n]+$/g) || [para])
       .map(p => p.trim())
       .filter(p => p.length > 0 && !/^[\s—–\-.]+$/.test(p));
 
@@ -100,10 +113,10 @@ export function parseAudiobookSegments(fullText: string): AudiobookSegment[] {
       let role: AudiobookSegment['role'] = 'narrator';
       let pitch = 0.98; // Warm, enveloping narrator pitch
       let rateMultiplier = 1.0;
-      let pauseBeforeMs = isFirstInParagraph ? 650 : (sIdx === 0 ? 200 : 320);
-      let moodLabel = '🎙️ Narrador';
+      let pauseBeforeMs = isFirstInParagraph ? 450 : (sIdx === 0 ? 180 : 260);
+      let moodLabel = '🎙️ Narrador Cálido';
 
-      // 1. Detect Dialogue
+      // 1. Detect Dialogue (Spanish em-dash or quotation marks)
       const isDialogue =
         phrase.startsWith('—') ||
         phrase.startsWith('–') ||
@@ -118,38 +131,39 @@ export function parseAudiobookSegments(fullText: string): AudiobookSegment[] {
       if (isDialogue) {
         role = 'dialogue';
         isAlternateCharacter = !isAlternateCharacter;
-        // Subtle character differentiation (subtle pitch shift between conversation turns)
+        // Subtle character differentiation (slight vocal pitch/presence shift)
         pitch = isAlternateCharacter ? 1.04 : 0.96;
         rateMultiplier = 1.02;
-        pauseBeforeMs = Math.max(pauseBeforeMs, 280);
-        moodLabel = '💬 Diálogo';
+        pauseBeforeMs = Math.max(pauseBeforeMs, 240);
+        moodLabel = isAlternateCharacter ? '💬 Diálogo (Personaje A)' : '💬 Diálogo (Personaje B)';
       }
 
-      // 2. Detect Action / Urgency
+      // 2. Detect Action / Urgency / Excitement (Guideline 1 & 4)
       const isExclamation = phrase.includes('!') || phrase.includes('¡');
-      const actionWords = /\b(corri[oó]|grit[oó]|escap[oó]|dispar[oó]|r[aá]pido|fuego|peligro|urgente|golpe|s[uú]bito)\b/i;
+      const actionWords = /\b(corri[oó]|grit[oó]|escap[oó]|dispar[oó]|r[aá]pido|fuego|peligro|urgente|golpe|s[uú]bito|estall[oó]|huyo|salt[oó]|furia|espada|ataque|lucha)\b/i;
       if (isExclamation || actionWords.test(phrase)) {
         if (!isDialogue) role = 'action';
-        rateMultiplier = Math.min(1.15, rateMultiplier * 1.08);
-        pitch = Math.min(1.12, pitch * 1.05);
-        moodLabel = isDialogue ? '💬 Diálogo Emotivo' : '⚡ Acción / Emoción';
+        rateMultiplier = Math.min(1.12, rateMultiplier * 1.06);
+        pitch = Math.min(1.10, pitch * 1.04);
+        moodLabel = isDialogue ? '⚡ Diálogo Intenso' : '⚡ Acción / Emoción';
       }
 
-      // 3. Detect Suspense / Mystery / Deep Reflection
+      // 3. Detect Suspense / Melancholy / Deep Reflection (Guideline 1 & 4)
       const isSuspense = phrase.includes('...') || phrase.includes('…');
-      const mysteryWords = /\b(silencio|oscuridad|sombra|misterio|muerte|miedo|pesar|tristeza|pensaba|recordaba|lejos)\b/i;
+      const mysteryWords = /\b(silencio|oscuridad|sombra|misterio|muerte|miedo|pesar|tristeza|pensaba|recordaba|lejos|fr[ií]o|soledad|abismo|susurr[oó]|secreto|l[aá]grima)\b/i;
       if (isSuspense || mysteryWords.test(phrase)) {
         if (!isDialogue && !isExclamation) role = 'suspense';
-        rateMultiplier = Math.max(0.88, rateMultiplier * 0.92);
-        pitch = Math.max(0.92, pitch * 0.96);
-        pauseBeforeMs = Math.max(pauseBeforeMs, 450);
-        moodLabel = '🌙 Tensión / Misterio';
+        rateMultiplier = Math.max(0.90, rateMultiplier * 0.93);
+        pitch = Math.max(0.94, pitch * 0.97);
+        pauseBeforeMs = Math.max(pauseBeforeMs, 380);
+        moodLabel = '🌙 Misterio / Reflexión';
       }
 
-      // Clean spoken text: strip wrapping dialogue em-dashes and quotes
+      // Guideline 5: Clean spoken text so the engine does not read punctuation marks aloud
       const cleanSpoken = phrase
         .replace(/^[—–\-«"“\s]+/, '')
         .replace(/[»"”\s]+$/, '')
+        .replace(/\s+/g, ' ')
         .trim();
 
       if (cleanSpoken.length > 0) {
