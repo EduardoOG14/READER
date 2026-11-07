@@ -12,14 +12,18 @@ import {
   SkipForward,
   Sparkles,
   Loader2,
+  Settings2,
 } from 'lucide-react';
 import {
   parseAudiobookSegments,
   NativeTts,
   isNativeTtsAvailable,
+  synthesizeCloudAiAudio,
   type AudiobookSegment,
   type TtsVoiceOption,
+  type CloudAiTtsSettings,
 } from '../../services/audiobookNarrator';
+import { TtsVoiceEngineModal } from './TtsVoiceEngineModal';
 
 interface TtsPlayerModalProps {
   isOpen: boolean;
@@ -31,6 +35,8 @@ interface TtsPlayerModalProps {
   onPrevPage: () => void;
   currentText?: string;
 }
+
+const CLOUD_SETTINGS_STORAGE_KEY = 'reader_cloud_tts_settings';
 
 export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
   isOpen,
@@ -49,9 +55,27 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
   const [selectedVoice, setSelectedVoice] = useState<TtsVoiceOption | null>(null);
   const [segmentIndex, setSegmentIndex] = useState<number>(0);
   const [useNativeTts, setUseNativeTts] = useState<boolean>(false);
+  const [showVoiceEngineModal, setShowVoiceEngineModal] = useState<boolean>(false);
+
+  // Cloud AI TTS settings
+  const [cloudSettings, setCloudSettings] = useState<CloudAiTtsSettings>(() => {
+    try {
+      const saved = localStorage.getItem(CLOUD_SETTINGS_STORAGE_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return { provider: 'system' };
+  });
+
+  const handleUpdateCloudSettings = (newSettings: CloudAiTtsSettings) => {
+    setCloudSettings(newSettings);
+    try {
+      localStorage.setItem(CLOUD_SETTINGS_STORAGE_KEY, JSON.stringify(newSettings));
+    } catch {}
+  };
 
   // References to keep event listeners and asynchronous timers fully synchronized
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const pauseTimerRef = useRef<any>(null);
   const activeUtteranceIdRef = useRef<string | null>(null);
   const isPlayingRef = useRef<boolean>(false);
@@ -123,15 +147,11 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
 
       if (isPlayingRef.current) {
         // Stop current speech so old audio does not leak into the new page
-        if (useNativeTts) {
-          NativeTts.stop();
-        } else if (typeof window !== 'undefined' && window.speechSynthesis) {
-          window.speechSynthesis.cancel();
-        }
+        stopAllAudio();
         isAwaitingNewPageRef.current = true;
       }
     }
-  }, [currentPage, useNativeTts]);
+  }, [currentPage]);
 
   // When new page text is parsed into segments, resume narration seamlessly
   useEffect(() => {
@@ -159,23 +179,28 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
         try {
           const vRes = await NativeTts.getVoices();
           const voiceList: TtsVoiceOption[] = (vRes.voices || []).map(v => ({
+            id: v.id,
             name: v.name,
+            rawName: v.rawName,
             lang: v.lang,
-            isNeural: (v.quality && v.quality >= 400) || v.name.toLowerCase().includes('neural') || v.name.toLowerCase().includes('network'),
+            isNeural: v.isNeural,
+            gender: v.gender,
+            quality: v.quality,
             isNative: true,
           }));
 
           if (voiceList.length > 0 && isMounted) {
             setVoices(voiceList);
+            // Prioritize neural voice, then selected voice, then first available
             const preferred =
-              voiceList.find(v => v.isNeural && v.lang.startsWith('es')) ||
-              voiceList.find(v => v.lang.startsWith('es')) ||
+              voiceList.find(v => v.id === vRes.currentVoiceId) ||
+              voiceList.find(v => v.isNeural) ||
               voiceList[0];
             setSelectedVoice(preferred);
           } else if (isMounted) {
-            // Default Spanish system voice fallback
             const fallbackVoice: TtsVoiceOption = {
-              name: 'Voz del Sistema (Español)',
+              id: 'es-system',
+              name: '🇪🇸 Español • Voz del Sistema ⭐',
               lang: 'es-ES',
               isNeural: true,
               isNative: true,
@@ -193,7 +218,11 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
           const available = window.speechSynthesis.getVoices();
           if (available.length > 0 && isMounted) {
             const mapped: TtsVoiceOption[] = available.map(v => ({
-              name: v.name,
+              id: v.name,
+              name: v.name.includes('Natural') || v.name.includes('Neural') || v.name.includes('Google')
+                ? `⭐ ${v.name}`
+                : v.name,
+              rawName: v.name,
               lang: v.lang,
               isNeural: v.name.toLowerCase().includes('natural') || v.name.toLowerCase().includes('neural') || v.name.toLowerCase().includes('google'),
               isNative: false,
@@ -220,11 +249,29 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
 
     return () => {
       isMounted = false;
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
+      stopAllAudio();
     };
   }, []);
+
+  const stopAllAudio = () => {
+    if (pauseTimerRef.current) {
+      clearTimeout(pauseTimerRef.current);
+      pauseTimerRef.current = null;
+    }
+    activeUtteranceIdRef.current = null;
+
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current.currentTime = 0;
+      currentAudioRef.current = null;
+    }
+
+    if (useNativeTts) {
+      NativeTts.stop().catch(() => {});
+    } else if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+  };
 
   // Handler when a sentence completes reading
   const handleSegmentDone = (completedIndex: number) => {
@@ -310,10 +357,7 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
 
   // Speak a specific segment by index applying all 5 Narrator Guidelines
   const speakSegment = async (index: number) => {
-    if (pauseTimerRef.current) {
-      clearTimeout(pauseTimerRef.current);
-      pauseTimerRef.current = null;
-    }
+    stopAllAudio();
 
     const list = segmentsRef.current;
     if (!list || list.length === 0) return;
@@ -342,7 +386,29 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
     const finalRate = Math.max(0.65, Math.min(1.8, speed * seg.rateMultiplier));
     const finalPitch = Math.max(0.75, Math.min(1.3, seg.pitch));
 
-    // NATIVE ANDROID TTS PATH
+    // CLOUD AI PATH (OpenAI TTS & ElevenLabs)
+    if (cloudSettings.provider !== 'system') {
+      try {
+        const audioUrl = await synthesizeCloudAiAudio(seg.text, cloudSettings, finalRate);
+        const audio = new Audio(audioUrl);
+        currentAudioRef.current = audio;
+        audio.onended = () => {
+          if (!isPlayingRef.current) return;
+          handleSegmentDone(index);
+        };
+        audio.onerror = () => {
+          handleSegmentDone(index);
+        };
+        setIsPlaying(true);
+        setIsPaused(false);
+        await audio.play();
+        return;
+      } catch (err) {
+        console.warn('[CloudAi] synthesis error, falling back to system:', err);
+      }
+    }
+
+    // NATIVE ANDROID TTS PATH (With Google WaveNet / Neural engine)
     if (useNativeTts) {
       try {
         const generatedId = 'utt_' + Date.now();
@@ -352,7 +418,7 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
           text: seg.text,
           rate: finalRate,
           pitch: finalPitch,
-          voiceName: selectedVoice?.name && selectedVoice.name !== 'Voz del Sistema (Español)' ? selectedVoice.name : undefined,
+          voiceName: selectedVoice?.rawName || selectedVoice?.id || undefined,
         });
 
         if (res && res.utteranceId) {
@@ -374,7 +440,7 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
     const utterance = new SpeechSynthesisUtterance(seg.text);
 
     if (selectedVoice) {
-      const matchingWebVoice = window.speechSynthesis.getVoices().find(v => v.name === selectedVoice.name);
+      const matchingWebVoice = window.speechSynthesis.getVoices().find(v => v.name === selectedVoice.rawName || v.name === selectedVoice.name);
       if (matchingWebVoice) {
         utterance.voice = matchingWebVoice;
       }
@@ -420,36 +486,14 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
 
   // Pause
   const handlePause = () => {
-    if (pauseTimerRef.current) {
-      clearTimeout(pauseTimerRef.current);
-      pauseTimerRef.current = null;
-    }
-
-    activeUtteranceIdRef.current = null;
-
-    if (useNativeTts) {
-      NativeTts.stop();
-    } else if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-    }
+    stopAllAudio();
     setIsPlaying(false);
     setIsPaused(true);
   };
 
   // Stop
   const handleStop = () => {
-    if (pauseTimerRef.current) {
-      clearTimeout(pauseTimerRef.current);
-      pauseTimerRef.current = null;
-    }
-
-    activeUtteranceIdRef.current = null;
-
-    if (useNativeTts) {
-      NativeTts.stop();
-    } else if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-    }
+    stopAllAudio();
     setIsPlaying(false);
     setIsPaused(false);
     setSegmentIndex(0);
@@ -499,177 +543,196 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
   const isTextLoading = segments.length === 0;
 
   return (
-    <div className="fixed bottom-14 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-lg bg-slate-900/95 dark:bg-[#18191c]/95 text-white backdrop-blur-md border border-slate-700/80 dark:border-zinc-700/80 rounded-3xl shadow-2xl p-4 animate-in slide-in-from-bottom duration-150">
-      {/* Top Header */}
-      <div className="flex items-center justify-between pb-2.5 border-b border-slate-800 dark:border-zinc-800/80">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-rose-500/20 text-rose-400 dark:bg-zinc-800 dark:text-zinc-200">
-            <Volume2 className="w-4 h-4 stroke-[2.2]" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
-                <span>Narrador de Audiolibro Profesional</span>
-              </h4>
-              {/* Dynamic Mood Badge following guidelines */}
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 dark:bg-zinc-800 border border-slate-700 dark:border-zinc-700 text-rose-300 dark:text-zinc-200 flex items-center gap-1">
-                <Sparkles className="w-2.5 h-2.5 text-amber-400" />
-                {isTextLoading ? '📖 Preparando...' : (isPaused ? '⏸️ En pausa' : activeSegment?.moodLabel || '🎙️ Narrador Cálido')}
-              </span>
+    <>
+      <div className="fixed bottom-14 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-lg bg-slate-900/95 dark:bg-[#18191c]/95 text-white backdrop-blur-md border border-slate-700/80 dark:border-zinc-700/80 rounded-3xl shadow-2xl p-4 animate-in slide-in-from-bottom duration-150">
+        {/* Top Header */}
+        <div className="flex items-center justify-between pb-2.5 border-b border-slate-800 dark:border-zinc-800/80">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-rose-500/20 text-rose-400 dark:bg-zinc-800 dark:text-zinc-200">
+              <Volume2 className="w-4 h-4 stroke-[2.2]" />
             </div>
-            <p className="text-[10px] text-slate-400 dark:text-zinc-400">
-              Pág. {currentPage} de {totalPages} • {isTextLoading ? 'Extrayendo texto...' : `Frase ${segmentIndex + 1} de ${segments.length} (${progressPercent}%)`}
-            </p>
+            <div>
+              <div className="flex items-center gap-2">
+                <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <span>Narrador de Audiolibro Profesional</span>
+                </h4>
+                {/* Dynamic Mood Badge following guidelines */}
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 dark:bg-zinc-800 border border-slate-700 dark:border-zinc-700 text-rose-300 dark:text-zinc-200 flex items-center gap-1">
+                  <Sparkles className="w-2.5 h-2.5 text-amber-400" />
+                  {isTextLoading ? '📖 Preparando...' : (isPaused ? '⏸️ En pausa' : activeSegment?.moodLabel || '🎙️ Narrador Cálido')}
+                </span>
+              </div>
+              <p className="text-[10px] text-slate-400 dark:text-zinc-400">
+                Pág. {currentPage} de {totalPages} • {isTextLoading ? 'Extrayendo texto...' : `Frase ${segmentIndex + 1} de ${segments.length} (${progressPercent}%)`}
+              </p>
+            </div>
           </div>
-        </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            handleStop();
-            onClose();
-          }}
-          className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-          title="Cerrar reproductor"
-        >
-          <X className="w-4 h-4" />
-        </button>
-      </div>
-
-      {/* Spoken Text Preview Card with Audio Waves */}
-      <div className="my-2.5 p-3.5 rounded-2xl bg-black/40 border border-slate-800/80 dark:border-zinc-800/60 max-h-24 overflow-y-auto relative">
-        {isTextLoading ? (
-          <div className="flex items-center justify-center gap-2 py-2 text-slate-400 dark:text-zinc-400 text-xs">
-            <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-400" />
-            <span>Extrayendo texto de «{bookTitle}»...</span>
-          </div>
-        ) : (
-          <p className="text-xs text-slate-200 dark:text-zinc-200 font-sans leading-relaxed">
-            {activeSegment?.fullPhrase ? (
-              <span>
-                <span className="text-rose-400 dark:text-zinc-400 font-bold mr-1">“</span>
-                {activeSegment.fullPhrase}
-                <span className="text-rose-400 dark:text-zinc-400 font-bold ml-1">”</span>
-              </span>
-            ) : (
-              <span className="text-slate-400 dark:text-zinc-400 italic">Listo para narrar.</span>
-            )}
-          </p>
-        )}
-
-        {isPlaying && !isTextLoading && (
-          <div className="absolute top-2 right-2 flex items-end gap-0.5 h-3">
-            <span className="w-0.5 h-3 bg-rose-400 dark:bg-zinc-300 animate-pulse" />
-            <span className="w-0.5 h-2 bg-rose-400 dark:bg-zinc-300 animate-ping" />
-            <span className="w-0.5 h-3.5 bg-rose-400 dark:bg-zinc-300 animate-pulse" />
-          </div>
-        )}
-      </div>
-
-      {/* Progress Bar of Current Page */}
-      <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden mb-2.5">
-        <div
-          className="h-full bg-rose-500 dark:bg-zinc-300 transition-all duration-300"
-          style={{ width: `${progressPercent}%` }}
-        />
-      </div>
-
-      {/* Playback Controls & Voice Customizer */}
-      <div className="flex items-center justify-between pt-1">
-        {/* Speed toggle */}
-        <div className="flex items-center gap-1 bg-slate-800/80 dark:bg-zinc-800/80 px-2 py-1 rounded-xl">
-          <FastForward className="w-3.5 h-3.5 text-slate-400" />
-          <select
-            value={speed}
-            onChange={e => handleSpeedChange(Number(e.target.value))}
-            className="bg-transparent text-xs text-slate-200 dark:text-zinc-200 font-bold outline-none cursor-pointer"
-            title="Velocidad base de lectura"
-          >
-            <option value={0.75} className="bg-slate-900 text-white">0.75x</option>
-            <option value={1.0} className="bg-slate-900 text-white">1.0x</option>
-            <option value={1.25} className="bg-slate-900 text-white">1.25x</option>
-            <option value={1.5} className="bg-slate-900 text-white">1.5x</option>
-            <option value={2.0} className="bg-slate-900 text-white">2.0x</option>
-          </select>
-        </div>
-
-        {/* Play / Skip Buttons */}
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handlePrevSegment}
-            disabled={isTextLoading}
-            className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
-            title="Frase anterior"
-          >
-            <SkipBack className="w-4 h-4" />
-          </button>
-
-          <button
-            type="button"
-            onClick={isPlaying ? handlePause : handlePlay}
-            disabled={isTextLoading}
-            className="p-3 rounded-2xl bg-rose-500 hover:bg-rose-600 dark:bg-zinc-200 dark:hover:bg-white text-white dark:text-zinc-950 disabled:opacity-40 shadow-lg transition-transform active:scale-95 cursor-pointer"
-            title={isPlaying ? 'Pausar narración' : 'Iniciar narración humana'}
-          >
-            {isPlaying ? (
-              <Pause className="w-5 h-5 fill-current" />
-            ) : (
-              <Play className="w-5 h-5 fill-current" />
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={handleStop}
-            className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-            title="Detener"
-          >
-            <Square className="w-4 h-4 fill-slate-300" />
-          </button>
-
-          <button
-            type="button"
-            onClick={handleNextSegment}
-            disabled={isTextLoading}
-            className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
-            title="Siguiente frase"
-          >
-            <SkipForward className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Voice selector */}
-        {voices.length > 0 && (
-          <div className="flex items-center gap-1 bg-slate-800/80 dark:bg-zinc-800/80 px-2 py-1 rounded-xl max-w-[125px]">
-            <Languages className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-            <select
-              value={selectedVoice?.name || ''}
-              onChange={e => {
-                const v = voices.find(vc => vc.name === e.target.value);
-                if (v) {
-                  setSelectedVoice(v);
-                  if (isPlaying) {
-                    handleStop();
-                    setTimeout(() => {
-                      setIsPlaying(true);
-                      speakSegment(segmentIndexRef.current);
-                    }, 120);
-                  }
-                }
-              }}
-              className="bg-transparent text-[11px] text-slate-200 dark:text-zinc-200 font-medium outline-none truncate cursor-pointer w-full"
-              title="Voz del narrador"
+          <div className="flex items-center gap-1">
+            {/* Configure Voice & Engine Button */}
+            <button
+              type="button"
+              onClick={() => setShowVoiceEngineModal(true)}
+              className="p-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer flex items-center gap-1 text-[11px] font-bold"
+              title="Cambiar voz o motor de audio"
             >
-              {voices.map(v => (
-                <option key={v.name} value={v.name} className="bg-slate-900 text-white">
-                  {v.isNeural ? `⭐ ${v.name}` : v.name}
-                </option>
-              ))}
+              <Settings2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Voz / Motor</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                handleStop();
+                onClose();
+              }}
+              className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+              title="Cerrar reproductor"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Spoken Text Preview Card with Audio Waves */}
+        <div className="my-2.5 p-3.5 rounded-2xl bg-black/40 border border-slate-800/80 dark:border-zinc-800/60 max-h-24 overflow-y-auto relative">
+          {isTextLoading ? (
+            <div className="flex items-center justify-center gap-2 py-2 text-slate-400 dark:text-zinc-400 text-xs">
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-400" />
+              <span>Extrayendo texto de «{bookTitle}»...</span>
+            </div>
+          ) : (
+            <p className="text-xs text-slate-200 dark:text-zinc-200 font-sans leading-relaxed">
+              {activeSegment?.fullPhrase ? (
+                <span>
+                  <span className="text-rose-400 dark:text-zinc-400 font-bold mr-1">“</span>
+                  {activeSegment.fullPhrase}
+                  <span className="text-rose-400 dark:text-zinc-400 font-bold ml-1">”</span>
+                </span>
+              ) : (
+                <span className="text-slate-400 dark:text-zinc-400 italic">Listo para narrar.</span>
+              )}
+            </p>
+          )}
+
+          {isPlaying && !isTextLoading && (
+            <div className="absolute top-2 right-2 flex items-end gap-0.5 h-3">
+              <span className="w-0.5 h-3 bg-rose-400 dark:bg-zinc-300 animate-pulse" />
+              <span className="w-0.5 h-2 bg-rose-400 dark:bg-zinc-300 animate-ping" />
+              <span className="w-0.5 h-3.5 bg-rose-400 dark:bg-zinc-300 animate-pulse" />
+            </div>
+          )}
+        </div>
+
+        {/* Progress Bar of Current Page */}
+        <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden mb-2.5">
+          <div
+            className="h-full bg-rose-500 dark:bg-zinc-300 transition-all duration-300"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+
+        {/* Playback Controls & Voice Customizer */}
+        <div className="flex items-center justify-between pt-1">
+          {/* Speed toggle */}
+          <div className="flex items-center gap-1 bg-slate-800/80 dark:bg-zinc-800/80 px-2 py-1 rounded-xl">
+            <FastForward className="w-3.5 h-3.5 text-slate-400" />
+            <select
+              value={speed}
+              onChange={e => handleSpeedChange(Number(e.target.value))}
+              className="bg-transparent text-xs text-slate-200 dark:text-zinc-200 font-bold outline-none cursor-pointer"
+              title="Velocidad base de lectura"
+            >
+              <option value={0.75} className="bg-slate-900 text-white">0.75x</option>
+              <option value={1.0} className="bg-slate-900 text-white">1.0x</option>
+              <option value={1.25} className="bg-slate-900 text-white">1.25x</option>
+              <option value={1.5} className="bg-slate-900 text-white">1.5x</option>
+              <option value={2.0} className="bg-slate-900 text-white">2.0x</option>
             </select>
           </div>
-        )}
+
+          {/* Play / Skip Buttons */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handlePrevSegment}
+              disabled={isTextLoading}
+              className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
+              title="Frase anterior"
+            >
+              <SkipBack className="w-4 h-4" />
+            </button>
+
+            <button
+              type="button"
+              onClick={isPlaying ? handlePause : handlePlay}
+              disabled={isTextLoading}
+              className="p-3 rounded-2xl bg-rose-500 hover:bg-rose-600 dark:bg-zinc-200 dark:hover:bg-white text-white dark:text-zinc-950 disabled:opacity-40 shadow-lg transition-transform active:scale-95 cursor-pointer"
+              title={isPlaying ? 'Pausar narración' : 'Iniciar narración humana'}
+            >
+              {isPlaying ? (
+                <Pause className="w-5 h-5 fill-current" />
+              ) : (
+                <Play className="w-5 h-5 fill-current" />
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleStop}
+              className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+              title="Detener"
+            >
+              <Square className="w-4 h-4 fill-slate-300" />
+            </button>
+
+            <button
+              type="button"
+              onClick={handleNextSegment}
+              disabled={isTextLoading}
+              className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
+              title="Siguiente frase"
+            >
+              <SkipForward className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Voice selector pill that opens Voice & Engine modal */}
+          <button
+            type="button"
+            onClick={() => setShowVoiceEngineModal(true)}
+            className="flex items-center gap-1.5 bg-slate-800/90 dark:bg-zinc-800/90 hover:bg-slate-700 dark:hover:bg-zinc-700 px-2.5 py-1.5 rounded-xl max-w-[135px] border border-slate-700 dark:border-zinc-700 text-left cursor-pointer transition-colors"
+            title="Toca para cambiar voz o motor de lectura"
+          >
+            <Languages className="w-3.5 h-3.5 shrink-0 text-rose-400 dark:text-zinc-300" />
+            <span className="text-[11px] text-slate-200 dark:text-zinc-200 font-bold truncate">
+              {cloudSettings.provider !== 'system'
+                ? `🤖 ${cloudSettings.provider === 'openai' ? cloudSettings.openaiVoice || 'Onyx' : 'ElevenLabs'}`
+                : selectedVoice?.name?.replace(/⭐/g, '')?.trim() || 'Voz...'}
+            </span>
+          </button>
+        </div>
       </div>
-    </div>
+
+      {/* Voice & Engine Settings Modal */}
+      <TtsVoiceEngineModal
+        isOpen={showVoiceEngineModal}
+        onClose={() => setShowVoiceEngineModal(false)}
+        voices={voices}
+        selectedVoice={selectedVoice}
+        onSelectVoice={v => {
+          setSelectedVoice(v);
+          if (isPlaying) {
+            handleStop();
+            setTimeout(() => {
+              setIsPlaying(true);
+              speakSegment(segmentIndexRef.current);
+            }, 120);
+          }
+        }}
+        cloudSettings={cloudSettings}
+        onUpdateCloudSettings={handleUpdateCloudSettings}
+      />
+    </>
   );
 };

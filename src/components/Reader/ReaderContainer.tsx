@@ -9,6 +9,8 @@ import {
   Search,
   BookOpen,
   Type,
+  Volume2,
+  Scroll,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { getBookFile } from '../../services/storage';
@@ -507,31 +509,11 @@ export const ReaderContainer: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* Quick Font Size & Typography Button for Books */}
-          {isTextBased && (
-            <button
-              onClick={() => setShowFontSizeModal(true)}
-              className="p-2 sm:p-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-zinc-800 transition-all active:scale-90 cursor-pointer flex items-center justify-center font-bold"
-              title="Ajustar tamaño de letra y tipografía"
-            >
-              <Type className="w-5 h-5 stroke-[2.2]" />
-            </button>
-          )}
-
-          {/* 1. Quick Search Button */}
-          <button
-            onClick={() => setShowSearchDrawer(true)}
-            className="p-2 sm:p-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-zinc-800 transition-all active:scale-90 cursor-pointer"
-            title="Buscar texto en el libro"
-          >
-            <Search className="w-5 h-5 stroke-[2.2]" />
-          </button>
-
-          {/* 2. Quick Bookmark Toggle Button */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {/* Quick Bookmark Toggle Button */}
           <button
             onClick={handleToggleCurrentBookmark}
-            className={`p-2 sm:p-2.5 rounded-xl transition-all active:scale-90 cursor-pointer ${
+            className={`p-2 rounded-xl transition-all active:scale-90 cursor-pointer ${
               isCurrentBookmarked
                 ? 'bg-amber-500/25 text-amber-400 border border-amber-500/40 ring-2 ring-amber-400/20'
                 : 'text-slate-300 hover:text-white hover:bg-slate-800 dark:hover:bg-zinc-800'
@@ -539,16 +521,6 @@ export const ReaderContainer: React.FC = () => {
             title={isCurrentBookmarked ? 'Eliminar marcador de esta página' : 'Guardar marcador en esta página'}
           >
             <BookmarkIcon className={`w-5 h-5 stroke-[2.2] ${isCurrentBookmarked ? 'fill-amber-400' : ''}`} />
-          </button>
-
-          {/* 3. Ergonomic Reader Menu / Controls Bottom Sheet Trigger */}
-          <button
-            onClick={() => setShowSettingsSheet(true)}
-            className="flex items-center gap-1.5 py-1.5 px-3 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-200 hover:text-white border border-slate-700 dark:border-zinc-700 transition-all active:scale-95 cursor-pointer shadow-xs ml-0.5"
-            title="Ajustes de lectura, modo y herramientas"
-          >
-            <SlidersHorizontal className="w-4 h-4 stroke-[2.2]" />
-            <span className="text-xs font-bold hidden sm:inline">Menú</span>
           </button>
         </div>
       </div>
@@ -636,48 +608,123 @@ export const ReaderContainer: React.FC = () => {
         )}
       </div>
 
-      {/* Bottom Floating Scrubber Bar (HUD) */}
+      {/* Bottom Floating Scrubber Bar & Ergonomic Thumb Deck (HUD) */}
       <div
         onClick={e => e.stopPropagation()}
-        className={`absolute bottom-6 inset-x-0 z-40 bg-slate-900/95 dark:bg-[#121316]/95 backdrop-blur-md border-t border-slate-800/80 dark:border-zinc-800/80 px-4 py-3 transition-all duration-200 ${
+        className={`absolute bottom-6 inset-x-0 z-40 bg-slate-900/95 dark:bg-[#121316]/95 backdrop-blur-md border-t border-slate-800/80 dark:border-zinc-800/80 px-4 pt-3 pb-2.5 transition-all duration-200 ${
           showControls ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'
         }`}
       >
-        <div className="max-w-2xl mx-auto flex items-center gap-3">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage <= 1}
-            className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:pointer-events-none transition-colors"
-            title="Página anterior"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
+        <div className="max-w-xl mx-auto flex flex-col gap-2">
+          {/* Row 1: Slider Scrubber & Page Turning Arrows */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage <= 1}
+              className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+              title="Página anterior"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
 
-          {/* Slider Scrubber */}
-          <div className="flex-1 flex flex-col gap-1">
-            <input
-              type="range"
-              min={1}
-              max={Math.max(1, totalPages)}
-              value={currentPage}
-              onChange={e => handlePageChange(Number(e.target.value))}
-              className="w-full accent-zinc-400 dark:accent-zinc-300 cursor-pointer"
-            />
-            <div className="flex justify-between items-center text-[11px] text-slate-300 dark:text-zinc-300 px-1 font-mono font-medium">
-              <span>Pág {currentPage}</span>
-              <span className="font-bold text-white dark:text-zinc-100">{progressPercent}%</span>
-              <span>Total: {totalPages}</span>
+            {/* Slider Scrubber */}
+            <div className="flex-1 flex flex-col gap-1">
+              <input
+                type="range"
+                min={1}
+                max={Math.max(1, totalPages)}
+                value={currentPage}
+                onChange={e => handlePageChange(Number(e.target.value))}
+                className="w-full accent-rose-500 dark:accent-zinc-300 cursor-pointer h-2"
+              />
+              <div className="flex justify-between items-center text-[11px] text-slate-300 dark:text-zinc-300 px-1 font-mono font-medium">
+                <span>Pág {currentPage}</span>
+                <span className="font-bold text-white dark:text-zinc-100">{progressPercent}%</span>
+                <span>Total: {totalPages}</span>
+              </div>
             </div>
+
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage >= totalPages}
+              className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+              title="Página siguiente"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
           </div>
 
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage >= totalPages}
-            className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:pointer-events-none transition-colors"
-            title="Página siguiente"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
+          {/* Row 2: Ergonomic Thumb Action Deck (Directly in natural thumb reach zone) */}
+          <div className="flex items-center justify-between gap-1 pt-1.5 border-t border-slate-800/80 dark:border-zinc-800/80">
+            {/* 1. Buscar en el libro */}
+            <button
+              type="button"
+              onClick={() => setShowSearchDrawer(true)}
+              className="flex-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/80 dark:hover:bg-zinc-800 transition-all active:scale-95 cursor-pointer"
+              title="Buscar texto en el libro"
+            >
+              <Search className="w-4 h-4 stroke-[2.2]" />
+              <span className="text-[10px] font-bold mt-0.5">Buscar</span>
+            </button>
+
+            {/* 2. Tamaño de Letra (para libros) o Modo Cascada (para mangas) */}
+            {isTextBased ? (
+              <button
+                type="button"
+                onClick={() => setShowFontSizeModal(true)}
+                className="flex-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/80 dark:hover:bg-zinc-800 transition-all active:scale-95 cursor-pointer"
+                title="Ajustar tamaño de letra"
+              >
+                <Type className="w-4 h-4 stroke-[2.2]" />
+                <span className="text-[10px] font-bold mt-0.5">Letra</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={toggleReadingMode}
+                className="flex-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/80 dark:hover:bg-zinc-800 transition-all active:scale-95 cursor-pointer"
+                title="Cambiar modo de vista"
+              >
+                <Scroll className="w-4 h-4 stroke-[2.2]" />
+                <span className="text-[10px] font-bold mt-0.5">{isContinuousReading ? 'Cascada' : 'Páginas'}</span>
+              </button>
+            )}
+
+            {/* 3. HERO CENTER BUTTON: AJUSTES (ACCESO PRINCIPAL EN EL CENTRO EXACTO DEL PULGAR) */}
+            <button
+              type="button"
+              onClick={() => setShowSettingsSheet(true)}
+              className="flex-1.3 flex items-center justify-center gap-1.5 py-2 px-3.5 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 dark:from-zinc-200 dark:to-zinc-100 dark:text-zinc-950 text-white font-bold text-xs shadow-md transition-transform active:scale-95 cursor-pointer border border-rose-400/40 dark:border-white/40"
+              title="Ajustes de lectura y modo"
+            >
+              <SlidersHorizontal className="w-4 h-4 stroke-[2.5]" />
+              <span>Ajustes</span>
+            </button>
+
+            {/* 4. Voz Audiolibro (para libros) o Cambiar Sentido (para manga) */}
+            {isTextBased && (
+              <button
+                type="button"
+                onClick={() => setShowTtsModal(true)}
+                className="flex-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/80 dark:hover:bg-zinc-800 transition-all active:scale-95 cursor-pointer"
+                title="Escuchar libro con narrador"
+              >
+                <Volume2 className="w-4 h-4 stroke-[2.2]" />
+                <span className="text-[10px] font-bold mt-0.5">Voz</span>
+              </button>
+            )}
+
+            {/* 5. Marcadores */}
+            <button
+              type="button"
+              onClick={() => setShowBookmarksDrawer(true)}
+              className="flex-1 flex flex-col items-center justify-center py-1 px-1 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/80 dark:hover:bg-zinc-800 transition-all active:scale-95 cursor-pointer"
+              title="Ver marcadores guardados"
+            >
+              <BookmarkIcon className="w-4 h-4 stroke-[2.2]" />
+              <span className="text-[10px] font-bold mt-0.5">Marcadores</span>
+            </button>
+          </div>
         </div>
       </div>
 
