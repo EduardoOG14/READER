@@ -84,6 +84,34 @@ export const BookListItem: React.FC<BookListItemProps> = ({ book, onOpenDetails,
           {book.totalPages} páginas • {formatFileSize(book.fileSize)}
         </p>
 
+        {/* Rating and Tags */}
+        {(book.rating || (book.tags && book.tags.length > 0)) && (
+          <div className="flex items-center gap-1.5 mt-0.5">
+            {book.rating && book.rating > 0 && (
+              <span className="text-[10px] text-amber-500 font-bold shrink-0">
+                {'★'.repeat(book.rating)}
+              </span>
+            )}
+            {book.tags && book.tags.length > 0 && (
+              <div className="flex items-center gap-1 overflow-hidden">
+                {book.tags.slice(0, 3).map(tag => (
+                  <span
+                    key={tag}
+                    className="text-[9px] font-semibold bg-rose-100/70 dark:bg-zinc-800 text-rose-700 dark:text-zinc-300 px-1.5 py-0.2 rounded-md shrink-0"
+                  >
+                    #{tag}
+                  </span>
+                ))}
+                {book.tags.length > 3 && (
+                  <span className="text-[9px] font-semibold text-slate-400 dark:text-zinc-500 shrink-0">
+                    +{book.tags.length - 3}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Progress bar */}
         <div className="flex items-center gap-2 mt-2">
           <div className="flex-1 h-1.5 bg-rose-100 dark:bg-zinc-800 rounded-full overflow-hidden max-w-48">

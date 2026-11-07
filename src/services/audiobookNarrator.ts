@@ -66,9 +66,11 @@ interface NativeTtsPluginInterface {
     voiceName?: string;
   }): Promise<{ utteranceId: string }>;
   stop(): Promise<void>;
+  updateMediaSession(options: { state: 'playing' | 'paused' | 'stopped'; title?: string; author?: string }): Promise<void>;
   addListener(eventName: 'onStart', listenerFunc: (data: { utteranceId: string }) => void): Promise<PluginListenerHandle>;
   addListener(eventName: 'onDone', listenerFunc: (data: { utteranceId: string }) => void): Promise<PluginListenerHandle>;
   addListener(eventName: 'onError', listenerFunc: (data: { utteranceId: string; error?: string; errorCode?: number }) => void): Promise<PluginListenerHandle>;
+  addListener(eventName: 'onMediaControlAction', listenerFunc: (data: { action: 'play' | 'pause' | 'next' | 'previous' | 'stop' }) => void): Promise<PluginListenerHandle>;
 }
 
 export const NativeTts = registerPlugin<NativeTtsPluginInterface>('NativeTts');

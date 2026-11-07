@@ -118,9 +118,35 @@ export const BookCard: React.FC<BookCardProps> = ({ book, onOpenDetails, onRead 
         <h3 className="text-xs sm:text-sm font-bold text-[#4c0519] dark:text-[#f3f4f6] line-clamp-1 group-hover:text-rose-600 dark:group-hover:text-zinc-100 transition-colors">
           {book.title}
         </h3>
-        <p className="text-[11px] text-[#881337]/80 dark:text-zinc-300 line-clamp-1 mt-0.5 font-medium">
-          {book.author || `${book.totalPages} ${book.totalPages === 1 ? 'pág' : 'págs'}`}
-        </p>
+        <div className="flex items-center justify-between gap-1 mt-0.5">
+          <p className="text-[11px] text-[#881337]/80 dark:text-zinc-300 line-clamp-1 font-medium">
+            {book.author || `${book.totalPages} ${book.totalPages === 1 ? 'pág' : 'págs'}`}
+          </p>
+          {book.rating && book.rating > 0 && (
+            <span className="text-[10px] text-amber-500 font-bold shrink-0">
+              {'★'.repeat(book.rating)}
+            </span>
+          )}
+        </div>
+
+        {/* Tags preview */}
+        {book.tags && book.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-1">
+            {book.tags.slice(0, 2).map(tag => (
+              <span
+                key={tag}
+                className="text-[9px] font-semibold bg-rose-100/70 dark:bg-zinc-800 text-rose-700 dark:text-zinc-300 px-1.5 py-0.2 rounded-md"
+              >
+                #{tag}
+              </span>
+            ))}
+            {book.tags.length > 2 && (
+              <span className="text-[9px] font-semibold text-slate-400 dark:text-zinc-500">
+                +{book.tags.length - 2}
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

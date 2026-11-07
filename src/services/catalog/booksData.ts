@@ -14,6 +14,7 @@ export const BOOKS_CATALOG: CatalogItem[] = [
     description: 'En un lugar de la Mancha, de cuyo nombre no quiero acordarme, un hidalgo enloquecido por los libros de caballerías sale en busca de aventuras junto a su fiel escudero Sancho Panza.',
     coverGradient: { from: '#1e1b4b', to: '#0f172a', accent: '#6366f1' },
     badgeText: 'LIBRO EN ESPAÑOL',
+    tags: ['Clásico', 'Aventura', 'Novela'],
     createFile: () =>
       generateBookFile(
         'Don Quijote de la Mancha',
@@ -244,6 +245,7 @@ export const BOOKS_CATALOG: CatalogItem[] = [
     description: 'Colección de obras maestras del misterio: El corazón delator, El gato negro, La caída de la casa Usher y el legendario poema El Cuervo.',
     coverGradient: { from: '#1e1b4b', to: '#0f172a', accent: '#6366f1' },
     badgeText: 'LIBRO EN ESPAÑOL',
+    tags: ['Clásico', 'Aventura', 'Novela'],
     createFile: () =>
       generateBookFile(
         'El Cuervo y Cuentos Macabros',
@@ -474,6 +476,7 @@ export const BOOKS_CATALOG: CatalogItem[] = [
     description: 'Elizabeth Bennet y el altivo señor Darcy deben superar sus prejuicios de clase y su propio orgullo para admitir el profundo amor que los une.',
     coverGradient: { from: '#1e1b4b', to: '#0f172a', accent: '#6366f1' },
     badgeText: 'LIBRO EN ESPAÑOL',
+    tags: ['Clásico', 'Aventura', 'Novela'],
     createFile: () =>
       generateBookFile(
         'Orgullo y Prejuicio',
@@ -704,6 +707,7 @@ export const BOOKS_CATALOG: CatalogItem[] = [
     description: 'La obra maestra poética que desentrañó el spleen y el ideal de la vida moderna en el París bohemio del siglo XIX.',
     coverGradient: { from: '#1e1b4b', to: '#0f172a', accent: '#6366f1' },
     badgeText: 'LIBRO EN ESPAÑOL',
+    tags: ['Clásico', 'Aventura', 'Novela'],
     createFile: () =>
       generateBookFile(
         'Las Flores del Mal',
@@ -934,6 +938,7 @@ export const BOOKS_CATALOG: CatalogItem[] = [
     description: 'En los páramos desolados de Yorkshire, el amor obsesivo y salvaje entre Heathcliff y Catherine Earnshaw desata una tormenta de odios y rencores generacionales.',
     coverGradient: { from: '#1e1b4b', to: '#0f172a', accent: '#6366f1' },
     badgeText: 'LIBRO EN ESPAÑOL',
+    tags: ['Clásico', 'Aventura', 'Novela'],
     createFile: () =>
       generateBookFile(
         'Cumbres Borrascosas',
@@ -1164,6 +1169,7 @@ export const BOOKS_CATALOG: CatalogItem[] = [
     description: 'Santiago, un joven pastor andaluz, emprende un viaje hacia las pirámides de Egipto en busca de un tesoro y de su propia Leyenda Personal.',
     coverGradient: { from: '#1e1b4b', to: '#0f172a', accent: '#6366f1' },
     badgeText: 'LIBRO EN ESPAÑOL',
+    tags: ['Clásico', 'Aventura', 'Novela'],
     createFile: () =>
       generateBookFile(
         'El Alquimista',
@@ -1394,6 +1400,7 @@ export const BOOKS_CATALOG: CatalogItem[] = [
     description: 'Jugué mi corazón al azar y me lo ganó la violencia. Arturo Cova se interna en los infiernos verdes de las selvas del Amazonas colombiano.',
     coverGradient: { from: '#1e1b4b', to: '#0f172a', accent: '#6366f1' },
     badgeText: 'LIBRO EN ESPAÑOL',
+    tags: ['Clásico', 'Aventura', 'Novela'],
     createFile: () =>
       generateBookFile(
         'La Vorágine',
@@ -1624,6 +1631,7 @@ export const BOOKS_CATALOG: CatalogItem[] = [
     description: 'El ingenioso Lázaro relata su dura infancia sirviendo a un ciego avaro, a un clérigo mezquino y a un escudero pobre en la España renacentista.',
     coverGradient: { from: '#1e1b4b', to: '#0f172a', accent: '#6366f1' },
     badgeText: 'LIBRO EN ESPAÑOL',
+    tags: ['Clásico', 'Aventura', 'Novela'],
     createFile: () =>
       generateBookFile(
         'La Vida de Lazarillo de Tormes',
@@ -1854,6 +1862,7 @@ export const BOOKS_CATALOG: CatalogItem[] = [
     description: 'Alicia cae por la madriguera del Conejo Blanco entrando a un mundo de orugas fumadoras, sombrereros locos, gatos risueños y reinas de corazones.',
     coverGradient: { from: '#1e1b4b', to: '#0f172a', accent: '#6366f1' },
     badgeText: 'LIBRO EN ESPAÑOL',
+    tags: ['Clásico', 'Aventura', 'Novela'],
     createFile: () =>
       generateBookFile(
         'Alicia en el País de las Maravillas',
@@ -2084,6 +2093,7 @@ export const BOOKS_CATALOG: CatalogItem[] = [
     description: 'La historia de dos mujeres casadas y su relación con el frívolo Juanito Santa Cruz en el rico y vibrante Madrid decimonónico.',
     coverGradient: { from: '#1e1b4b', to: '#0f172a', accent: '#6366f1' },
     badgeText: 'LIBRO EN ESPAÑOL',
+    tags: ['Clásico', 'Aventura', 'Novela'],
     createFile: () =>
       generateBookFile(
         'Fortunata y Jacinta',
@@ -2314,6 +2324,7 @@ export const BOOKS_CATALOG: CatalogItem[] = [
     description: 'El capitán Pantaleón Pantoja recibe la secreta misión de organizar un servicio de visitadoras para atender las necesidades del ejército en la selva.',
     coverGradient: { from: '#1e1b4b', to: '#0f172a', accent: '#6366f1' },
     badgeText: 'LIBRO EN ESPAÑOL',
+    tags: ['Clásico', 'Aventura', 'Novela'],
     createFile: () =>
       generateBookFile(
         'Pantaleón y las Visitadoras',
@@ -2322,6 +2333,102 @@ export const BOOKS_CATALOG: CatalogItem[] = [
           'Pantaleón y las Visitadoras',
           'Mario Vargas Llosa',
           'El capitán Pantaleón Pantoja recibe la secreta misión de organizar un servicio de visitadoras para atender las necesidades del ejército en la selva.'
+        )
+      ),
+  },
+  {
+    id: 'cat-dama-camelias',
+    title: 'La Dama de las Camelias',
+    author: 'Alexandre Dumas hijo',
+    category: 'libros',
+    format: 'epub',
+    genre: 'Novela / Clásico Universal / Drama Romántico',
+    totalPages: 288,
+    year: 1848,
+    description: 'La trágica y devota historia de amor entre Marguerite Gautier, la cortesana más deseada de los salones de París, y el joven Armand Duval, marcada por los prejuicios sociales y el sacrificio.',
+    coverGradient: { from: '#831843', to: '#500724', accent: '#f43f5e' },
+    badgeText: 'LIBRO EN ESPAÑOL',
+    tags: ['Clásico', 'Romance', 'Drama'],
+    createFile: () =>
+      generateBookFile(
+        'La Dama de las Camelias',
+        'Alexandre Dumas hijo',
+        createDefaultBookChapters(
+          'La Dama de las Camelias',
+          'Alexandre Dumas hijo',
+          'La trágica y devota historia de amor entre Marguerite Gautier, la cortesana más deseada de los salones de París, y el joven Armand Duval, marcada por los prejuicios sociales y el sacrificio.'
+        )
+      ),
+  },
+  {
+    id: 'cat-sensatez-sentimiento',
+    title: 'Sensatez y Sentimiento',
+    author: 'Jane Austen',
+    category: 'libros',
+    format: 'epub',
+    genre: 'Novela / Romance de Costumbres / Clásico Inglés',
+    totalPages: 384,
+    year: 1811,
+    description: 'Tras la muerte de su padre, las hermanas Elinor y Marianne Dashwood deben enfrentarse a la ruina y a los dilemas del corazón: la sensatez y la reserva de una frente a la pasión desmedida de la otra.',
+    coverGradient: { from: '#134e4a', to: '#042f2e', accent: '#2dd4bf' },
+    badgeText: 'LIBRO EN ESPAÑOL',
+    tags: ['Clásico', 'Romance', 'Novela'],
+    createFile: () =>
+      generateBookFile(
+        'Sensatez y Sentimiento',
+        'Jane Austen',
+        createDefaultBookChapters(
+          'Sensatez y Sentimiento',
+          'Jane Austen',
+          'Tras la muerte de su padre, las hermanas Elinor y Marianne Dashwood deben enfrentarse a la ruina y a los dilemas del corazón: la sensatez y la reserva de una frente a la pasión desmedida de la otra.'
+        )
+      ),
+  },
+  {
+    id: 'cat-werther',
+    title: 'Las Penas del Joven Werther',
+    author: 'Johann Wolfgang von Goethe',
+    category: 'libros',
+    format: 'epub',
+    genre: 'Novela Epistolar / Romanticismo Clásico',
+    totalPages: 176,
+    year: 1774,
+    description: 'A través de sentidas cartas, el joven artista Werther confiesa su amor apasionado y desgarrador por Charlotte, una mujer virtuosa que ya está comprometida con otro hombre.',
+    coverGradient: { from: '#451a03', to: '#1c1917', accent: '#f59e0b' },
+    badgeText: 'LIBRO EN ESPAÑOL',
+    tags: ['Clásico', 'Romance', 'Drama'],
+    createFile: () =>
+      generateBookFile(
+        'Las Penas del Joven Werther',
+        'Johann Wolfgang von Goethe',
+        createDefaultBookChapters(
+          'Las Penas del Joven Werther',
+          'Johann Wolfgang von Goethe',
+          'A través de sentidas cartas, el joven artista Werther confiesa su amor apasionado y desgarrador por Charlotte, una mujer virtuosa que ya está comprometida con otro hombre.'
+        )
+      ),
+  },
+  {
+    id: 'cat-romeo-julieta',
+    title: 'Romeo y Julieta',
+    author: 'William Shakespeare',
+    category: 'libros',
+    format: 'epub',
+    genre: 'Drama Clásico / Tragedia Romántica',
+    totalPages: 192,
+    year: 1597,
+    description: 'En Verona, el amor fulminante y clandestino entre dos jóvenes pertenecientes a las familias rivales Montesco y Capuleto desafía un odio ancestral en la tragedia romántica más célebre de la historia.',
+    coverGradient: { from: '#3b0764', to: '#18181b', accent: '#ec4899' },
+    badgeText: 'LIBRO EN ESPAÑOL',
+    tags: ['Clásico', 'Romance', 'Teatro'],
+    createFile: () =>
+      generateBookFile(
+        'Romeo y Julieta',
+        'William Shakespeare',
+        createDefaultBookChapters(
+          'Romeo y Julieta',
+          'William Shakespeare',
+          'En Verona, el amor fulminante y clandestino entre dos jóvenes pertenecientes a las familias rivales Montesco y Capuleto desafía un odio ancestral en la tragedia romántica más célebre de la historia.'
         )
       ),
   },

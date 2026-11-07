@@ -31,6 +31,7 @@ interface TtsPlayerModalProps {
   currentPage: number;
   totalPages: number;
   bookTitle: string;
+  author?: string;
   onNextPage: () => void;
   onPrevPage: () => void;
   currentText?: string;
@@ -44,6 +45,7 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
   currentPage,
   totalPages,
   bookTitle,
+  author = 'READER',
   onNextPage,
   onPrevPage,
   currentText = '',
@@ -535,6 +537,65 @@ export const TtsPlayerModal: React.FC<TtsPlayerModalProps> = ({
       onPrevPageRef.current();
     }
   };
+
+  // Synchronize MediaSession (Lockscreen widget & Bluetooth headset buttons)
+  useEffect(() => {
+    if (!isOpen) {
+      if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'none';
+      }
+      NativeTts.updateMediaSession({ state: 'stopped' }).catch(() => {});
+      return;
+    }
+
+    if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: bookTitle,
+        artist: author || 'Narrador READER',
+        album: `Página ${currentPage} de ${totalPages}`,
+      });
+
+      navigator.mediaSession.playbackState = isPlaying ? 'playing' : isPaused ? 'paused' : 'none';
+
+      try {
+        navigator.mediaSession.setActionHandler('play', () => handlePlay());
+        navigator.mediaSession.setActionHandler('pause', () => handlePause());
+        navigator.mediaSession.setActionHandler('previoustrack', () => handlePrevSegment());
+        navigator.mediaSession.setActionHandler('nexttrack', () => handleNextSegment());
+      } catch {}
+    }
+
+    NativeTts.updateMediaSession({
+      state: isPlaying ? 'playing' : isPaused ? 'paused' : 'stopped',
+      title: bookTitle,
+      author: author || 'READER',
+    }).catch(() => {});
+  }, [isOpen, isPlaying, isPaused, bookTitle, author, currentPage, totalPages]);
+
+  // Listen to native Bluetooth headset media actions
+  useEffect(() => {
+    let subHandle: any = null;
+    NativeTts.addListener('onMediaControlAction', (data: any) => {
+      if (!data) return;
+      if (data.action === 'play') {
+        handlePlay();
+      } else if (data.action === 'pause') {
+        handlePause();
+      } else if (data.action === 'next') {
+        handleNextSegment();
+      } else if (data.action === 'previous') {
+        handlePrevSegment();
+      } else if (data.action === 'stop') {
+        handleStop();
+      }
+    }).then(h => {
+      subHandle = h;
+    }).catch(() => {});
+
+    return () => {
+      if (subHandle && subHandle.remove) subHandle.remove();
+    };
+  }, []);
 
   if (!isOpen) return null;
 

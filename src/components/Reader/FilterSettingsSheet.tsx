@@ -370,6 +370,123 @@ export const FilterSettingsSheet: React.FC<FilterSettingsSheetProps> = ({
             </div>
           </div>
 
+          {/* ANIMACIÓN DE PASO DE HOJA (SOLO EN MODO PAGINADO) */}
+          {!isContinuousReading && (
+            <div className="p-3.5 bg-slate-50 dark:bg-zinc-900/60 rounded-3xl border border-slate-200/80 dark:border-zinc-800 space-y-2 shadow-2xs">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-800 dark:text-zinc-200 flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-rose-500 dark:text-zinc-300" />
+                  <span>Animación de Paso de Hoja</span>
+                </span>
+                <span className="text-[10px] text-slate-500 dark:text-zinc-400 font-medium">
+                  {settings.pageTransitionStyle === 'slide'
+                    ? '↔️ Deslizamiento'
+                    : settings.pageTransitionStyle === 'instant'
+                    ? '⚡ Directo'
+                    : '💫 Volteo 3D'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-1.5">
+                {[
+                  { id: 'curl', label: 'Volteo 3D', icon: '💫', sub: 'Efecto libro' },
+                  { id: 'slide', label: 'Deslizar', icon: '↔️', sub: 'Suave' },
+                  { id: 'instant', label: 'Directo', icon: '⚡', sub: 'Sin espera' },
+                ].map(opt => {
+                  const isSelected = (settings.pageTransitionStyle || 'curl') === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => updateSettings({ pageTransitionStyle: opt.id as any })}
+                      className={`flex flex-col items-center justify-center py-2.5 px-1 rounded-xl border text-center transition-all cursor-pointer ${
+                        isSelected
+                          ? 'border-rose-500 bg-rose-50/70 dark:border-zinc-300 dark:bg-zinc-800 text-rose-600 dark:text-zinc-100 font-bold shadow-xs'
+                          : 'border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-100/70'
+                      }`}
+                    >
+                      <span className="text-base mb-0.5">{opt.icon}</span>
+                      <span className="text-xs font-bold block">{opt.label}</span>
+                      <span className="text-[9.5px] opacity-75 block">{opt.sub}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* MODO DOBLE PÁGINA (SPREAD) */}
+          {!isContinuousReading && (
+            <div className="p-3.5 bg-slate-50 dark:bg-zinc-900/60 rounded-3xl border border-slate-200/80 dark:border-zinc-800 space-y-2 shadow-2xs">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-800 dark:text-zinc-200 flex items-center gap-1.5">
+                  <BookOpen className="w-4 h-4 text-rose-500 dark:text-zinc-300" />
+                  <span>Doble Página (Horizontal / Tablets)</span>
+                </span>
+                <span className="text-[10px] text-slate-500 dark:text-zinc-400 font-medium">
+                  {settings.dualPageMode === 'always'
+                    ? '📖 Siempre 2'
+                    : settings.dualPageMode === 'never'
+                    ? '📄 1 Fija'
+                    : '🔄 Auto'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-1.5">
+                {[
+                  { id: 'auto', label: 'Automático', icon: '🔄', sub: 'Al rotar / tablet' },
+                  { id: 'always', label: 'Siempre 2', icon: '📖', sub: 'Lado a lado' },
+                  { id: 'never', label: '1 Página', icon: '📄', sub: 'Solo individual' },
+                ].map(opt => {
+                  const isSelected = (settings.dualPageMode || 'auto') === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => updateSettings({ dualPageMode: opt.id as any })}
+                      className={`flex flex-col items-center justify-center py-2.5 px-1 rounded-xl border text-center transition-all cursor-pointer ${
+                        isSelected
+                          ? 'border-rose-500 bg-rose-50/70 dark:border-zinc-300 dark:bg-zinc-800 text-rose-600 dark:text-zinc-100 font-bold shadow-xs'
+                          : 'border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-100/70'
+                      }`}
+                    >
+                      <span className="text-base mb-0.5">{opt.icon}</span>
+                      <span className="text-xs font-bold block">{opt.label}</span>
+                      <span className="text-[9.5px] opacity-75 block">{opt.sub}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Si es manga y modo doble página está activo: opción de primera página portada */}
+              {isManga && settings.dualPageMode !== 'never' && (
+                <div className="pt-2 border-t border-slate-200/60 dark:border-zinc-800/80 flex items-center justify-between">
+                  <div className="pr-2">
+                    <span className="text-xs font-bold text-slate-800 dark:text-zinc-200 block">
+                      Portada en 1 sola hoja
+                    </span>
+                    <span className="text-[10px] text-slate-500 dark:text-zinc-400 block">
+                      Muestra la página 1 sola y empareja las demás (2-3, 4-5)
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => updateSettings({ firstPageAsCover: settings.firstPageAsCover === false })}
+                    className={`w-11 h-6 flex items-center rounded-full p-0.5 transition-colors cursor-pointer shrink-0 ${
+                      settings.firstPageAsCover !== false ? 'bg-rose-500 dark:bg-zinc-300' : 'bg-slate-300 dark:bg-zinc-700'
+                    }`}
+                  >
+                    <div
+                      className={`bg-white dark:bg-zinc-950 w-5 h-5 rounded-full shadow-md transform transition-transform ${
+                        settings.firstPageAsCover !== false ? 'translate-x-5' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* 4. BRILLO DE LA PANTALLA */}
           <div className="p-3.5 bg-slate-50 dark:bg-zinc-900/60 rounded-3xl border border-slate-200/80 dark:border-zinc-800 space-y-2.5 shadow-2xs">
             <div className="flex justify-between items-center text-xs font-bold text-slate-800 dark:text-zinc-200">

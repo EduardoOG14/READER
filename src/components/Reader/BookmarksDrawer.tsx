@@ -1,5 +1,5 @@
-import React from 'react';
-import { Bookmark as BookmarkIcon, Trash2, X, Plus, ChevronRight, Clock } from 'lucide-react';
+import React, { useState } from 'react';
+import { Bookmark as BookmarkIcon, Trash2, X, Plus, ChevronRight, Clock, Copy, Check, Quote } from 'lucide-react';
 import type { Bookmark } from '../../types';
 import { useSwipeDownToClose } from '../../hooks/useSwipeDownToClose';
 
@@ -22,11 +22,21 @@ export const BookmarksDrawer: React.FC<BookmarksDrawerProps> = ({
   onAddCurrentPage,
   onRemoveBookmark,
 }) => {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const { dragHandleProps, modalStyle } = useSwipeDownToClose({ onClose });
 
   if (!isOpen) return null;
 
-  const isCurrentPageBookmarked = bookmarks.some(b => b.page === currentPage);
+  const isCurrentPageBookmarked = bookmarks.some(b => b.page === currentPage && !b.note);
+
+  const handleCopyQuote = (bm: Bookmark, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (bm.note) {
+      navigator.clipboard.writeText(bm.note);
+      setCopiedId(bm.id);
+      setTimeout(() => setCopiedId(null), 1800);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
@@ -112,49 +122,83 @@ export const BookmarksDrawer: React.FC<BookmarksDrawerProps> = ({
               return (
                 <div
                   key={bm.id}
-                  className={`group flex items-center justify-between p-3 rounded-2xl border transition-all ${
+                  className={`group flex flex-col p-3 rounded-2xl border transition-all ${
                     isCurrent
                       ? 'border-amber-400/60 bg-amber-50/50 dark:bg-amber-950/20'
                       : 'border-slate-100 dark:border-zinc-800 hover:border-slate-200 dark:hover:border-zinc-700 bg-slate-50/60 dark:bg-zinc-800/40'
                   }`}
                 >
-                  <button
-                    onClick={() => {
-                      onJumpToPage(bm.page);
-                      onClose();
-                    }}
-                    className="flex-1 flex items-center gap-3 text-left min-w-0"
-                  >
-                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-xs shrink-0">
-                      #{bm.page}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-sm text-slate-900 dark:text-white truncate">
-                          {bm.title || `Página ${bm.page}`}
-                        </span>
-                        {isCurrent && (
-                          <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-700 dark:text-amber-300">
-                            Actual
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => {
+                        onJumpToPage(bm.page);
+                        onClose();
+                      }}
+                      className="flex-1 flex items-center gap-3 text-left min-w-0 cursor-pointer"
+                    >
+                      <div className="w-8 h-8 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-xs shrink-0">
+                        #{bm.page}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-xs text-slate-900 dark:text-white truncate">
+                            {bm.title || `Página ${bm.page}`}
                           </span>
-                        )}
+                          {bm.note && (
+                            <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-md bg-rose-500/15 text-rose-600 dark:text-rose-300">
+                              Cita guardada
+                            </span>
+                          )}
+                          {isCurrent && (
+                            <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded-md bg-amber-500/20 text-amber-700 dark:text-amber-300">
+                              Actual
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-zinc-400 mt-0.5">
+                          <Clock className="w-3 h-3" />
+                          <span>{formattedDate}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">
-                        <Clock className="w-3 h-3" />
-                        <span>{formattedDate}</span>
-                        {bm.note && <span className="truncate italic">• {bm.note}</span>}
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-slate-400 shrink-0 group-hover:translate-x-0.5 transition-transform" />
-                  </button>
+                      <ChevronRight className="w-4 h-4 text-slate-400 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                    </button>
 
-                  <button
-                    onClick={() => onRemoveBookmark(bm.id)}
-                    className="p-2 ml-1 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-colors shrink-0"
-                    title="Eliminar marcador"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                    <div className="flex items-center gap-1 shrink-0 ml-1">
+                      {bm.note && (
+                        <button
+                          onClick={e => handleCopyQuote(bm, e)}
+                          className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30 rounded-xl transition-colors cursor-pointer"
+                          title="Copiar texto de la cita"
+                        >
+                          {copiedId === bm.id ? (
+                            <Check className="w-4 h-4 text-emerald-500" />
+                          ) : (
+                            <Copy className="w-4 h-4" />
+                          )}
+                        </button>
+                      )}
+                      <button
+                        onClick={() => onRemoveBookmark(bm.id)}
+                        className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-colors shrink-0 cursor-pointer"
+                        title="Eliminar marcador"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {bm.note && (
+                    <div
+                      onClick={() => {
+                        onJumpToPage(bm.page);
+                        onClose();
+                      }}
+                      className="mt-2 p-2.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border-l-2 border-amber-500 text-xs text-amber-950 dark:text-amber-200/90 italic cursor-pointer hover:bg-amber-100/60 dark:hover:bg-amber-900/40 transition-colors flex items-start gap-1.5"
+                    >
+                      <Quote className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
+                      <p className="line-clamp-3 select-text">«{bm.note}»</p>
+                    </div>
+                  )}
                 </div>
               );
             })

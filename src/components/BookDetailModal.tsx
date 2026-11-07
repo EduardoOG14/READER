@@ -19,6 +19,7 @@ import {
   Sparkles,
   Info,
   Download,
+  Tag,
 } from 'lucide-react';
 import type { Book } from '../types';
 import { useApp } from '../context/AppContext';
@@ -59,6 +60,8 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
   const [coverUrl, setCoverUrl] = useState<string | undefined>(undefined);
   const [imgError, setImgError] = useState(false);
   const [assignedCats, setAssignedCats] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
+  const [newTagInput, setNewTagInput] = useState('');
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [isProcessingCover, setIsProcessingCover] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
@@ -92,6 +95,8 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
       setCoverUrl(book.coverUrl);
       setImgError(false);
       setAssignedCats(book.categoryIds || []);
+      setTags(book.tags || []);
+      setNewTagInput('');
       setIsEditingDescription(false);
       setNotification(null);
       setIsCheckingEpisodes(false);
@@ -180,6 +185,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
           : undefined,
       rating: rating > 0 ? rating : undefined,
       review: review.trim() || undefined,
+      tags: tags.length > 0 ? tags : undefined,
     });
     setIsEditingDescription(false);
     showNotice('¡Detalles guardados exitosamente!');
@@ -864,6 +870,124 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
                     })}
                 </div>
               </div>
+
+              {/* Custom Tags Section */}
+              <div className="p-4 rounded-2xl bg-purple-50/40 dark:bg-zinc-900/50 border border-purple-200/60 dark:border-zinc-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-[#4c0519] dark:text-[#f3f4f6] uppercase tracking-wider flex items-center gap-1.5">
+                    <Tag className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                    <span>Etiquetas Personalizadas (Tags)</span>
+                  </label>
+                  <span className="text-[10px] text-purple-700 dark:text-purple-300 font-semibold">
+                    {tags.length} {tags.length === 1 ? 'etiqueta' : 'etiquetas'}
+                  </span>
+                </div>
+
+                {/* Current Tags Chips */}
+                {tags.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {tags.map(t => (
+                      <span
+                        key={t}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold bg-purple-100 text-purple-900 dark:bg-purple-950/70 dark:text-purple-200 border border-purple-200/60 dark:border-purple-800/60 shadow-2xs"
+                      >
+                        <span>#{t}</span>
+                        <button
+                          type="button"
+                          onClick={() => setTags(tags.filter(item => item !== t))}
+                          className="hover:bg-purple-200 dark:hover:bg-purple-800 rounded-full p-0.5 text-purple-700 dark:text-purple-300 transition-colors cursor-pointer"
+                        >
+                          <X className="w-3 h-3 stroke-[2.5]" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-500 dark:text-zinc-400 italic">
+                    Sin etiquetas. Añade palabras clave para clasificar y encontrar rápidamente esta obra.
+                  </p>
+                )}
+
+                {/* Input for adding a new tag */}
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newTagInput}
+                    onChange={e => setNewTagInput(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const val = newTagInput.trim().replace(/^#/, '');
+                        if (val && !tags.includes(val)) {
+                          setTags([...tags, val]);
+                          setNewTagInput('');
+                        }
+                      }
+                    }}
+                    placeholder="Escribe una etiqueta (ej. Isekai, Comedia, Favorito)..."
+                    className="flex-1 text-xs p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 text-[#4c0519] dark:text-[#f3f4f6] outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const val = newTagInput.trim().replace(/^#/, '');
+                      if (val && !tags.includes(val)) {
+                        setTags([...tags, val]);
+                        setNewTagInput('');
+                      }
+                    }}
+                    disabled={!newTagInput.trim()}
+                    className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:opacity-40 text-white text-xs font-bold shadow-xs transition-all active:scale-95 cursor-pointer shrink-0"
+                  >
+                    + Añadir
+                  </button>
+                </div>
+
+                {/* Quick Suggestion Pills */}
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 block mb-1.5">
+                    Sugerencias populares (1 toque para agregar):
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      'Fantasía',
+                      'Romance',
+                      'Isekai',
+                      'Acción',
+                      'Misterio',
+                      'Comedia',
+                      'Ciencia Ficción',
+                      'Drama',
+                      'Histórico',
+                      'Pendiente',
+                      'Favorito',
+                      'Relectura',
+                    ].map(sug => {
+                      const isAdded = tags.includes(sug);
+                      return (
+                        <button
+                          key={sug}
+                          type="button"
+                          onClick={() => {
+                            if (!isAdded) {
+                              setTags([...tags, sug]);
+                            } else {
+                              setTags(tags.filter(t => t !== sug));
+                            }
+                          }}
+                          className={`text-[11px] font-semibold px-2 py-0.5 rounded-lg border transition-all cursor-pointer ${
+                            isAdded
+                              ? 'bg-purple-600 text-white border-purple-600 shadow-2xs'
+                              : 'bg-white dark:bg-zinc-800 text-purple-900 dark:text-purple-300 border-purple-200/60 dark:border-purple-800/40 hover:bg-purple-50'
+                          }`}
+                        >
+                          {isAdded ? `✓ #${sug}` : `+#${sug}`}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -910,7 +1034,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({ book, isOpen, 
             genre: 'Manga / Cómic',
             badgeText: 'MANGA',
             format: (book.format as any) || 'cbz',
-            category: (book.categoryIds?.includes('cat-comics') ? 'comics' : book.categoryIds?.includes('cat-manhwa') ? 'manhwa' : 'manga') as any,
+            category: (book.categoryIds?.includes('cat-comics') ? 'comics' : book.categoryIds?.includes('cat-romance') ? 'romance' : book.categoryIds?.includes('cat-manhwa') ? 'manhwa' : 'manga') as any,
             totalPages: book.totalPages,
             description: book.description || '',
             coverGradient: { from: '#f43f5e', to: '#be123c', accent: '#f43f5e' },

@@ -52,6 +52,7 @@ export async function loadDemoContent(): Promise<Book[]> {
       progress: 0,
       coverUrl: `data:image/svg+xml;utf8,${encodeURIComponent(coverSvg)}`,
       categoryIds: ['cat-manga'],
+      tags: ['Manga', 'Fantasía', 'Acción'],
       fileStorageKey: mangaStorageKey,
     };
 
@@ -122,6 +123,7 @@ Toca en el centro de la pantalla mientras lees para mostrar u ocultar la barra d
       progress: 0,
       coverUrl: `data:image/svg+xml;utf8,${encodeURIComponent(bookCoverSvg)}`,
       categoryIds: ['cat-books', 'cat-favorites'],
+      tags: ['Guía', 'Favorito', 'Manual'],
       fileStorageKey: textStorageKey,
     };
 

@@ -29,6 +29,7 @@ export interface Book {
   progress: number; // 0 to 100
   coverUrl?: string; // Data URL or object URL for cover preview
   categoryIds: string[]; // List of category IDs assigned by user
+  tags?: string[]; // Custom user tags (e.g. 'Isekai', 'Fantasía', 'Pendiente')
   fileStorageKey: string; // Key in IndexedDB/Filesystem
   description?: string; // Synopsis or summary of the book/manga
   bookmarks?: Bookmark[]; // MoonReader bookmarks
@@ -44,6 +45,10 @@ export type ThemeMode = 'light' | 'dark' | 'system';
 export type EyeFilterMode = 'none' | 'sepia' | 'warm' | 'invert';
 
 export type ReadingThemePreset = 'emerald' | 'sakura' | 'oled' | 'sepia' | 'day';
+
+export type PageTransitionStyle = 'curl' | 'slide' | 'instant';
+
+export type DualPageMode = 'auto' | 'always' | 'never';
 
 export interface ReadingSettings {
   theme: ThemeMode;
@@ -65,6 +70,9 @@ export interface ReadingSettings {
   orientationLock?: 'auto' | 'portrait' | 'landscape'; // Screen orientation lock
   smartTrimMargins?: boolean; // Smart crop blank margins in manga and comics
   immersiveMode?: boolean; // Fullscreen immersive mode hiding system status bars
+  pageTransitionStyle?: PageTransitionStyle; // 'curl' | 'slide' | 'instant'
+  dualPageMode?: DualPageMode; // 'auto' | 'always' | 'never'
+  firstPageAsCover?: boolean; // Show page 1 standalone as cover in dual page mode
 }
 
 export interface ReadingSession {

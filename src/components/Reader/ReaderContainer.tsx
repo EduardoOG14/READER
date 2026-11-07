@@ -28,6 +28,8 @@ import { TtsPlayerModal } from './TtsPlayerModal';
 import { BrightnessGestureHud } from './BrightnessGestureHud';
 import { SearchInBookDrawer } from './SearchInBookDrawer';
 import { BookCompletedModal } from '../BookCompletedModal';
+import { TextSelectionToolbar } from './TextSelectionToolbar';
+import { DictionaryModal } from './DictionaryModal';
 import { useBackHandler } from '../../services/backButton';
 
 export const ReaderContainer: React.FC = () => {
@@ -50,6 +52,8 @@ export const ReaderContainer: React.FC = () => {
   const [hudBrightness, setHudBrightness] = useState<number>(settings.brightness || 100);
   const [bookmarkToast, setBookmarkToast] = useState<string | null>(null);
   const [currentPageText, setCurrentPageText] = useState<string>('');
+  const [selectedText, setSelectedText] = useState<string>('');
+  const [showDictionaryModal, setShowDictionaryModal] = useState(false);
   const [orientationMode, setOrientationMode] = useState<'auto' | 'portrait' | 'landscape'>(
     settings.orientationLock || 'auto'
   );
@@ -94,6 +98,40 @@ export const ReaderContainer: React.FC = () => {
     });
     setBookmarkToast(next ? 'Modo Lectura Continuo activado' : 'Modo Paginado activado');
     setTimeout(() => setBookmarkToast(null), 2000);
+  };
+
+  // Listen for text selections in DOM and from custom reader events
+  useEffect(() => {
+    const handleDomSelection = () => {
+      const sel = window.getSelection();
+      const txt = sel ? sel.toString().trim() : '';
+      if (txt.length >= 2 && txt.length <= 1500) {
+        setSelectedText(txt);
+      }
+    };
+
+    const handleCustomSelection = (e: any) => {
+      const txt = e.detail?.text?.trim();
+      if (txt && txt.length >= 2 && txt.length <= 1500) {
+        setSelectedText(txt);
+      }
+    };
+
+    document.addEventListener('selectionchange', handleDomSelection);
+    window.addEventListener('reader-text-selected', handleCustomSelection);
+
+    return () => {
+      document.removeEventListener('selectionchange', handleDomSelection);
+      window.removeEventListener('reader-text-selected', handleCustomSelection);
+    };
+  }, []);
+
+  const handleSaveSelectedQuote = (quote: string) => {
+    if (!activeBook) return;
+    addBookmark(activeBook.id, currentPage, quote);
+    setBookmarkToast('¡Frase guardada en Marcadores! 🔖');
+    setTimeout(() => setBookmarkToast(null), 2500);
+    setSelectedText('');
   };
 
   // Synchronous local state for instant page turning without waiting for DB writes
@@ -261,8 +299,12 @@ export const ReaderContainer: React.FC = () => {
       setShowAutoScroll(false);
       return true;
     }
+    if (showDictionaryModal) {
+      setShowDictionaryModal(false);
+      return true;
+    }
     return false;
-  }, 200, showCompletedModal || showSearchDrawer || showBookmarksDrawer || showSettingsSheet || showTtsModal || showAutoScroll);
+  }, 200, showCompletedModal || showSearchDrawer || showBookmarksDrawer || showSettingsSheet || showTtsModal || showAutoScroll || showDictionaryModal);
 
   // 3. Reader container itself: exits reader and returns to library (Priority 50)
   useBackHandler(() => {
@@ -757,6 +799,7 @@ export const ReaderContainer: React.FC = () => {
         currentPage={currentPage}
         totalPages={totalPages}
         bookTitle={activeBook.title}
+        author={activeBook.author}
         currentText={currentPageText}
         onNextPage={() => {
           if (currentPage < totalPages) {
@@ -841,6 +884,34 @@ export const ReaderContainer: React.FC = () => {
         }}
         book={activeBook}
         onSaveRatingAndReview={handleSaveRatingAndReview}
+      />
+
+      {/* Floating Selection Toolbar for Quotes, Dictionary and Search */}
+      {selectedText && (
+        <TextSelectionToolbar
+          selectedText={selectedText}
+          onSaveQuote={handleSaveSelectedQuote}
+          onOpenDictionary={txt => {
+            setSelectedText(txt);
+            setShowDictionaryModal(true);
+          }}
+          onSearchInBook={() => {
+            setShowSearchDrawer(true);
+            setSelectedText('');
+          }}
+          onClearSelection={() => {
+            window.getSelection()?.removeAllRanges();
+            setSelectedText('');
+          }}
+        />
+      )}
+
+      {/* Quick In-Book Dictionary & Translation Modal */}
+      <DictionaryModal
+        isOpen={showDictionaryModal}
+        onClose={() => setShowDictionaryModal(false)}
+        selectedText={selectedText}
+        onSaveBookmarkQuote={handleSaveSelectedQuote}
       />
     </div>
   );

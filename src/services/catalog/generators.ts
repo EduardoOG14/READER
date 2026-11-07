@@ -31,12 +31,12 @@ export function createCoverSvg(
 export function createMangaCoverSvg(
   title: string,
   author: string,
-  category: 'manga' | 'manhwa' | 'comics' = 'manga',
+  category: 'manga' | 'manhwa' | 'comics' | 'romance' = 'manga',
   _fromColor?: string,
   _toColor?: string,
   _accentColor?: string
 ): string {
-  return createMangaTankobonCoverSvg(title, author, category);
+  return createMangaTankobonCoverSvg(title, author, category as any);
 }
 
 // ==========================================
@@ -45,12 +45,12 @@ export function createMangaCoverSvg(
 export function createMangaSplashPageSvg(
   title: string,
   author: string,
-  category: 'manga' | 'manhwa' | 'comics' = 'manga',
+  category: 'manga' | 'manhwa' | 'comics' | 'romance' = 'manga',
   description?: string
 ): string {
   const safeTitle = title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeAuthor = author.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const categoryLabel = category === 'manhwa' ? 'WEBTOON' : category === 'comics' ? 'CÓMIC' : 'MANGA';
+  const categoryLabel = category === 'manhwa' ? 'WEBTOON' : category === 'romance' ? 'MANHWA ROMÁNTICO' : category === 'comics' ? 'CÓMIC' : 'MANGA';
   const quote = description
     ? description.slice(0, 160)
     : `Una obra cumbre de ${safeAuthor}, adaptada íntegramente al español para disfrutar en cualquier momento y lugar.`;
@@ -113,7 +113,7 @@ export function createMangaStoryPageSvg(
   sceneName: string,
   dialogue: string,
   narrativeText: string,
-  category: 'manga' | 'manhwa' | 'comics' = 'manga'
+  category: 'manga' | 'manhwa' | 'comics' | 'romance' = 'manga'
 ): string {
   const safeTitle = title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeAuthor = author.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -121,7 +121,7 @@ export function createMangaStoryPageSvg(
   const safeChap = chapterTitle.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeDia = dialogue.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeNar = narrativeText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const catShort = category === 'manhwa' ? 'Webtoon' : category === 'comics' ? 'Cómic' : 'Manga';
+  const catShort = category === 'manhwa' ? 'Webtoon' : category === 'romance' ? 'Romance' : category === 'comics' ? 'Cómic' : 'Manga';
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1350" viewBox="0 0 900 1350">
   <defs>
@@ -212,7 +212,7 @@ export function notifyDownloadProgress(title: string, message: string, percent: 
 export async function fetchMangaDexOnlineData(
   title: string,
   author?: string,
-  category: 'manga' | 'manhwa' | 'comics' = 'manga'
+  category: 'manga' | 'manhwa' | 'comics' | 'romance' = 'manga'
 ): Promise<{
   coverBlob?: Blob;
   coverUrl?: string;
@@ -358,7 +358,7 @@ export async function generateMangaCbz(
   title: string,
   author: string,
   pagesData: ComicPanelData[],
-  category: 'manga' | 'manhwa' | 'comics' = 'manga',
+  category: 'manga' | 'manhwa' | 'comics' | 'romance' = 'manga',
   description?: string
 ): Promise<File> {
   const zip = new JSZip();
@@ -730,19 +730,29 @@ export function createDefaultMangaPanels(
   title: string,
   author: string,
   description: string,
-  category: 'manga' | 'manhwa' | 'comics' = 'manga'
+  category: 'manga' | 'manhwa' | 'comics' | 'romance' = 'manga'
 ): ComicPanelData[] {
-  const categoryLabel = category === 'manhwa' ? 'Webtoon' : category === 'comics' ? 'Cómic' : 'Manga';
+  const isRomance = category === 'romance';
+  const categoryLabel = category === 'manhwa' ? 'Webtoon' : isRomance ? 'Manhwa Romántico' : category === 'comics' ? 'Cómic' : 'Manga';
 
-  const scenes = [
-    { scene: 'El Despertar', act: 'Apertura de la historia', dia: `¡No me rendiré jamás en ${title}! ¡Este es el camino que he elegido seguir!`, text: `${description.slice(0, 110)}...` },
-    { scene: 'Sombra en la Ciudad', act: 'Tensión creciente', dia: 'Si quieres dar un paso adelante... ¡primero tendrás que superarme a mí!', text: 'Una presencia arrolladora irrumpe en escena mientras las miradas se cruzan con tensión electrizante.' },
-    { scene: 'Choque de Fuerzas', act: 'Impacto cinético', dia: '¡He entrenado mi mente y mi espíritu para no retroceder ante ningún desafío!', text: 'La energía fluye y el aire vibra con el impacto inminente del choque de voluntades.' },
-    { scene: 'El Límite', act: 'Punto de inflexión', dia: '¿Es esto todo lo que tienes? ¡Aún no he visto tu verdadera fuerza!', text: 'El polvo se disipa revelando una determinación intacta en medio del fragor.' },
-    { scene: 'El Despertar del Poder', act: 'Evolución interior', dia: 'En los momentos más oscuros es cuando brilla con mayor fuerza nuestra convicción.', text: 'Una luz cegadora emana del centro del combate, alterando el curso de la contienda.' },
-    { scene: 'Contraataque Épico', act: 'Maniobra táctica', dia: '¡Esta técnica la he perfeccionado para proteger lo que más me importa!', text: 'Un movimiento magistral rompe las defensas del adversario con precisión milimétrica.' },
-    { scene: 'Hacia el Horizonte', act: 'Resolución de la batalla', dia: '¡Nuestra aventura apenas acaba de comenzar... hacia lo desconocido!', text: `Una obra cumbre del ${categoryLabel} creada por ${author}, adaptada íntegramente al español para disfrutar sin conexión.` }
-  ];
+  const scenes = isRomance
+    ? [
+        { scene: 'El Encuentro del Destino', act: 'Apertura de la historia', dia: `Aunque el destino intente separarnos en ${title}... ¡protegeré este amor con mi vida!`, text: `${description.slice(0, 110)}...` },
+        { scene: 'Secretos y Miradas', act: 'Latidos compartidos', dia: '¿Por qué cada vez que te acercas... mi corazón late con tanta fuerza?', text: 'Un silencio elocuente envuelve el salón mientras sus miradas se cruzan, revelando sentimientos ocultos.' },
+        { scene: 'El Baile de Salón', act: 'Acercamiento inolvidable', dia: 'Permíteme sostener tu mano esta noche. Prometo no soltarte jamás.', text: 'Al compás de la música, los rumores y miradas de la corte se desvanecen en un instante íntimo y mágico.' },
+        { scene: 'La Promesa Sincera', act: 'Confesión bajo las estrellas', dia: 'No me importa lo que diga el reino entero. Mi único deseo eres tú.', text: 'Bajo la luz plateada de la noche, las barreras del pasado caen y la verdad florece sin reservas.' },
+        { scene: 'Pruebas del Corazón', act: 'Determinación inquebrantable', dia: 'Si el mundo se opone a nuestro destino, entonces desafiaré al mundo por ti.', text: 'El amor forjado a través de las pruebas demuestra ser más fuerte que cualquier obstáculo o intriga.' },
+        { scene: 'Un Nuevo Amanecer', act: 'Desenlace y juramento', dia: 'De ahora en adelante, cada amanecer lo recibiremos juntos.', text: `Una inolvidable obra cumbre de ${categoryLabel} creada por ${author}, adaptada íntegramente al español para disfrutar sin conexión.` }
+      ]
+    : [
+        { scene: 'El Despertar', act: 'Apertura de la historia', dia: `¡No me rendiré jamás en ${title}! ¡Este es el camino que he elegido seguir!`, text: `${description.slice(0, 110)}...` },
+        { scene: 'Sombra en la Ciudad', act: 'Tensión creciente', dia: 'Si quieres dar un paso adelante... ¡primero tendrás que superarme a mí!', text: 'Una presencia arrolladora irrumpe en escena mientras las miradas se cruzan con tensión electrizante.' },
+        { scene: 'Choque de Fuerzas', act: 'Impacto cinético', dia: '¡He entrenado mi mente y mi espíritu para no retroceder ante ningún desafío!', text: 'La energía fluye y el aire vibra con el impacto inminente del choque de voluntades.' },
+        { scene: 'El Límite', act: 'Punto de inflexión', dia: '¿Es esto todo lo que tienes? ¡Aún no he visto tu verdadera fuerza!', text: 'El polvo se disipa revelando una determinación intacta en medio del fragor.' },
+        { scene: 'El Despertar del Poder', act: 'Evolución interior', dia: 'En los momentos más oscuros es cuando brilla con mayor fuerza nuestra convicción.', text: 'Una luz cegadora emana del centro del combate, alterando el curso de la contienda.' },
+        { scene: 'Contraataque Épico', act: 'Maniobra táctica', dia: '¡Esta técnica la he perfeccionado para proteger lo que más me importa!', text: 'Un movimiento magistral rompe las defensas del adversario con precisión milimétrica.' },
+        { scene: 'Hacia el Horizonte', act: 'Resolución de la batalla', dia: '¡Nuestra aventura apenas acaba de comenzar... hacia lo desconocido!', text: `Una obra cumbre del ${categoryLabel} creada por ${author}, adaptada íntegramente al español para disfrutar sin conexión.` }
+      ];
 
   return scenes.map((s, idx) => ({
     number: idx + 1,

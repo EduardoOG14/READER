@@ -31,6 +31,8 @@ export const CategoryBar: React.FC<CategoryBarProps> = ({ onOpenCategoryManager 
         return '🎨 Mangas';
       case 'cat-books':
         return '📄 Libros';
+      case 'cat-romance':
+        return '💖 Romance';
       default:
         return category.name;
     }

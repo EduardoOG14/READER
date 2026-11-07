@@ -4,7 +4,7 @@ export interface CatalogItem {
   id: string;
   title: string;
   author: string;
-  category: 'libros' | 'manga' | 'manhwa';
+  category: 'libros' | 'manga' | 'manhwa' | 'romance';
   format: BookFormat;
   genre: string;
   totalPages: number;
@@ -13,6 +13,7 @@ export interface CatalogItem {
   coverGradient: { from: string; to: string; accent: string };
   badgeText: string;
   coverUrl?: string;
+  tags?: string[];
   createFile?: (onProgress?: (msg: string, percent: number) => void) => Promise<File>;
 }
 

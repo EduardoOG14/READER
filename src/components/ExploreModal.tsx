@@ -26,7 +26,7 @@ interface ExploreModalProps {
   onClose: () => void;
 }
 
-type CategoryFilter = 'todos' | 'libros' | 'manga' | 'manhwa';
+type CategoryFilter = 'todos' | 'libros' | 'manga' | 'manhwa' | 'romance';
 
 export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) => {
   const { books, openReader, refreshLibrary } = useApp();
@@ -114,6 +114,7 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
       libros: fullCatalog.filter(i => i.category === 'libros').length,
       manga: fullCatalog.filter(i => i.category === 'manga').length,
       manhwa: fullCatalog.filter(i => i.category === 'manhwa').length,
+      romance: fullCatalog.filter(i => i.category === 'romance').length,
     };
   }, [fullCatalog]);
 
@@ -312,6 +313,16 @@ export const ExploreModal: React.FC<ExploreModalProps> = ({ isOpen, onClose }) =
               }`}
             >
               🇰🇷 Manhwas ({categoryCounts.manhwa})
+            </button>
+            <button
+              onClick={() => handleCategoryChange('romance')}
+              className={`px-3 py-1.5 rounded-xl font-black transition-all shrink-0 cursor-pointer ${
+                activeCategory === 'romance'
+                  ? 'bg-rose-500 text-white dark:bg-zinc-100 dark:text-zinc-950 shadow-xs'
+                  : 'bg-rose-50 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 hover:bg-rose-100 dark:hover:bg-zinc-700 font-bold'
+              }`}
+            >
+              💖 Romance ({categoryCounts.romance})
             </button>
           </div>
         </div>

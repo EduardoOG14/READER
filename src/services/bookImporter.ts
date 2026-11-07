@@ -124,6 +124,7 @@ export async function importBookFile(
     progress: 0,
     coverUrl,
     categoryIds,
+    tags: initialMeta?.tags,
     fileStorageKey,
     description,
   };

@@ -203,8 +203,29 @@ export const PdfReader: React.FC<PdfReaderProps> = ({
 }) => {
   const { settings, activeBook } = useApp();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRightRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const continuousScrollRef = useRef<HTMLDivElement>(null);
+
+  // Responsive spread tracking
+  const [windowDimensions, setWindowDimensions] = useState(() => ({
+    width: typeof window !== 'undefined' ? window.innerWidth : 800,
+    height: typeof window !== 'undefined' ? window.innerHeight : 600,
+  }));
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowDimensions({ width: window.innerWidth, height: window.innerHeight });
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isLandscapeOrTablet = windowDimensions.width > windowDimensions.height || windowDimensions.width >= 768;
+  const isDualPage = !isContinuousMode && (
+    settings.dualPageMode === 'always' ||
+    (settings.dualPageMode !== 'never' && isLandscapeOrTablet)
+  );
 
   // Persistent book zoom scale and lock
   const bookZoomStorageKey = useMemo(() => `book_zoom_${activeBook?.id || 'default'}`, [activeBook?.id]);
@@ -232,6 +253,38 @@ export const PdfReader: React.FC<PdfReaderProps> = ({
     } catch {}
     return 1.0;
   });
+
+  // Page turn animation
+  const [turnAnimation, setTurnAnimation] = useState<'left' | 'right' | null>(null);
+  const lastPageRef = useRef<number>(currentPage);
+
+  useEffect(() => {
+    if (currentPage === lastPageRef.current) return;
+    const isForward = currentPage > lastPageRef.current;
+    lastPageRef.current = currentPage;
+
+    if (settings.pageTransitionStyle === 'instant' || scale > 1.0) {
+      setTurnAnimation(null);
+      return;
+    }
+
+    const dir = isForward ? 'right' : 'left';
+    setTurnAnimation(dir);
+
+    const timer = setTimeout(() => {
+      setTurnAnimation(null);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [currentPage, settings.pageTransitionStyle, scale]);
+
+  let animationClass = '';
+  if (turnAnimation && scale <= 1.0) {
+    if (settings.pageTransitionStyle === 'curl') {
+      animationClass = turnAnimation === 'right' ? 'animate-page-curl-right' : 'animate-page-curl-left';
+    } else if (settings.pageTransitionStyle === 'slide') {
+      animationClass = turnAnimation === 'right' ? 'animate-page-slide-right' : 'animate-page-slide-left';
+    }
+  }
 
   // Zoom feedback toast
   const [zoomToast, setZoomToast] = useState<string | null>(null);
@@ -284,6 +337,7 @@ export const PdfReader: React.FC<PdfReaderProps> = ({
   const pdfDocRef = useRef<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const renderTaskRef = useRef<any>(null);
+  const renderTaskRightRef = useRef<any>(null);
   const isCancelledRef = useRef<boolean>(false);
 
   // Pan state for Paginated Mode
@@ -445,7 +499,12 @@ export const PdfReader: React.FC<PdfReaderProps> = ({
     }
   }, [currentPage, isContinuousMode, startPage, endPage, isZoomLocked, pdfDoc, totalPages]);
 
-  // Render single page safely in Paginated Mode (fit to screen)
+  // Base spread page calculation for Dual Page
+  const baseSpreadPage = isDualPage
+    ? (currentPage % 2 !== 0 ? currentPage : currentPage - 1)
+    : currentPage;
+
+  // Render page(s) in Paginated Mode (fit to screen, supports Dual-Page spread)
   const renderPaginatedPage = useCallback(
     async (pageNum: number) => {
       if (isContinuousMode || !pdfDoc || !canvasRef.current || isCancelledRef.current) return;
@@ -457,61 +516,99 @@ export const PdfReader: React.FC<PdfReaderProps> = ({
         } catch (e) {}
         renderTaskRef.current = null;
       }
+      if (renderTaskRightRef.current) {
+        try {
+          renderTaskRightRef.current.cancel();
+          await renderTaskRightRef.current.promise.catch(() => {});
+        } catch (e) {}
+        renderTaskRightRef.current = null;
+      }
 
       if (isCancelledRef.current || !canvasRef.current) return;
 
       try {
-        const page = await pdfDoc.getPage(pageNum);
-        if (isCancelledRef.current || !canvasRef.current) return;
-
         const container = containerRef.current;
         const containerWidth = container ? container.clientWidth : window.innerWidth;
         const containerHeight = container ? container.clientHeight : window.innerHeight;
-
-        const unscaledViewport = page.getViewport({ scale: 1.0 });
-
-        // Calculate scale to fit the entire page completely within the screen
-        const fitScale = Math.min(
-          (containerWidth - 16) / unscaledViewport.width,
-          (containerHeight - 16) / unscaledViewport.height
-        );
-        const finalScale = fitScale * scale;
-
-        const viewport = page.getViewport({ scale: finalScale });
-        const canvas = canvasRef.current;
-        const context = canvas.getContext('2d');
-        if (!context) return;
-
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        canvas.width = Math.floor(viewport.width * dpr);
-        canvas.height = Math.floor(viewport.height * dpr);
-        canvas.style.width = `${Math.floor(viewport.width)}px`;
-        canvas.style.height = `${Math.floor(viewport.height)}px`;
 
-        context.setTransform(dpr, 0, 0, dpr, 0, 0);
+        // Render Left Page (Page A)
+        const pageA = await pdfDoc.getPage(pageNum);
+        if (isCancelledRef.current || !canvasRef.current) return;
 
-        const renderTask = page.render({
-          canvasContext: context,
-          viewport: viewport,
-        });
+        const unscaledViewportA = pageA.getViewport({ scale: 1.0 });
+        const availableWidthA = isDualPage ? containerWidth / 2 - 20 : containerWidth - 16;
+        const fitScaleA = Math.min(
+          availableWidthA / unscaledViewportA.width,
+          (containerHeight - 16) / unscaledViewportA.height
+        );
+        const finalScaleA = fitScaleA * scale;
 
-        renderTaskRef.current = renderTask;
-        await renderTask.promise;
-        renderTaskRef.current = null;
+        const viewportA = pageA.getViewport({ scale: finalScaleA });
+        const canvasA = canvasRef.current;
+        const contextA = canvasA.getContext('2d');
+        if (contextA) {
+          canvasA.width = Math.floor(viewportA.width * dpr);
+          canvasA.height = Math.floor(viewportA.height * dpr);
+          canvasA.style.width = `${Math.floor(viewportA.width)}px`;
+          canvasA.style.height = `${Math.floor(viewportA.height)}px`;
+          contextA.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+          const taskA = pageA.render({
+            canvasContext: contextA,
+            viewport: viewportA,
+          });
+          renderTaskRef.current = taskA;
+          await taskA.promise;
+          renderTaskRef.current = null;
+        }
+
+        // If Dual Page, render Right Page (Page B)
+        if (isDualPage && canvasRightRef.current && pageNum + 1 <= pdfDoc.numPages) {
+          const pageB = await pdfDoc.getPage(pageNum + 1);
+          if (isCancelledRef.current || !canvasRightRef.current) return;
+
+          const unscaledViewportB = pageB.getViewport({ scale: 1.0 });
+          const availableWidthB = containerWidth / 2 - 20;
+          const fitScaleB = Math.min(
+            availableWidthB / unscaledViewportB.width,
+            (containerHeight - 16) / unscaledViewportB.height
+          );
+          const finalScaleB = fitScaleB * scale;
+
+          const viewportB = pageB.getViewport({ scale: finalScaleB });
+          const canvasB = canvasRightRef.current;
+          const contextB = canvasB.getContext('2d');
+          if (contextB) {
+            canvasB.width = Math.floor(viewportB.width * dpr);
+            canvasB.height = Math.floor(viewportB.height * dpr);
+            canvasB.style.width = `${Math.floor(viewportB.width)}px`;
+            canvasB.style.height = `${Math.floor(viewportB.height)}px`;
+            contextB.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            const taskB = pageB.render({
+              canvasContext: contextB,
+              viewport: viewportB,
+            });
+            renderTaskRightRef.current = taskB;
+            await taskB.promise;
+            renderTaskRightRef.current = null;
+          }
+        }
       } catch (err: any) {
         if (err?.name !== 'RenderingCancelledException') {
           console.warn('Paginated PDF render error:', err);
         }
       }
     },
-    [pdfDoc, scale, isContinuousMode]
+    [pdfDoc, scale, isContinuousMode, isDualPage]
   );
 
   useEffect(() => {
     if (pdfDoc && !isContinuousMode) {
-      renderPaginatedPage(currentPage);
+      renderPaginatedPage(baseSpreadPage);
     }
-  }, [pdfDoc, currentPage, renderPaginatedPage, isContinuousMode]);
+  }, [pdfDoc, baseSpreadPage, renderPaginatedPage, isContinuousMode]);
 
   // Extract page text for TTS
   useEffect(() => {
@@ -552,23 +649,43 @@ export const PdfReader: React.FC<PdfReaderProps> = ({
     const clickX = e.clientX - rect.left;
     const width = rect.width;
 
-    if (clickX < width * 0.25) {
-      // Left 25% edge -> Previous Page
-      if (currentPage > 1) {
-        onPageChange(currentPage - 1);
-        if (!isZoomLocked) setScale(1.0);
-        setPanOffset({ x: 0, y: 0 });
+    if (clickX < width * 0.28) {
+      // Left edge -> Previous Page
+      if (isDualPage) {
+        if (baseSpreadPage > 1) {
+          onPageChange(Math.max(1, baseSpreadPage - 2));
+          if (!isZoomLocked) setScale(1.0);
+          setPanOffset({ x: 0, y: 0 });
+        }
+      } else {
+        if (currentPage > 1) {
+          onPageChange(currentPage - 1);
+          if (!isZoomLocked) setScale(1.0);
+          setPanOffset({ x: 0, y: 0 });
+        }
       }
-    } else if (clickX > width * 0.75) {
-      // Right 25% edge -> Next Page
+    } else if (clickX > width * 0.72) {
+      // Right edge -> Next Page
       const maxPages = pdfDoc ? pdfDoc.numPages : totalPages;
-      if (currentPage < maxPages) {
-        onPageChange(currentPage + 1);
-        if (!isZoomLocked) setScale(1.0);
-        setPanOffset({ x: 0, y: 0 });
+      if (isDualPage) {
+        if (baseSpreadPage + 2 <= maxPages) {
+          onPageChange(baseSpreadPage + 2);
+          if (!isZoomLocked) setScale(1.0);
+          setPanOffset({ x: 0, y: 0 });
+        } else if (baseSpreadPage + 1 <= maxPages) {
+          onPageChange(baseSpreadPage + 1);
+          if (!isZoomLocked) setScale(1.0);
+          setPanOffset({ x: 0, y: 0 });
+        }
+      } else {
+        if (currentPage < maxPages) {
+          onPageChange(currentPage + 1);
+          if (!isZoomLocked) setScale(1.0);
+          setPanOffset({ x: 0, y: 0 });
+        }
       }
     } else {
-      // Center 50% -> Toggle Controls
+      // Center 44% -> Toggle Controls
       onToggleControls();
     }
   };
@@ -881,22 +998,57 @@ export const PdfReader: React.FC<PdfReaderProps> = ({
         overscrollBehavior: 'none',
       }}
     >
-      {/* Complete Page Canvas (Fitted to screen, Pan & Zoom) */}
+      {/* Complete Page Canvas (Fitted to screen, Pan & Zoom, Single or Dual Page) */}
       <div
-        className="relative flex items-center justify-center shadow-2xl rounded-sm overflow-hidden bg-white"
+        className={`relative flex items-center justify-center shadow-2xl rounded-sm overflow-hidden ${animationClass}`}
         style={{
           transform: `translate(${panOffset.x}px, ${panOffset.y}px)`,
           transition: isDragging ? 'none' : 'transform 0.1s ease-out',
         }}
       >
-        <canvas
-          ref={canvasRef}
-          className="block select-none"
-          style={{
-            maxWidth: scale > 1 ? 'none' : '100%',
-            maxHeight: scale > 1 ? 'none' : '100%',
-          }}
-        />
+        {isDualPage && baseSpreadPage + 1 <= (pdfDoc?.numPages || totalPages) ? (
+          <div className="flex items-center justify-center bg-white shadow-xl">
+            {/* Left Canvas (Page A) */}
+            <div className="relative">
+              <canvas
+                ref={canvasRef}
+                className="block select-none"
+                style={{
+                  maxWidth: scale > 1 ? 'none' : '100%',
+                  maxHeight: scale > 1 ? 'none' : '100%',
+                }}
+              />
+              <div className="absolute top-0 right-0 bottom-0 w-5 bg-gradient-to-l from-black/25 to-transparent pointer-events-none" />
+            </div>
+
+            {/* Central spine fold crease */}
+            <div className="w-[1.5px] self-stretch bg-slate-400 dark:bg-zinc-700 shadow-sm shrink-0" />
+
+            {/* Right Canvas (Page B) */}
+            <div className="relative">
+              <canvas
+                ref={canvasRightRef}
+                className="block select-none"
+                style={{
+                  maxWidth: scale > 1 ? 'none' : '100%',
+                  maxHeight: scale > 1 ? 'none' : '100%',
+                }}
+              />
+              <div className="absolute top-0 left-0 bottom-0 w-5 bg-gradient-to-r from-black/25 to-transparent pointer-events-none" />
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white">
+            <canvas
+              ref={canvasRef}
+              className="block select-none"
+              style={{
+                maxWidth: scale > 1 ? 'none' : '100%',
+                maxHeight: scale > 1 ? 'none' : '100%',
+              }}
+            />
+          </div>
+        )}
       </div>
 
       {/* Floating Zoom & Lock Controls in Paginated Mode */}

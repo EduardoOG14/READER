@@ -1,6 +1,8 @@
 package com.antigravity.reader;
 
 import android.content.Intent;
+import android.media.session.MediaSession;
+import android.media.session.PlaybackState;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
@@ -27,6 +29,7 @@ public class NativeTtsPlugin extends Plugin implements TextToSpeech.OnInitListen
     private volatile String currentUtteranceId = null;
     private String currentEngineName = null;
     private Voice currentSelectedVoice = null;
+    private MediaSession mediaSession;
 
     @Override
     public void load() {
@@ -410,6 +413,81 @@ public class NativeTtsPlugin extends Plugin implements TextToSpeech.OnInitListen
                 tts.stop();
             } catch (Exception ignored) {}
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            updatePlaybackState(PlaybackState.STATE_STOPPED);
+        }
+        call.resolve();
+    }
+
+    private synchronized void initMediaSession() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            try {
+                if (mediaSession != null) {
+                    mediaSession.release();
+                }
+                mediaSession = new MediaSession(getContext(), "ReaderAudiobookSession");
+                mediaSession.setCallback(new MediaSession.Callback() {
+                    @Override
+                    public void onPlay() {
+                        notifyMediaAction("play");
+                    }
+                    @Override
+                    public void onPause() {
+                        notifyMediaAction("pause");
+                    }
+                    @Override
+                    public void onSkipToNext() {
+                        notifyMediaAction("next");
+                    }
+                    @Override
+                    public void onSkipToPrevious() {
+                        notifyMediaAction("previous");
+                    }
+                    @Override
+                    public void onStop() {
+                        notifyMediaAction("stop");
+                    }
+                });
+                mediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+                mediaSession.setActive(true);
+            } catch (Exception ignored) {}
+        }
+    }
+
+    private void updatePlaybackState(int state) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && mediaSession != null) {
+            try {
+                PlaybackState.Builder builder = new PlaybackState.Builder()
+                    .setActions(PlaybackState.ACTION_PLAY | PlaybackState.ACTION_PAUSE |
+                                PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_SKIP_TO_NEXT |
+                                PlaybackState.ACTION_SKIP_TO_PREVIOUS | PlaybackState.ACTION_STOP)
+                    .setState(state, PlaybackState.PLAYBACK_POSITION_UNKNOWN, 1.0f);
+                mediaSession.setPlaybackState(builder.build());
+            } catch (Exception ignored) {}
+        }
+    }
+
+    private void notifyMediaAction(String action) {
+        JSObject ret = new JSObject();
+        ret.put("action", action);
+        notifyListeners("onMediaControlAction", ret);
+    }
+
+    @PluginMethod
+    public void updateMediaSession(PluginCall call) {
+        String state = call.getString("state", "playing");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if ("playing".equalsIgnoreCase(state)) {
+                if (mediaSession == null) {
+                    initMediaSession();
+                }
+                updatePlaybackState(PlaybackState.STATE_PLAYING);
+            } else if ("paused".equalsIgnoreCase(state)) {
+                updatePlaybackState(PlaybackState.STATE_PAUSED);
+            } else {
+                updatePlaybackState(PlaybackState.STATE_STOPPED);
+            }
+        }
         call.resolve();
     }
 
@@ -420,6 +498,15 @@ public class NativeTtsPlugin extends Plugin implements TextToSpeech.OnInitListen
             tts.shutdown();
             tts = null;
             isInitialized = false;
+        }
+        if (mediaSession != null) {
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    mediaSession.setActive(false);
+                    mediaSession.release();
+                }
+            } catch (Exception ignored) {}
+            mediaSession = null;
         }
         super.handleOnDestroy();
     }

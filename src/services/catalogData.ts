@@ -4,4 +4,5 @@ export {
   BOOKS_CATALOG,
   MANGAS_CATALOG,
   MANHWAS_CATALOG,
+  ROMANCE_CATALOG,
 } from './catalog';

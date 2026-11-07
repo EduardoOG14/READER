@@ -84,6 +84,7 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: 'cat-favorites', name: 'Favoritos', color: '#ef4444', isDefault: true },
   { id: 'cat-manga', name: 'Mangas & Cómics', color: '#8b5cf6', isDefault: true },
   { id: 'cat-books', name: 'Libros & PDFs', color: '#f59e0b', isDefault: true },
+  { id: 'cat-romance', name: 'Romance', color: '#ec4899', isDefault: true },
 ];
 
 export const DEFAULT_SETTINGS: ReadingSettings = {
@@ -106,6 +107,9 @@ export const DEFAULT_SETTINGS: ReadingSettings = {
   orientationLock: 'auto',
   smartTrimMargins: false,
   immersiveMode: false,
+  pageTransitionStyle: 'curl',
+  dualPageMode: 'auto',
+  firstPageAsCover: true,
 };
 
 // --- Storage API ---

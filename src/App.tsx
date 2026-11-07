@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Header } from './components/Header';
 import { CategoryBar } from './components/CategoryBar';
+import { LibraryFilterBar } from './components/LibraryFilterBar';
 import { SpotlightHero } from './components/SpotlightHero';
 import { BookCard } from './components/BookCard';
 import { BookListItem } from './components/BookListItem';
@@ -15,6 +16,8 @@ import { DownloadCenterModal } from './components/DownloadCenterModal';
 import { BottomQuickMenuModal } from './components/BottomQuickMenuModal';
 import { BottomSearchSheet } from './components/BottomSearchSheet';
 import { MobileDock } from './components/MobileDock';
+import { ReadingStatsModal } from './components/ReadingStatsModal';
+import { BackupRestoreModal } from './components/BackupRestoreModal';
 import { ReaderContainer } from './components/Reader/ReaderContainer';
 import { ReaderErrorBoundary } from './components/ReaderErrorBoundary';
 import { PullToRefresh } from './components/PullToRefresh';
@@ -34,6 +37,8 @@ const LibraryView: React.FC = () => {
   const [isDownloadCenterOpen, setIsDownloadCenterOpen] = useState(false);
   const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
   const [isSearchSheetOpen, setIsSearchSheetOpen] = useState(false);
+  const [isStatsOpen, setIsStatsOpen] = useState(false);
+  const [isBackupOpen, setIsBackupOpen] = useState(false);
   const [selectedBookForDetails, setSelectedBookForDetails] = useState<Book | null>(null);
   const [showExitToast, setShowExitToast] = useState(false);
   const [groupBySeries, setGroupBySeries] = useState(false);
@@ -213,10 +218,14 @@ const LibraryView: React.FC = () => {
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenExplore={() => setIsExploreOpen(true)}
         onOpenDownloadCenter={() => setIsDownloadCenterOpen(true)}
+        onOpenStats={() => setIsStatsOpen(true)}
       />
 
       {/* Responsive Category Navigation Bar */}
       <CategoryBar onOpenCategoryManager={() => setIsCatManagerOpen(true)} />
+
+      {/* Multi-Filter & Tags Interactive Bar */}
+      <LibraryFilterBar />
 
       {/* Scrollable Library Area with Pull-To-Refresh */}
       <main className="flex-1 w-full overflow-hidden flex flex-col">
@@ -409,6 +418,18 @@ const LibraryView: React.FC = () => {
         onOpenDownloadCenter={() => setIsDownloadCenterOpen(true)}
         onOpenCategoryManager={() => setIsCatManagerOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenStats={() => setIsStatsOpen(true)}
+        onOpenBackup={() => setIsBackupOpen(true)}
+      />
+
+      <ReadingStatsModal
+        isOpen={isStatsOpen}
+        onClose={() => setIsStatsOpen(false)}
+      />
+
+      <BackupRestoreModal
+        isOpen={isBackupOpen}
+        onClose={() => setIsBackupOpen(false)}
       />
 
       <BottomSearchSheet

@@ -115,3 +115,74 @@ html, body, #root {
   word-break: normal !important;
   overflow-wrap: break-word !important;
 }
+
+/* Page Turn Realistic 3D Curl and Slide Animations */
+@keyframes pageTurnCurlInRight {
+  0% {
+    transform: perspective(1400px) rotateY(32deg) translateX(40px) scale(0.97);
+    box-shadow: -20px 0 30px rgba(0, 0, 0, 0.45);
+    opacity: 0.85;
+  }
+  100% {
+    transform: perspective(1400px) rotateY(0deg) translateX(0) scale(1);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes pageTurnCurlInLeft {
+  0% {
+    transform: perspective(1400px) rotateY(-32deg) translateX(-40px) scale(0.97);
+    box-shadow: 20px 0 30px rgba(0, 0, 0, 0.45);
+    opacity: 0.85;
+  }
+  100% {
+    transform: perspective(1400px) rotateY(0deg) translateX(0) scale(1);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes pageTurnSlideInRight {
+  0% {
+    transform: translateX(50px);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pageTurnSlideInLeft {
+  0% {
+    transform: translateX(-50px);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-page-curl-right {
+  animation: pageTurnCurlInRight 0.28s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
+  will-change: transform, opacity, box-shadow;
+  transform-origin: left center;
+}
+
+.animate-page-curl-left {
+  animation: pageTurnCurlInLeft 0.28s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
+  will-change: transform, opacity, box-shadow;
+  transform-origin: right center;
+}
+
+.animate-page-slide-right {
+  animation: pageTurnSlideInRight 0.22s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.animate-page-slide-left {
+  animation: pageTurnSlideInLeft 0.22s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
+  will-change: transform, opacity;
+}

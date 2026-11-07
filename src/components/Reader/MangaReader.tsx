@@ -117,6 +117,25 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
   const urlsRef = useRef<Map<number, string>>(new Map());
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Window dimension tracking for responsive dual-page spread
+  const [windowDimensions, setWindowDimensions] = useState(() => ({
+    width: typeof window !== 'undefined' ? window.innerWidth : 800,
+    height: typeof window !== 'undefined' ? window.innerHeight : 600,
+  }));
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowDimensions({ width: window.innerWidth, height: window.innerHeight });
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isLandscapeOrTablet = windowDimensions.width > windowDimensions.height || windowDimensions.width >= 768;
+  const isDualPageActive =
+    settings.mangaDirection !== 'webtoon' &&
+    (settings.dualPageMode === 'always' || (settings.dualPageMode !== 'never' && isLandscapeOrTablet));
+
   // Persistent book zoom scale and lock
   const bookZoomStorageKey = useMemo(() => `manga_zoom_${activeBook?.id || 'default'}`, [activeBook?.id]);
   const bookZoomLockedKey = useMemo(() => `manga_zoom_locked_${activeBook?.id || 'default'}`, [activeBook?.id]);
@@ -143,6 +162,30 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
     } catch {}
     return 1.0;
   });
+
+  // Page turn animation tracking (Page Curl 3D / Smooth Slide / Instant)
+  const [turnAnimation, setTurnAnimation] = useState<'left' | 'right' | null>(null);
+  const lastPageRef = useRef<number>(currentPage);
+
+  useEffect(() => {
+    if (currentPage === lastPageRef.current) return;
+    const isForward = currentPage > lastPageRef.current;
+    lastPageRef.current = currentPage;
+
+    if (settings.pageTransitionStyle === 'instant' || scale > 1.0) {
+      setTurnAnimation(null);
+      return;
+    }
+
+    const isRTL = settings.mangaDirection === 'rtl' || settings.mangaDirection === 'horizontal';
+    const dir = isRTL ? (isForward ? 'left' : 'right') : (isForward ? 'right' : 'left');
+    setTurnAnimation(dir);
+
+    const timer = setTimeout(() => {
+      setTurnAnimation(null);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [currentPage, settings.pageTransitionStyle, settings.mangaDirection, scale]);
 
   const [zoomToast, setZoomToast] = useState<string | null>(null);
 
@@ -289,20 +332,22 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
     [zip, pageFilenames, triggerBatchUrlsUpdate]
   );
 
-  // Preload current, previous, and next page
+  // Preload current, previous, and next page(s) (taking dual-page into account)
   useEffect(() => {
     if (!zip || pageFilenames.length === 0) return;
     const currentIndex = currentPage - 1;
 
     loadPageUrl(currentIndex);
     if (currentIndex + 1 < pageFilenames.length) loadPageUrl(currentIndex + 1);
+    if (currentIndex + 2 < pageFilenames.length) loadPageUrl(currentIndex + 2);
     if (currentIndex - 1 >= 0) loadPageUrl(currentIndex - 1);
+    if (currentIndex - 2 >= 0) loadPageUrl(currentIndex - 2);
 
     // Free memory of distant pages in horizontal mode to prevent memory exhaustion
     if (settings.mangaDirection !== 'webtoon') {
       let pruned = false;
       urlsRef.current.forEach((url, idx) => {
-        if (Math.abs(idx - currentIndex) > 6) {
+        if (Math.abs(idx - currentIndex) > 10) {
           URL.revokeObjectURL(url);
           urlsRef.current.delete(idx);
           pruned = true;
@@ -312,7 +357,7 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
         setPageUrls(new Map(urlsRef.current));
       }
     }
-  }, [zip, currentPage, pageFilenames, loadPageUrl, settings.mangaDirection]);
+  }, [zip, currentPage, pageFilenames, loadPageUrl, settings.mangaDirection, isDualPageActive]);
 
   // Track active visible page and coordinate Webtoon scrolling without flickering
   const internalActivePageRef = useRef<number>(currentPage);
@@ -344,6 +389,67 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
     }
   }, [currentPage, settings.mangaDirection, pageFilenames.length]);
 
+  // Spread calculations for Dual Page
+  const isCoverAlone = settings.firstPageAsCover !== false;
+  const isCurrentSingleCover = isDualPageActive && isCoverAlone && currentPage === 1;
+
+  let currentSpreadBase = currentPage;
+  if (isDualPageActive) {
+    if (isCoverAlone) {
+      currentSpreadBase = currentPage === 1 ? 1 : (currentPage % 2 === 0 ? currentPage : currentPage - 1);
+    } else {
+      currentSpreadBase = currentPage % 2 !== 0 ? currentPage : currentPage - 1;
+    }
+  }
+
+  const goToNextPage = () => {
+    if (!isDualPageActive) {
+      if (currentPage < pageFilenames.length) {
+        onPageChange(currentPage + 1);
+        if (!isZoomLocked) setScale(1.0);
+        setPanOffset({ x: 0, y: 0 });
+      }
+      return;
+    }
+
+    let nextTarget: number;
+    if (isCoverAlone && currentSpreadBase === 1) {
+      nextTarget = Math.min(pageFilenames.length, 2);
+    } else {
+      nextTarget = Math.min(pageFilenames.length, currentSpreadBase + 2);
+    }
+
+    if (nextTarget !== currentPage) {
+      onPageChange(nextTarget);
+      if (!isZoomLocked) setScale(1.0);
+      setPanOffset({ x: 0, y: 0 });
+    }
+  };
+
+  const goToPrevPage = () => {
+    if (!isDualPageActive) {
+      if (currentPage > 1) {
+        onPageChange(currentPage - 1);
+        if (!isZoomLocked) setScale(1.0);
+        setPanOffset({ x: 0, y: 0 });
+      }
+      return;
+    }
+
+    let prevTarget: number;
+    if (isCoverAlone && currentSpreadBase <= 3) {
+      prevTarget = 1;
+    } else {
+      prevTarget = Math.max(1, currentSpreadBase - 2);
+    }
+
+    if (prevTarget !== currentPage) {
+      onPageChange(prevTarget);
+      if (!isZoomLocked) setScale(1.0);
+      setPanOffset({ x: 0, y: 0 });
+    }
+  };
+
   // Click handler for paginated and webtoon modes
   const handlePageClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isDraggingRef.current) return;
@@ -366,8 +472,8 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
     const clickX = e.clientX - rect.left;
     const width = rect.width;
 
-    // Center 50% toggles HUD controls
-    if (clickX >= width * 0.25 && clickX <= width * 0.75) {
+    // Center 44% toggles HUD controls
+    if (clickX >= width * 0.28 && clickX <= width * 0.72) {
       onToggleControls();
       return;
     }
@@ -376,39 +482,19 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
     // Right side click = Previous page, Left side click = Next page
     const isRTL = settings.mangaDirection === 'rtl' || settings.mangaDirection === 'horizontal';
 
-    if (clickX < width * 0.25) {
-      // Left 25% edge
+    if (clickX < width * 0.28) {
+      // Left edge
       if (isRTL) {
-        // RTL advances forward
-        if (currentPage < pageFilenames.length) {
-          onPageChange(currentPage + 1);
-          if (!isZoomLocked) setScale(1.0);
-          setPanOffset({ x: 0, y: 0 });
-        }
+        goToNextPage();
       } else {
-        // LTR goes back
-        if (currentPage > 1) {
-          onPageChange(currentPage - 1);
-          if (!isZoomLocked) setScale(1.0);
-          setPanOffset({ x: 0, y: 0 });
-        }
+        goToPrevPage();
       }
-    } else if (clickX > width * 0.75) {
-      // Right 25% edge
+    } else if (clickX > width * 0.72) {
+      // Right edge
       if (isRTL) {
-        // RTL goes back
-        if (currentPage > 1) {
-          onPageChange(currentPage - 1);
-          if (!isZoomLocked) setScale(1.0);
-          setPanOffset({ x: 0, y: 0 });
-        }
+        goToPrevPage();
       } else {
-        // LTR advances forward
-        if (currentPage < pageFilenames.length) {
-          onPageChange(currentPage + 1);
-          if (!isZoomLocked) setScale(1.0);
-          setPanOffset({ x: 0, y: 0 });
-        }
+        goToNextPage();
       }
     }
   };
@@ -529,8 +615,43 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
     );
   }
 
-  // --- Render Mode: Horizontal / Paginated (RTL / LTR) ---
-  const currentUrl = pageUrls.get(currentPage - 1);
+  // --- Render Mode: Horizontal / Paginated (RTL / LTR & Dual-Page Spread) ---
+  let pageA = currentPage;
+  let pageB: number | null = null;
+
+  if (isDualPageActive && !isCurrentSingleCover) {
+    pageA = currentSpreadBase;
+    pageB = currentSpreadBase + 1 <= pageFilenames.length ? currentSpreadBase + 1 : null;
+  }
+
+  const isRTL = settings.mangaDirection === 'rtl' || settings.mangaDirection === 'horizontal';
+  let leftPageNum = pageA;
+  let rightPageNum = pageB;
+
+  if (isDualPageActive && !isCurrentSingleCover && pageB !== null) {
+    if (isRTL) {
+      // In RTL (Japanese manga), earlier page is on the right, later page is on the left
+      rightPageNum = pageA;
+      leftPageNum = pageB;
+    } else {
+      // In LTR (Western comic), earlier page is on the left, later page is on the right
+      leftPageNum = pageA;
+      rightPageNum = pageB;
+    }
+  }
+
+  const leftUrl = pageUrls.get(leftPageNum - 1);
+  const rightUrl = rightPageNum !== null ? pageUrls.get(rightPageNum - 1) : null;
+  const singleUrl = pageUrls.get(currentPage - 1);
+
+  let animationClass = '';
+  if (turnAnimation && scale <= 1.0) {
+    if (settings.pageTransitionStyle === 'curl') {
+      animationClass = turnAnimation === 'right' ? 'animate-page-curl-right' : 'animate-page-curl-left';
+    } else if (settings.pageTransitionStyle === 'slide') {
+      animationClass = turnAnimation === 'right' ? 'animate-page-slide-right' : 'animate-page-slide-left';
+    }
+  }
 
   return (
     <div
@@ -547,24 +668,86 @@ export const MangaReader: React.FC<MangaReaderProps> = ({
     >
       {renderZoomBar()}
 
-      {currentUrl ? (
+      {/* DUAL PAGE SPREAD */}
+      {isDualPageActive && !isCurrentSingleCover && rightUrl ? (
         <div
-          className="transition-transform duration-75 flex items-center justify-center max-w-full max-h-full"
+          key={`dual_${leftPageNum}_${rightPageNum}`}
+          className={`flex items-center justify-center max-w-full max-h-full transition-transform duration-75 select-none ${animationClass}`}
           style={{
             transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${scale})`,
             transformOrigin: 'center center',
           }}
         >
-          <img
-            src={currentUrl}
-            alt={`Página ${currentPage}`}
-            className={`max-w-full max-h-[92vh] object-contain select-none shadow-md pointer-events-none transition-transform duration-200 ${
-              settings.smartTrimMargins ? 'scale-[1.08]' : ''
-            }`}
-          />
+          {/* Left Page */}
+          <div className="relative flex items-center justify-end overflow-hidden max-h-[92vh]">
+            {leftUrl ? (
+              <img
+                src={leftUrl}
+                alt={`Página ${leftPageNum}`}
+                className={`max-w-[48vw] max-h-[92vh] object-contain select-none shadow-md pointer-events-none transition-transform duration-200 ${
+                  settings.smartTrimMargins ? 'scale-[1.05]' : ''
+                }`}
+              />
+            ) : (
+              <div className="w-48 h-64 flex items-center justify-center text-slate-400 text-xs">
+                Cargando pág. {leftPageNum}...
+              </div>
+            )}
+            {/* Spine fold crease shadow */}
+            <div className="absolute top-0 right-0 bottom-0 w-6 pointer-events-none bg-gradient-to-l from-black/30 via-black/10 to-transparent" />
+          </div>
+
+          {/* Spine Divider */}
+          <div className="w-[1.5px] h-[88vh] bg-slate-700/60 dark:bg-zinc-700/60 shadow-sm shrink-0 z-10 mx-0.5" />
+
+          {/* Right Page */}
+          <div className="relative flex items-center justify-start overflow-hidden max-h-[92vh]">
+            {rightUrl ? (
+              <img
+                src={rightUrl}
+                alt={`Página ${rightPageNum}`}
+                className={`max-w-[48vw] max-h-[92vh] object-contain select-none shadow-md pointer-events-none transition-transform duration-200 ${
+                  settings.smartTrimMargins ? 'scale-[1.05]' : ''
+                }`}
+              />
+            ) : (
+              <div className="w-48 h-64 flex items-center justify-center text-slate-400 text-xs">
+                Cargando pág. {rightPageNum}...
+              </div>
+            )}
+            {/* Spine fold crease shadow */}
+            <div className="absolute top-0 left-0 bottom-0 w-6 pointer-events-none bg-gradient-to-r from-black/30 via-black/10 to-transparent" />
+          </div>
         </div>
       ) : (
-        <div className="text-slate-300 dark:text-zinc-300 text-sm">Cargando página {currentPage}...</div>
+        /* SINGLE PAGE (OR STANDALONE COVER) */
+        <div
+          key={`single_${currentPage}`}
+          className={`transition-transform duration-75 flex flex-col items-center justify-center max-w-full max-h-full ${animationClass}`}
+          style={{
+            transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${scale})`,
+            transformOrigin: 'center center',
+          }}
+        >
+          {singleUrl ? (
+            <>
+              <img
+                src={singleUrl}
+                alt={`Página ${currentPage}`}
+                className={`max-w-full max-h-[92vh] object-contain select-none shadow-md pointer-events-none transition-transform duration-200 ${
+                  settings.smartTrimMargins ? 'scale-[1.08]' : ''
+                }`}
+              />
+              {isDualPageActive && isCurrentSingleCover && (
+                <span className="mt-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 bg-slate-900/60 px-2 py-0.5 rounded-full border border-slate-700/50 pointer-events-none">
+                  📖 Portada
+                </span>
+              )}
+            </>
+          ) : (
+            <div className="text-slate-300 dark:text-zinc-300 text-sm">Cargando página {currentPage}...</div>
+          )}
+        </div>
       )}
 
       {/* Floating Zoom Toast */}

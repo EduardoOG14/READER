@@ -11,22 +11,33 @@ import {
   BookOpen,
   Check,
   Download,
+  Flame,
 } from 'lucide-react';
 import { useApp, type SortOption } from '../context/AppContext';
 import { useBackHandler } from '../services/backButton';
 import { downloadQueue, type QueueState } from '../services/downloadQueue';
+import { getReadingStats } from '../services/readingStats';
 
 interface HeaderProps {
   onOpenImport: () => void;
   onOpenSettings: () => void;
   onOpenExplore: () => void;
   onOpenDownloadCenter?: () => void;
+  onOpenStats?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenImport, onOpenSettings, onOpenExplore, onOpenDownloadCenter }) => {
+export const Header: React.FC<HeaderProps> = ({
+  onOpenImport,
+  onOpenSettings,
+  onOpenExplore,
+  onOpenDownloadCenter,
+  onOpenStats,
+}) => {
   const [queueState, setQueueState] = useState<QueueState>(downloadQueue.getState());
+  const [streak, setStreak] = useState<number>(0);
 
   useEffect(() => {
+    getReadingStats().then(s => setStreak(s.currentStreak));
     return downloadQueue.subscribe(state => setQueueState(state));
   }, []);
   const {
@@ -124,6 +135,18 @@ export const Header: React.FC<HeaderProps> = ({ onOpenImport, onOpenSettings, on
 
         {/* Action Controls Bar */}
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+          {/* Reading Streak Indicator */}
+          {onOpenStats && (
+            <button
+              onClick={onOpenStats}
+              className="flex items-center gap-1 py-1.5 px-2.5 rounded-2xl bg-amber-500/15 text-amber-800 dark:text-amber-300 hover:bg-amber-500/25 border border-amber-300/60 dark:border-amber-500/30 text-xs font-black transition-all active:scale-95 cursor-pointer"
+              title="Ver estadísticas y racha de lectura"
+            >
+              <Flame className="w-3.5 h-3.5 fill-amber-500 text-amber-500 animate-pulse" />
+              <span>{streak}d</span>
+            </button>
+          )}
+
           {/* Download Center Trigger (Desktop) */}
           {onOpenDownloadCenter && (
             <button

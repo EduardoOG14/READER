@@ -59,7 +59,7 @@ export async function fetchOfficialCoverUrl(
     return coverCache.get(cacheKey)!;
   }
 
-  const isMangaLike = category === 'manga' || category === 'manhwa';
+  const isMangaLike = category === 'manga' || category === 'manhwa' || category === 'romance';
 
   // 1. For Manga & Manhwa: Primary search via MangaDex
   if (isMangaLike) {
@@ -324,13 +324,15 @@ export function createClassicBookCoverSvg(
 export function createMangaTankobonCoverSvg(
   title: string,
   author: string,
-  category: 'manga' | 'manhwa' | 'comics' = 'manga'
+  category: 'manga' | 'manhwa' | 'comics' | 'romance' = 'manga'
 ): string {
   const safeTitle = title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeAuthor = (author || 'Editorial').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const tag =
     category === 'manhwa'
       ? 'WEBTOON EDITION'
+      : category === 'romance'
+      ? 'ROMANCE EDITION'
       : category === 'comics'
       ? 'GRAPHIC NOVEL'
       : 'MANGA TANKOBON';

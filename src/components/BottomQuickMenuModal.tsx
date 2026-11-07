@@ -11,6 +11,8 @@ import {
   ArrowUpDown,
   Settings,
   Sparkles,
+  Flame,
+  Database,
 } from 'lucide-react';
 import { useApp, type SortOption } from '../context/AppContext';
 import { useBackHandler } from '../services/backButton';
@@ -24,6 +26,8 @@ interface BottomQuickMenuModalProps {
   onOpenDownloadCenter: () => void;
   onOpenCategoryManager: () => void;
   onOpenSettings: () => void;
+  onOpenStats?: () => void;
+  onOpenBackup?: () => void;
 }
 
 export const BottomQuickMenuModal: React.FC<BottomQuickMenuModalProps> = ({
@@ -32,6 +36,8 @@ export const BottomQuickMenuModal: React.FC<BottomQuickMenuModalProps> = ({
   onOpenImport,
   onOpenCategoryManager,
   onOpenSettings,
+  onOpenStats,
+  onOpenBackup,
 }) => {
   const {
     viewMode,
@@ -280,6 +286,53 @@ export const BottomQuickMenuModal: React.FC<BottomQuickMenuModalProps> = ({
               </span>
             </div>
           </button>
+        </div>
+
+        {/* 6. ESTADÍSTICAS Y COPIA DE SEGURIDAD */}
+        <div className="grid grid-cols-2 gap-2.5">
+          {onOpenStats && (
+            <button
+              onClick={() => {
+                onClose();
+                onOpenStats();
+              }}
+              className="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-rose-200/80 dark:border-zinc-800 flex items-center gap-3 hover:bg-amber-50/60 dark:hover:bg-zinc-800/80 active:scale-96 transition-all cursor-pointer shadow-xs"
+            >
+              <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-zinc-800 flex items-center justify-center text-amber-500 shrink-0">
+                <Flame className="w-5 h-5 fill-amber-500 stroke-none" />
+              </div>
+              <div className="text-left min-w-0">
+                <span className="block text-xs font-black text-[#4c0519] dark:text-[#f3f4f6] truncate">
+                  Estadísticas
+                </span>
+                <span className="text-[10px] text-slate-500 dark:text-zinc-300 truncate block font-medium">
+                  Rachas y hábitos
+                </span>
+              </div>
+            </button>
+          )}
+
+          {onOpenBackup && (
+            <button
+              onClick={() => {
+                onClose();
+                onOpenBackup();
+              }}
+              className="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-rose-200/80 dark:border-zinc-800 flex items-center gap-3 hover:bg-blue-50/60 dark:hover:bg-zinc-800/80 active:scale-96 transition-all cursor-pointer shadow-xs"
+            >
+              <div className="w-9 h-9 rounded-xl bg-blue-100 dark:bg-zinc-800 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+                <Database className="w-5 h-5 stroke-[2.3]" />
+              </div>
+              <div className="text-left min-w-0">
+                <span className="block text-xs font-black text-[#4c0519] dark:text-[#f3f4f6] truncate">
+                  Copia Respaldo
+                </span>
+                <span className="text-[10px] text-slate-500 dark:text-zinc-300 truncate block font-medium">
+                  Guardar / Restaurar
+                </span>
+              </div>
+            </button>
+          )}
         </div>
 
         {/* 6. BOTÓN GRANDE PARA CERRAR */}

@@ -325,7 +325,7 @@ class DownloadQueueService {
     this.notify();
 
     try {
-      const isManga = next.item.category === 'manga' || next.item.category === 'manhwa';
+      const isManga = next.item.category === 'manga' || next.item.category === 'manhwa' || next.item.category === 'romance';
 
       // 1. Fetch real official cover in parallel
       let officialCoverUrl: string | null = null;
@@ -395,12 +395,13 @@ class DownloadQueueService {
 
         await importBookFile(
           file,
-          [next.item.category !== 'libros' ? 'cat-manga' : 'cat-books'],
+          [next.item.category === 'libros' ? 'cat-books' : 'cat-manga', ...(next.item.category === 'romance' ? ['cat-romance'] : [])],
           {
             title: next.item.title,
             author: next.item.author,
             description: next.item.description,
             coverUrl: officialCoverUrl || undefined,
+            tags: next.item.tags,
           }
         );
       }
@@ -516,12 +517,13 @@ class DownloadQueueService {
 
     await importBookFile(
       file,
-      ['cat-manga'],
+      [queueItem.item.category === 'romance' ? 'cat-romance' : 'cat-manga', ...(queueItem.item.category === 'romance' ? ['cat-manga'] : [])],
       {
         title: queueItem.item.title,
         author: queueItem.item.author,
         description: queueItem.item.description,
         coverUrl: officialCoverUrl || undefined,
+        tags: queueItem.item.tags,
       }
     );
   }

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
-import type { Book, Category, ReadingSettings } from '../types';
+import type { Book, Category, ReadingSettings, Bookmark } from '../types';
 import {
   getAllBooks,
   getAllCategories,
@@ -51,7 +51,7 @@ interface AppContextType {
   importFiles: (files: FileList | File[], targetCategoryIds?: string[]) => Promise<{ success: number; failed: number; errors: string[] }>;
   editBook: (bookId: string, updates: Partial<Book>) => Promise<void>;
   deleteBookById: (bookId: string) => Promise<void>;
-  addBookmark: (bookId: string, page: number, note?: string) => Promise<void>;
+  addBookmark: (bookId: string, page: number, note?: string, title?: string) => Promise<void>;
   removeBookmark: (bookId: string, bookmarkId: string) => Promise<void>;
   
   // Category management
@@ -59,6 +59,19 @@ interface AppContextType {
   updateCategory: (category: Category) => Promise<void>;
   removeCategory: (categoryId: string) => Promise<void>;
   
+  // Tag and Multi-Filter State
+  selectedTags: string[];
+  setSelectedTags: (tags: string[]) => void;
+  toggleTagFilter: (tag: string) => void;
+  filterRating: number | null;
+  setFilterRating: (rating: number | null) => void;
+  filterStatus: 'all' | 'reading' | 'completed' | 'unread';
+  setFilterStatus: (status: 'all' | 'reading' | 'completed' | 'unread') => void;
+  clearAllFilters: () => void;
+  allLibraryTags: string[];
+  addTagToBook: (bookId: string, tag: string) => Promise<void>;
+  removeTagFromBook: (bookId: string, tag: string) => Promise<void>;
+
   // Filtered books
   filteredBooks: Book[];
   isLoading: boolean;
@@ -73,6 +86,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('cat-all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [filterRating, setFilterRating] = useState<number | null>(null);
+  const [filterStatus, setFilterStatus] = useState<'all' | 'reading' | 'completed' | 'unread'>('all');
   const [sortBy, setSortBy] = useState<SortOption>('recent');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [settings, setSettingsState] = useState<ReadingSettings>(DEFAULT_SETTINGS);
@@ -358,16 +374,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const addBookmark = async (bookId: string, page: number, note?: string) => {
+  const addBookmark = async (bookId: string, page: number, note?: string, title?: string) => {
     const target = books.find(b => b.id === bookId);
     if (!target) return;
     const existing = target.bookmarks || [];
-    if (existing.some(b => b.page === page)) return;
-    const newBookmark = {
+    if (!note && existing.some(b => b.page === page && !b.note)) return;
+    const newBookmark: Bookmark = {
       id: `bm_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
       page,
       timestamp: Date.now(),
-      title: `Página ${page}`,
+      title: title || (note ? `Cita (Pág. ${page})` : `Página ${page}`),
       note,
     };
     const updatedBookmarks = [...existing, newBookmark].sort((a, b) => a.page - b.page);
@@ -414,6 +430,50 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
   };
 
+  const allLibraryTags = useMemo(() => {
+    const tagSet = new Set<string>();
+    books.forEach(b => {
+      if (b.tags && Array.isArray(b.tags)) {
+        b.tags.forEach(t => {
+          if (t && t.trim()) tagSet.add(t.trim());
+        });
+      }
+    });
+    return Array.from(tagSet).sort((a, b) => a.localeCompare(b));
+  }, [books]);
+
+  const toggleTagFilter = (tag: string) => {
+    setSelectedTags(prev =>
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    );
+  };
+
+  const clearAllFilters = () => {
+    setSelectedTags([]);
+    setFilterRating(null);
+    setFilterStatus('all');
+    setSearchQuery('');
+  };
+
+  const addTagToBook = async (bookId: string, tag: string) => {
+    const trimmed = tag.trim();
+    if (!trimmed) return;
+    const target = books.find(b => b.id === bookId);
+    if (!target) return;
+    const currentTags = target.tags || [];
+    if (currentTags.includes(trimmed)) return;
+    const updatedTags = [...currentTags, trimmed];
+    await editBook(bookId, { tags: updatedTags });
+  };
+
+  const removeTagFromBook = async (bookId: string, tag: string) => {
+    const target = books.find(b => b.id === bookId);
+    if (!target) return;
+    const currentTags = target.tags || [];
+    const updatedTags = currentTags.filter(t => t !== tag);
+    await editBook(bookId, { tags: updatedTags });
+  };
+
   // Filter and sort books
   const filteredBooks = useMemo(() => {
     return books
@@ -433,13 +493,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           }
         }
 
-        // Search query
+        // Reading status filter
+        if (filterStatus !== 'all') {
+          const isDone = book.progress >= 100 || (book.currentPage >= book.totalPages && book.totalPages > 1);
+          const isReading = book.progress > 0 && !isDone;
+          const isUnread = book.progress === 0 && (book.currentPage <= 1 || !book.lastReadDate);
+
+          if (filterStatus === 'reading' && !isReading) return false;
+          if (filterStatus === 'completed' && !isDone) return false;
+          if (filterStatus === 'unread' && !isUnread) return false;
+        }
+
+        // Rating filter (Minimum stars)
+        if (filterRating !== null && filterRating > 0) {
+          if (!book.rating || book.rating < filterRating) return false;
+        }
+
+        // Tags filter (Book must contain all selected tags)
+        if (selectedTags.length > 0) {
+          const bookTags = (book.tags || []).map(t => t.toLowerCase());
+          const hasAll = selectedTags.every(st => bookTags.includes(st.toLowerCase()));
+          if (!hasAll) return false;
+        }
+
+        // Search query (Title, Author, Format, or Tags)
         if (searchQuery.trim()) {
           const q = searchQuery.toLowerCase().trim();
+          const cleanQ = q.replace(/^#/, '');
           const matchTitle = book.title.toLowerCase().includes(q);
           const matchAuthor = book.author ? book.author.toLowerCase().includes(q) : false;
           const matchFormat = book.format.toLowerCase().includes(q);
-          if (!matchTitle && !matchAuthor && !matchFormat) return false;
+          const matchTags = (book.tags || []).some(t => t.toLowerCase().includes(cleanQ));
+          if (!matchTitle && !matchAuthor && !matchFormat && !matchTags) return false;
         }
 
         return true;
@@ -459,7 +544,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
         return 0;
       });
-  }, [books, selectedCategoryId, searchQuery, sortBy]);
+  }, [books, selectedCategoryId, searchQuery, sortBy, filterStatus, filterRating, selectedTags]);
 
   const loadDemoBooks = async () => {
     setIsLoading(true);
@@ -515,6 +600,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         createCategory,
         updateCategory,
         removeCategory,
+        selectedTags,
+        setSelectedTags,
+        toggleTagFilter,
+        filterRating,
+        setFilterRating,
+        filterStatus,
+        setFilterStatus,
+        clearAllFilters,
+        allLibraryTags,
+        addTagToBook,
+        removeTagFromBook,
         filteredBooks,
         isLoading,
         loadDemoBooks,

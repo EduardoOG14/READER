@@ -113,6 +113,44 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
   const [loading, setLoading] = useState(true);
   const prevPageRef = useRef<number>(currentPage);
 
+  // Responsive spread tracking
+  const [windowDimensions, setWindowDimensions] = useState(() => ({
+    width: typeof window !== 'undefined' ? window.innerWidth : 800,
+    height: typeof window !== 'undefined' ? window.innerHeight : 600,
+  }));
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowDimensions({ width: window.innerWidth, height: window.innerHeight });
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isLandscapeOrTablet = windowDimensions.width > windowDimensions.height || windowDimensions.width >= 768;
+  const isDualPage = !isContinuousMode && (
+    settings.dualPageMode === 'always' ||
+    (settings.dualPageMode !== 'never' && isLandscapeOrTablet)
+  );
+
+  const [pageTransitionClass, setPageTransitionClass] = useState<string>('');
+
+  const triggerPageAnimation = (direction: 'left' | 'right') => {
+    if (settings.pageTransitionStyle === 'instant') return;
+
+    let animClass = '';
+    if (settings.pageTransitionStyle === 'curl') {
+      animClass = direction === 'right' ? 'animate-page-curl-right' : 'animate-page-curl-left';
+    } else if (settings.pageTransitionStyle === 'slide') {
+      animClass = direction === 'right' ? 'animate-page-slide-right' : 'animate-page-slide-left';
+    }
+
+    setPageTransitionClass(animClass);
+    setTimeout(() => {
+      setPageTransitionClass('');
+    }, 300);
+  };
+
   const extractCurrentText = () => {
     if (!onTextExtracted) return;
     try {
@@ -155,7 +193,7 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
     const rendition = book.renderTo(viewerRef.current, {
       width: '100%',
       height: '100%',
-      spread: 'none',
+      spread: isDualPage ? 'always' : 'none',
       flow: isContinuousMode ? 'scrolled-doc' : 'paginated',
       manager: isContinuousMode ? 'continuous' : 'default',
     });
@@ -179,6 +217,15 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
 
     rendition.on('rendered', () => {
       setTimeout(extractCurrentText, 150);
+    });
+
+    rendition.on('selected', (_cfiRange: string, contents: any) => {
+      try {
+        const text = contents.window?.getSelection?.()?.toString();
+        if (text && text.trim().length >= 2) {
+          window.dispatchEvent(new CustomEvent('reader-text-selected', { detail: { text: text.trim() } }));
+        }
+      } catch {}
     });
 
     const initialSavedPage = currentPage || 1;
@@ -218,9 +265,11 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
     rendition.on('click', (e: MouseEvent) => {
       const width = window.innerWidth;
       const clickX = e.clientX || 0;
-      if (clickX < width * 0.25) {
+      if (clickX < width * 0.28) {
+        triggerPageAnimation('left');
         rendition.prev();
-      } else if (clickX > width * 0.75) {
+      } else if (clickX > width * 0.72) {
+        triggerPageAnimation('right');
         rendition.next();
       } else {
         onToggleControls();
@@ -354,6 +403,18 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
     settings.readingThemePreset,
   ]);
 
+  // Dynamically update spread layout if orientation or dual-page mode changes
+  useEffect(() => {
+    if (renditionRef.current && !isContinuousMode) {
+      try {
+        renditionRef.current.spread(isDualPage ? 'always' : 'none');
+        renditionRef.current.resize();
+      } catch (e) {
+        console.warn('Could not update epub spread mode:', e);
+      }
+    }
+  }, [isDualPage, isContinuousMode]);
+
   // Outer container color based on preset
   let containerBg = '#f7f4ed';
   const preset = settings.readingThemePreset || (settings.theme === 'dark' ? 'emerald' : 'day');
@@ -375,9 +436,13 @@ export const EpubReader: React.FC<EpubReaderProps> = ({
       )}
       <div
         ref={viewerRef}
-        className="w-full h-full overflow-y-auto"
+        className={`w-full h-full overflow-y-auto ${pageTransitionClass}`}
         style={{ backgroundColor: containerBg }}
       />
+      {/* Central spine crease separator when dual page is active */}
+      {isDualPage && (
+        <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[1px] bg-slate-400/20 dark:bg-zinc-700/30 pointer-events-none shadow-xs" />
+      )}
     </div>
   );
 };
